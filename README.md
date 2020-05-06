@@ -19,6 +19,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Display product informations](#display-product-informations)
   - [Localization](#localization)
   - [Notifications](#notifications)
+- [Xcode Demo Project](#xcode-demo-project)
 - [License](#license)
 
 
@@ -242,6 +243,10 @@ The period is in English by default, but you can add the following keys in your 
 | iapReceiptValidationSuccessful | The the App Store receipt is validated.                      |                         |
 See an example of using notifications: [iapProductPurchased](#unlock-purchased-product-and-finish-transactions).
 
-## License
 
+## Xcode Demo Project
+Do not hesitate to consult the demo project available on GitHub: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).
+
+
+## License
 InAppPurchaseLib is open-sourced library licensed under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0). See [LICENSE](LICENSE) for details.
