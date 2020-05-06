@@ -241,6 +241,7 @@ The period is in English by default, but you can add the following keys in your 
 | iapRefreshReceiptFailed        | Failed to refresh the App Store receipt.                     | `Error`                 |
 | iapReceiptValidationFailed     | Failed to validate the App Store receipt with Fovea.Billing. | may contain the `Error` |
 | iapReceiptValidationSuccessful | The the App Store receipt is validated.                      |                         |
+
 See an example of using notifications: [iapProductPurchased](#unlock-purchased-product-and-finish-transactions).
 
 
