@@ -133,20 +133,21 @@ The `callback` method is called once the transaction is complete. You must unloc
 
 ### Identify the purchased content
 ``` swift
-// Checks if the user has already purchased.
+// Checks if the user has already purchased at least one product.
 InAppPurchase.shared.hasAlreadyPurchased()
 
-// Get the purchased date for the product or nil.
-InAppPurchase.shared.getPurchaseDate(for productId)
-
-// Get the expiry date for the product or nil.
-InAppPurchase.shared.getExipryDate(for productId)
-
-// Checks if the product is purchased / subscribed.
-InAppPurchase.shared.isPurchased(for productId)
+// Checks if the product is currently purchased or subscribed.
+InAppPurchase.shared.hasActivePurchase(for productId)
 
 // Checks if the user has an active subscription.
 InAppPurchase.shared.hasActiveSubscription()
+
+// Returns the purchased date for the product or nil.
+InAppPurchase.shared.getPurchaseDate(for productId)
+
+// Returns the expiry date for the product or nil.
+// The expiry date is only available if the subscription is not expired.
+InAppPurchase.shared.getExpiryDate(for productId)
 ```
 
 

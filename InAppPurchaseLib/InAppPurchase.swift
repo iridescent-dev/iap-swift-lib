@@ -82,34 +82,35 @@ class InAppPurchase: NSObject {
     
     
     /* MARK: - Receipt methods */
-    // Checks if the user has already purchased.
+    // Checks if the user has already purchased at least one product.
     func hasAlreadyPurchased() -> Bool{
         return receiptService.hasAlreadyPurchased()
     }
+
+    // Checks if the product is currently purchased or subscribed.
+    func hasActivePurchase(for productId: String) -> Bool{
+        return receiptService.hasActivePurchase(for: productId)
+    }
     
+    // Checks if the user has an active subscription.
+    func hasActiveSubscription() -> Bool{
+        for productId in (iapProducts.filter{ $0.isSubscription() }.map{ $0.identifier }) {
+            if receiptService.hasActivePurchase(for: productId){
+                return true
+            }
+        }
+        return false;
+    }
+
     // Returns the purchased date for the product or nil.
     func getPurchaseDate(for productId: String) -> Date?{
         return receiptService.getPurchaseDate(for: productId)
     }
     
     // Returns the expiry date for the product or nil.
-    func getExipryDate(for productId: String) -> Date?{
-        return receiptService.getExipryDate(for: productId)
-    }
-    
-    // Checks if the product is purchased / subscribed.
-    func isPurchased(for productId: String) -> Bool{
-        return receiptService.isPurchased(for: productId)
-    }
-    
-    // Checks if the user has an active subscription.
-    func hasActiveSubscription() -> Bool{
-        for productId in (iapProducts.filter{ $0.isSubscription() }.map{ $0.identifier }) {
-            if receiptService.isPurchased(for: productId){
-                return true
-            }
-        }
-        return false;
+    // The expiry date is only available if the subscription is not expired.
+    func getExpiryDate(for productId: String) -> Date?{
+        return receiptService.getExpiryDate(for: productId)
     }
 }
 

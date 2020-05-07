@@ -30,32 +30,32 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
         return UserDefaults.standard.bool(forKey: HAS_ALREADY_PURCHASED_KEY)
     }
     
-    // Returns the purchased date for the product or nil.
-    func getPurchaseDate(for productId: String) -> Date?{
-        return UserDefaults.standard.object(forKey: "\(productId)_purchaseDate") as? Date
-    }
-    
-    // Returns the expiry date for the product or nil.
-    func getExipryDate(for productId: String) -> Date?{
-        return UserDefaults.standard.object(forKey: "\(productId)_expiryDate") as? Date
-    }
-    
     // Checks if the product is purchased.
-    func isPurchased(for productId: String) -> Bool{
+    func hasActivePurchase(for productId: String) -> Bool{
         switch InAppPurchase.shared.getType(for: productId) {
         case .nonConsumable:
             let purchaseDate = getPurchaseDate(for: productId)
             return purchaseDate != nil
             
         case .subscription, .autoRenewableSubscription:
-            let expDate = getExipryDate(for: productId)
+            let expDate = getExpiryDate(for: productId)
             return expDate != nil && expDate! > Date()
             
         default:
             break
         }
-        
         return false
+    }
+    
+    // Returns the purchased date for the product or nil.
+    func getPurchaseDate(for productId: String) -> Date?{
+        return UserDefaults.standard.object(forKey: "\(productId)_purchaseDate") as? Date
+    }
+    
+    // Returns the expiry date for the product or nil.
+    // The expiry date is only available if the subscription is not expired.
+    func getExpiryDate(for productId: String) -> Date?{
+        return UserDefaults.standard.object(forKey: "\(productId)_expiryDate") as? Date
     }
     
     // Validate App Store receipt using Fovea.Billing validator.
