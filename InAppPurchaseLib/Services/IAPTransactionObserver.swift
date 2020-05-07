@@ -64,7 +64,7 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     
     /* MARK: - SKPayment Transaction Observer */
     // One or more transactions have been updated.
-    public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
             switch (transaction.transactionState) {
             case .purchased:
@@ -117,5 +117,14 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
                 self.callbackBlock = nil
             }
         }
+    }
+    
+    // All restorable transactions have been processed by the payment queue.
+    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+        // If the user has no transactions to restore,
+        // the payment queue will not have received any transactions
+        // and the callback method has not been called.
+        self.callbackBlock?()
+        self.callbackBlock = nil
     }
 }
