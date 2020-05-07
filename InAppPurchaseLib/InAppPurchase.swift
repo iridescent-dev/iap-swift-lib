@@ -46,6 +46,14 @@ class InAppPurchase: NSObject {
         transactionObserver.stop()
     }
     
+    // Refresh App Store Products and Receipt.
+    func refresh(){
+        // Refresh Products from the App Store.
+        productService.loadProducts()
+        // Refresh and validate the App Store Receipt.
+        receiptService.validateReceipt()
+    }
+    
     
     /* MARK: - Product methods */
     // Returns all products retrieved from the App Store.
