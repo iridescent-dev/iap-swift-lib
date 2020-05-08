@@ -8,17 +8,20 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 - [Getting Started](#getting-started)
   - [Requirements](#requirements)
   - [Installation](#installation)
-  - [Initialization](#initialization)
 - [Usage](#usage)
+  - [Initialization](#initialization)
   - [Purchase a product](#purchase-a-product)
-    - [Init purchase transaction](#create-an-order)
-    - [Unlock purchased product and finish transactions](#processing-purchases)
-  - [Restore purchased products](#restore-purchased-products)
-  - [Identify the purchased content](#identify-the-purchased-content)
-  - [Get and refresh the products list](#get-and-refresh-the-products-list)
-  - [Display product informations](#display-product-informations)
+    - [Create an order](#create-an-order)
+    - [Processing purchases](#processing-purchases)
+      - [Simple case](#simple-case)
+      - [Advanced usage](#advanced-usage)
+  - [Restore purchases](#restore-purchases)
+  - [Purchased products](#purchased-products)
+  - [Products list](#products-list)
+  - [Display products information](#display-products-information)
   - [Localization](#localization)
   - [Notifications](#notifications)
+  - [Purchases information](#purchases-information)
 - [Xcode Demo Project](#xcode-demo-project)
 - [License](#license)
 
@@ -29,7 +32,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 * [x] Restore purchased products
 * [x] Verify transactions with the App Store on Fovea.Billing server
 * [x] Handle and notify payment transaction states
-* [x] Retreive products informations from the App Store
+* [x] Retreive products information from the App Store
 * [x] Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
 * [x] Status of purchases available when offline
 
@@ -43,6 +46,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   * Set your bundle ID
   * The iOS Shared Secret (or shared key) is to be retrieved from [AppStoreConnect](https://appstoreconnect.apple.com/)
   * The iOS Subscription Status URL (only if you want subscriptions)
+
 See our [blog post](https://iridescent.dev/posts/swift/in-app-purchases-ios) (in French) for more information.
 
 ### Installation
@@ -92,6 +96,7 @@ func applicationWillTerminate(_ application: UIApplication) {
 
 ### Purchase a product
 #### Create an order
+
 ``` swift
 InAppPurchase.shared.purchase(
     product: product, // XXX - Would be simpler to just send the product ID
@@ -105,6 +110,7 @@ The `callback` method is called when the purchase has been processed.
 From this callback, you can for example unlock the UI by hiding your loading indicator.
 
 #### Processing purchases
+
 When a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction.
 
 To achieve this, register an observer for `iapProductPurchased` notifications:
@@ -129,7 +135,7 @@ Then define your handler:
 
 ##### Simple case
 
-The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.shared.hasActivePurchase(for productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
+The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.shared.hasActivePurchase(for: productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
 
 ##### Advanced usage
 
@@ -158,9 +164,9 @@ The `callback` method is called once the operation is complete. You can unlock t
 ### Purchased products
 As mentioned earlier, the library provides access to the state of your purchases.
 
-Use `hasActivePurchase(productId)` to checks if the the user currently own (or is subscribed to) a given product.
+Use `hasActivePurchase(for: productId)` to checks if the the user currently own (or is subscribed to) a given product.
 ``` swift
-InAppPurchase.shared.hasActivePurchase(for productId)
+InAppPurchase.shared.hasActivePurchase(for: productId)
 ```
 
 ### Products list
@@ -296,12 +302,12 @@ InAppPurchase.shared.hasActiveSubscription()
 
 `getPurchaseDate(productId)` returns the latest purchased date for a given product (or nil)
 ``` swift
-InAppPurchase.shared.getPurchaseDate(for productId)
+InAppPurchase.shared.getPurchaseDate(for: productId)
 ```
 
 `getExpiryDate(productId)` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
 ``` swift
-InAppPurchase.shared.getExpiryDate(for productId)
+InAppPurchase.shared.getExpiryDate(for: productId)
 ```
 
 
@@ -310,6 +316,4 @@ Do not hesitate to check the demo project available on here: [iap-swift-demo](ht
 
 
 ## License
-InAppPurchaseLib is open-sourced library licensed under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0). See [LICENSE](LICENSE) for details.
-
-**XXX: GPL-3.0 is probably not appropriate. It means everyone that includes this code in their app have to release it with GPl-3.0 as well. MIT might be a better choice.**
+InAppPurchaseLib is open-sourced library licensed under the MIT License. See [LICENSE](LICENSE) for details.
