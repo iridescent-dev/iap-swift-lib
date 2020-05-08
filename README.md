@@ -56,38 +56,39 @@ See our [blog post](https://iridescent.dev/posts/swift/in-app-purchases-ios) (in
 
 ### Initialization
 
-The library must be initialized as soon as possible in order to process pending transactions.
-The best way is to call the `start` method when the application did finish launching.
+The library must be initialized as soon as possible in order to process pending transactions. A good way is to call the `start()` method when the application did finish launching.
 
-* Add the following lines to your `AppDelegate.swift` file:
+`InAppPurchase.shared.start()` accepts the following arguments:
+* `iapProducts` - An array of **IAPProduct** (REQUIRED)
+* `validatorUrlString` - The validator url retrieved from Fovea.Billing (REQUIRED)
+* `applicationUsername` - The user name, if your app implements user login (optional)
+
+Each **IAPProduct** contains the following fields:
+* `identifier` - The product unique identifier 
+* `type` - The product type (`.consumable`, `.nonConsumable`, `.subscription` or `.autoRenewableSubscription`)
+
+**Example**
+
+Add the following lines to your `AppDelegate.swift` file:
 
 ``` swift
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {   
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    InAppPurchase.shared.start(
-      iapProducts: [
-        IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
-        IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription)
-      ],
-      validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=iapdemo&apiKey=12345678-1234-1234-1234-12345678")
-    return true
-  }
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  InAppPurchase.shared.start(
+    iapProducts: [
+      IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
+      IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription)
+    ],
+    validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=iapdemo&apiKey=12345678-1234-1234-1234-12345678")
+  return true
 }
 ```
 
 You should also call the `stop` method when the application will terminate, for proper cleanup.
 ``` swift
- func applicationWillTerminate(_ application: UIApplication) {
-    InAppPurchase.shared.stop()
- }
+func applicationWillTerminate(_ application: UIApplication) {
+  InAppPurchase.shared.stop()
+}
 ```
-
-Product types:
-* `consumable`
-* `nonConsumable`
-* `subscription`
-* `autoRenewableSubscription`
 
 ### Purchase a product
 #### Create an order
