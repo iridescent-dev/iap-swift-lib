@@ -31,7 +31,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 * [x] Handle and notify payment transaction states
 * [x] Retreive products informations from the App Store
 * [x] Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
-
+* [x] Status of purchases available when offline
 
 ## Getting Started
 
@@ -39,53 +39,46 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 * Configure your App and Xcode to support In-App Purchases.
   * [In-App Purchase Overview](https://developer.apple.com/in-app-purchase)
   * [StoreKit Documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
-* Create and configure your [Fovea.Billing](https://billing.fovea.cc) project account.
-  
+* Create and configure your [Fovea.Billing](https://billing.fovea.cc) project account:
+  * Set your bundle ID
+  * The iOS Shared Secret (or shared key) is to be retrieved from [AppStoreConnect](https://appstoreconnect.apple.com/)
+  * The iOS Subscription Status URL (only if you want subscriptions)
 See our [blog post](https://iridescent.dev/posts/swift/in-app-purchases-ios) (in French) for more information.
 
 ### Installation
-* Add this library by dragging the `InAppPurchaseLib` folder to your project tree. When asked, set options as follows:
+* [Download](https://github.com/iridescent-dev/iap-swift-lib/archive/master.zip) and extract.
+* Drag the `InAppPurchaseLib` folder to your project tree in XCode. When asked, set options as follows:
   * Select *Copy items if needed*.
   * Select *Create groups*.
   * Make sure your project is selected in *add to target*.
 
 ### Initialization
 
-Services must be started as soon as possible in order to be able to process pending transactions.
-The best way is to call the `start` method when the application did finish launching and call the `stop` method when the application will terminate.
+The library must be initialized as soon as possible in order to process pending transactions.
+The best way is to call the `start` method when the application did finish launching.
+You should also call the `stop` method when the application will terminate, for proper cleanup.
 
-* Open your `AppDelegate.swift` file to add the following lines with your product information (identifier and type) and your Fovea.Billing validation URL:
+* Add the following lines to your `AppDelegate.swift` file:
 
 ``` swift
-import UIKit
-
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-  public static let monthlyPlan = IAPProduct(identifier: "com.iridescent.iapdemo.monthly_plan", type: .autoRenewableSubscription)
-  public static let yearlyPlan = IAPProduct(identifier: "com.iridescent.iapdemo.yearly_plan", type: .autoRenewableSubscription)
-    
-  private let iapProducts: Array<IAPProduct> = [ AppDelegate.monthlyPlan, AppDelegate.yearlyPlan ]
-  private let validatorUrlString: String = "https://validator.fovea.cc/v1/validate?appName=com.iridescent.iapdemo&apiKey=5074ade8-4950-4aed-a440-17d3c17b880e"
-    
+class AppDelegate: UIResponder, UIApplicationDelegate {   
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Start In App Purchase services
-    InAppPurchase.shared.start(iapProducts: iapProducts, validatorUrlString: validatorUrlString)
-    
+    InAppPurchase.shared.start(
+      iapProducts: [
+        IAPProduct(identifier: "com.iridescent.iapdemo.monthly_plan", type: .autoRenewableSubscription),
+        IAPProduct(identifier: "com.iridescent.iapdemo.yearly_plan", type: .autoRenewableSubscription)
+      ],
+      validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=iapdemo&apiKey=12345678-1234-1234-1234-12345678")
     return true
-    }
+  }
     
   func applicationWillTerminate(_ application: UIApplication) {
-    // Stop In App Purchase services
     InAppPurchase.shared.stop()
   }
 }
 ```
-
-You can provide the `applicationUsername` as a parameter of the `start` method, or later with the following line:
-``` swift
-InAppPurchase.shared.applicationUsername = applicationUsername
-```
-
 
 ## Usage
 
@@ -244,6 +237,15 @@ The period is in English by default, but you can add the following keys in your 
 | iapReceiptValidationSuccessful | The App Store receipt is validated.                          |                         |
 
 See an example of using notifications: [iapProductPurchased](#unlock-purchased-product-and-finish-transactions).
+
+### Application Username
+
+You can provide the `applicationUsername` as a parameter of the `start` method, or later with the following line:
+``` swift
+InAppPurchase.shared.applicationUsername = applicationUsername
+```
+
+https://developer.apple.com/documentation/storekit/skmutablepayment/1506088-applicationusername?language=objc
 
 
 ## Xcode Demo Project
