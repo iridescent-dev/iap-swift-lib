@@ -67,8 +67,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Start In App Purchase services
     InAppPurchase.shared.start(
       iapProducts: [
-        IAPProduct(identifier: "com.iridescent.iapdemo.monthly_plan", type: .autoRenewableSubscription),
-        IAPProduct(identifier: "com.iridescent.iapdemo.yearly_plan", type: .autoRenewableSubscription)
+        IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
+        IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription)
       ],
       validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=iapdemo&apiKey=12345678-1234-1234-1234-12345678")
     return true
@@ -86,27 +86,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 #### Init purchase transaction
 ``` swift
 InAppPurchase.shared.purchase(
-    product: product,
+    product: product, // XXX - Would be simpler to just send the product ID
     callback: { self.loaderView.hide() }
 )
 ```
-The `callback` method is called once the transaction is complete. You must unlock the UI, by hiding your loader for example.
+The `callback` method is called when the purchase has been processed.
 
-#### Unlock purchased product and finish transactions
-First, you need to register an observer for `iapProductPurchased` notifications:
+**Important**: This callback is not meant to unlock the feature. **purchase processed ≠ purchase successful**
+
+From this callback, you can for example unlock the UI by hiding your loading indicator.
+
+#### Processing purchases
+When a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction.
+
+To achieve this, register an observer for `iapProductPurchased` notifications:
 ``` swift
 NotificationCenter.default.addObserver(self, selector: #selector(productPurchased(_:)), name: .iapProductPurchased, object: nil)
 ```
 
-Then you have to define the function you want to call when a notification is observed:
+Then define the function your handler function:
 ``` swift
 @objc func productPurchased(_ notification: Notification){
   // Get the product from the notification object.
   let product = notification.object as? SKProduct
 
   if product != nil {
-    // Unlock product related content.
-    ...
+    // Unlock product content here...
 
     // Finish the product transactions.
     InAppPurchase.shared.finishTransactions(for: product!.productIdentifier)
@@ -114,35 +119,59 @@ Then you have to define the function you want to call when a notification is obs
 }
 ```
 
+##### Simple case
+
+The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.shared.hasActivePurchase(for productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
+
+##### Advanced usage
+
+In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [webhook on Fovea](https://billing.fovea.cc/documentation/webhook/). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
+
+The information sent from Fovea has been verified from Apple's server, which makes it way more trustable than information sent from your app itself.
+
+To take advantage of this, you have to inform the library of your application username. It can be provided as a parameter of the `start` method (`applicationUsername`) and updated later by changing the following property:
+``` swift
+InAppPurchase.shared.applicationUsername = applicationUsername
+```
 
 ### Restore purchased products
+Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users.
+
+This is the method to call from this button.
 ``` swift
 InAppPurchase.shared.restorePurchases(callback: {
     self.loaderView.hide()
 })
 ```
-The `callback` method is called once the transaction is complete. You must unlock the UI, by hiding your loader for example.
+The `callback` method is called once the operation is complete. You can unlock the UI, by hiding your loader for example.
 
+### Purchased products
+As mentioned earlier, the library provides access to the state of your purchases.
 
-### Identify the purchased content
+Use `hasActivePurchase(productId)` to checks if the the user currently own (or is subscribed to) a given product.
 ``` swift
-// Checks if the user has already purchased at least one product.
-InAppPurchase.shared.hasAlreadyPurchased()
-
-// Checks if the product is currently purchased or subscribed.
 InAppPurchase.shared.hasActivePurchase(for productId)
-
-// Checks if the user has an active subscription.
-InAppPurchase.shared.hasActiveSubscription()
-
-// Returns the purchased date for the product or nil.
-InAppPurchase.shared.getPurchaseDate(for productId)
-
-// Returns the expiry date for the product or nil.
-// The expiry date is only available if the subscription is not expired.
-InAppPurchase.shared.getExpiryDate(for productId)
 ```
 
+`hasAlreadyPurchased()` is a handy method that checks if the user has already purchased at least one product.
+``` swift
+InAppPurchase.shared.hasAlreadyPurchased()
+```
+
+`hasActiveSubscription()` checks if the user has an active subscription.
+``` swift
+InAppPurchase.shared.hasActiveSubscription()
+```
+
+`getPurchaseDate(productId)` returns the latest purchased date for a given product (or nil)
+``` swift
+InAppPurchase.shared.getPurchaseDate(for productId)
+```
+
+`getExpiryDate(productId)` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
+``` swift
+InAppPurchase.shared.getExpiryDate(for productId)
+```
 
 ### Get and refresh the products list
 ``` swift
@@ -237,15 +266,6 @@ The period is in English by default, but you can add the following keys in your 
 | iapReceiptValidationSuccessful | The App Store receipt is validated.                          |                         |
 
 See an example of using notifications: [iapProductPurchased](#unlock-purchased-product-and-finish-transactions).
-
-### Application Username
-
-You can provide the `applicationUsername` as a parameter of the `start` method, or later with the following line:
-``` swift
-InAppPurchase.shared.applicationUsername = applicationUsername
-```
-
-https://developer.apple.com/documentation/storekit/skmutablepayment/1506088-applicationusername?language=objc
 
 
 ## Xcode Demo Project
