@@ -52,11 +52,12 @@ See our [blog post](https://iridescent.dev/posts/swift/in-app-purchases-ios) (in
   * Select *Create groups*.
   * Make sure your project is selected in *add to target*.
 
+## Usage
+
 ### Initialization
 
 The library must be initialized as soon as possible in order to process pending transactions.
 The best way is to call the `start` method when the application did finish launching.
-You should also call the `stop` method when the application will terminate, for proper cleanup.
 
 * Add the following lines to your `AppDelegate.swift` file:
 
@@ -64,7 +65,6 @@ You should also call the `stop` method when the application will terminate, for 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {   
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Start In App Purchase services
     InAppPurchase.shared.start(
       iapProducts: [
         IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
@@ -73,14 +73,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=iapdemo&apiKey=12345678-1234-1234-1234-12345678")
     return true
   }
-    
-  func applicationWillTerminate(_ application: UIApplication) {
-    InAppPurchase.shared.stop()
-  }
 }
 ```
 
-## Usage
+You should also call the `stop` method when the application will terminate, for proper cleanup.
+``` swift
+ func applicationWillTerminate(_ application: UIApplication) {
+    InAppPurchase.shared.stop()
+ }
+```
+
+Product types:
+* `consumable`
+* `nonConsumable`
+* `subscription`
+* `autoRenewableSubscription`
 
 ### Purchase a product
 #### Create an order
