@@ -64,7 +64,7 @@ The library must be initialized as soon as possible in order to process pending 
 
 `InAppPurchase.shared.start()` accepts the following arguments:
 * `iapProducts` - An array of **IAPProduct** (REQUIRED)
-* `validatorUrlString` - The validator url retrieved from Fovea.Billing (REQUIRED)
+* `validatorUrlString` - The validator url retrieved from [Fovea](https://billing.fovea.cc) (REQUIRED)
 * `applicationUsername` - The user name, if your app implements user login (optional)
 
 Each **IAPProduct** contains the following fields:
@@ -275,15 +275,15 @@ The period is in English by default. You can add the following keys in your loca
 ### Notifications
 This is the list of notifications published to the by the library to the default NotificationCenter, for different events.
 
-| name                             | description                                                  | notification.object   |
-| -------------------------------- | ------------------------------------------------------------ | ----------------------- |
-| `iapProductsLoaded`              | Products are loaded from the App Store.                      |                         |
-| `iapTransactionFailed`           | The transaction failed.                                      | `SKPaymentTransaction`  |
-| `iapTransactionDeferred`         | The transaction is deferred.                                 | `SKPaymentTransaction`  |
-| `iapProductPurchased`            | The product is purchased.                                    | `SKProduct`             |
-| `iapRefreshReceiptFailed`        | Failed to refresh the App Store receipt.                     | `Error`                 |
-| `iapReceiptValidationFailed`     | Failed to validate the App Store receipt with Fovea.Billing. | may contain the `Error` |
-| `iapReceiptValidationSuccessful` | The App Store receipt is validated.                          |                         |
+| name                             | description                                          | notification.object   |
+| -------------------------------- | ---------------------------------------------------- | ----------------------- |
+| `iapProductsLoaded`              | Products are loaded from the App Store.              |                         |
+| `iapTransactionFailed`           | The transaction failed.                              | `SKPaymentTransaction`  |
+| `iapTransactionDeferred`         | The transaction is deferred.                         | `SKPaymentTransaction`  |
+| `iapProductPurchased`            | The product is purchased.                            | `SKProduct`             |
+| `iapRefreshReceiptFailed`        | Failed to refresh the App Store receipt.             | `Error`                 |
+| `iapReceiptValidationFailed`     | Failed to validate the App Store receipt with Fovea. | may contain the `Error` |
+| `iapReceiptValidationSuccessful` | The App Store receipt is validated.                  |                         |
 
 For an example of using notifications, check [iapProductPurchased](#processing-purchases).
 
