@@ -121,7 +121,7 @@ From this callback, you can for example unlock the UI by hiding your loading ind
 
 When a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction.
 
-To achieve this, register an observer for `iapProductPurchased` notifications:
+To achieve this, register an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) for `iapProductPurchased` notifications:
 ``` swift
 NotificationCenter.default.addObserver(self, selector: #selector(productPurchased(_:)), name: .iapProductPurchased, object: nil)
 ```
@@ -202,7 +202,7 @@ class ProductsViewController: UIViewController {
 ```
 
 ### Display products information
-All available products are listed in the `InAppPurchase.shared.getProducts()` array of [SKProduct](https://developer.apple.com/documentation/storekit/skproduct).
+All available products are listed in the `InAppPurchase.getProducts()` array of [SKProduct](https://developer.apple.com/documentation/storekit/skproduct).
 
 Those are the most important attributes.
 
@@ -284,18 +284,18 @@ This is the list of notifications published to the by the library to the default
 | name                             | description                                          | notification.object   |
 | -------------------------------- | ---------------------------------------------------- | ----------------------- |
 | `iapProductsLoaded`              | Products are loaded from the App Store.              |                         |
-| `iapTransactionFailed`           | The transaction failed. See [SKError.Code](https://developer.apple.com/documentation/storekit/skerror/code).                        | `SKPaymentTransaction`  |
-| `iapTransactionDeferred`         | The transaction is deferred.                         | `SKPaymentTransaction`  |
-| `iapProductPurchased`            | The product is purchased.                            | `SKProduct`             |
-| `iapRefreshReceiptFailed`        | Failed to refresh the App Store receipt.             | `Error`                 |
-| `iapReceiptValidationFailed`     | Failed to validate the App Store receipt with Fovea. | may contain the `Error` |
+| `iapTransactionFailed`           | The transaction failed. See [`SKError.Code`](https://developer.apple.com/documentation/storekit/skerror/code).                        | [`SKPaymentTransaction`](https://developer.apple.com/documentation/storekit/skpaymenttransaction)  |
+| `iapTransactionDeferred`         | The transaction is deferred.                         | [`SKPaymentTransaction`](https://developer.apple.com/documentation/storekit/skpaymenttransaction)  |
+| `iapProductPurchased`            | The product is purchased.                            | [`SKProduct`](https://developer.apple.com/documentation/storekit/skproduct)             |
+| `iapRefreshReceiptFailed`        | Failed to refresh the App Store receipt.             | [`Error`](https://developer.apple.com/documentation/swift/error)                 |
+| `iapReceiptValidationFailed`     | Failed to validate the App Store receipt with Fovea. | may contain the [`Error`](https://developer.apple.com/documentation/swift/error) |
 | `iapReceiptValidationSuccessful` | The App Store receipt is validated.                  |                         |
 
 See an example of using [iapProductPurchased](#processing-purchases) notifications.
 
 **Example**
 
-Register an observer for `iapTransactionFailed` notifications:
+Register an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) for `iapTransactionFailed` notifications:
 ``` swift
 NotificationCenter.default.addObserver(self, selector: #selector(transactionFailed(_:)), name: .iapTransactionFailed, object: nil)
 ```
