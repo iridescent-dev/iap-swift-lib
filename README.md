@@ -284,7 +284,7 @@ This is the list of notifications published to the by the library to the default
 | name                             | description                                          | notification.object   |
 | -------------------------------- | ---------------------------------------------------- | ----------------------- |
 | `iapProductsLoaded`              | Products are loaded from the App Store.              |                         |
-| `iapTransactionFailed`           | The transaction failed.                              | `SKPaymentTransaction`  |
+| `iapTransactionFailed`           | The transaction failed. See [SKError.Code](https://developer.apple.com/documentation/storekit/skerror/code).                        | `SKPaymentTransaction`  |
 | `iapTransactionDeferred`         | The transaction is deferred.                         | `SKPaymentTransaction`  |
 | `iapProductPurchased`            | The product is purchased.                            | `SKProduct`             |
 | `iapRefreshReceiptFailed`        | Failed to refresh the App Store receipt.             | `Error`                 |
