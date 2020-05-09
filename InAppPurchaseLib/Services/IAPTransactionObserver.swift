@@ -13,15 +13,26 @@ internal typealias CallbackBlock = () -> Void
 
 class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     
+    /* MARK: - Shared instance Adopting the Singleton pattern */
+    // - Instance of the class initialized as a static property.
+    @objc static let shared = IAPTransactionObserver()
+    // - Keep the initializer private so no more instances of the class can be created anywhere in the app.
+    private override init() {}
+
+    
     /* MARK: - Properties */
     private var callbackBlock: CallbackBlock?
     private var pendingTransactions: Dictionary<String, Array<SKPaymentTransaction>> = [:]
-    
+    private var started: Bool = false
+
     
     /* MARK: - Main methods */
     // Attach an observer to the payment queue.
     @objc func start(){
-        SKPaymentQueue.default().add(self)
+        if !started {
+            SKPaymentQueue.default().add(self)
+            started = true
+        }
     }
     
     // Remove the observer.
@@ -29,13 +40,20 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
         SKPaymentQueue.default().remove(self)
     }
     
+    // Checks if the user is allowed to authorize payments.
+    func canMakePayments() -> Bool {
+        return SKPaymentQueue.canMakePayments()
+    }
+    
     // Request a Payment from the App Store.
-    func purchase(product: SKProduct, quantity: Int, applicationUsername: String?, callback: @escaping CallbackBlock){
-        guard SKPaymentQueue.canMakePayments() else {
-            return
+    func purchase(product: SKProduct, quantity: Int, applicationUsername: String?, callback: @escaping CallbackBlock) throws {
+        guard canMakePayments() else {
+            callback()
+            throw IAPError.userIsNotAllowedToAuthorizePayments
         }
         guard SKPaymentQueue.default().transactions.last?.transactionState != .purchasing else {
-            return
+            callback()
+            throw IAPError.purchaseAlreadyInProgress
         }
         
         let payment = SKMutablePayment(product: product)
@@ -69,9 +87,9 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
             switch (transaction.transactionState) {
             case .purchased:
                 // The content will be unlocked after validation of the receipt.
-                InAppPurchase.shared.receiptService.validateReceipt()
+                InAppPurchase.refreshReceipt()
                 
-                if InAppPurchase.shared.getType(for: transaction.payment.productIdentifier) != IAPProductType.consumable {
+                if InAppPurchase.getType(for: transaction.payment.productIdentifier) != IAPProductType.consumable {
                     // For non-consumable and subscription transactions, we can finish
                     // the transaction now as they will always be present in the receipt.
                     SKPaymentQueue.default().finishTransaction(transaction)
@@ -87,7 +105,7 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
                 
             case .restored:
                 // Validate the restored purchases.
-                InAppPurchase.shared.receiptService.validateReceipt()
+                InAppPurchase.refreshReceipt()
                 SKPaymentQueue.default().finishTransaction(transaction)
                 break
                 

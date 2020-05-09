@@ -47,8 +47,6 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   * The iOS Shared Secret (or shared key) is to be retrieved from [AppStoreConnect](https://appstoreconnect.apple.com/)
   * The iOS Subscription Status URL (only if you want subscriptions)
 
-See our [blog post](https://iridescent.dev/posts/swift/in-app-purchases-ios) (in French) for more information.
-
 ### Installation
 * [Download](https://github.com/iridescent-dev/iap-swift-lib/archive/master.zip) and extract.
 * Drag the `InAppPurchaseLib` folder to your project tree in XCode. When asked, set options as follows:
@@ -62,7 +60,7 @@ See our [blog post](https://iridescent.dev/posts/swift/in-app-purchases-ios) (in
 
 The library must be initialized as soon as possible in order to process pending transactions. A good way is to call the `start()` method when the application did finish launching.
 
-`InAppPurchase.shared.start()` accepts the following arguments:
+`InAppPurchase.initialize()` accepts the following arguments:
 * `iapProducts` - An array of **IAPProduct** (REQUIRED)
 * `validatorUrlString` - The validator url retrieved from [Fovea](https://billing.fovea.cc) (REQUIRED)
 * `applicationUsername` - The user name, if your app implements user login (optional)
@@ -77,7 +75,7 @@ Add the following lines to your `AppDelegate.swift` file:
 
 ``` swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-  InAppPurchase.shared.start(
+  InAppPurchase.initialize(
     iapProducts: [
       IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
       IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription)
@@ -90,7 +88,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 You should also call the `stop` method when the application will terminate, for proper cleanup.
 ``` swift
 func applicationWillTerminate(_ application: UIApplication) {
-  InAppPurchase.shared.stop()
+  InAppPurchase.stop()
 }
 ```
 
@@ -98,10 +96,20 @@ func applicationWillTerminate(_ application: UIApplication) {
 #### Create an order
 
 ``` swift
-InAppPurchase.shared.purchase(
-    product: product,
-    callback: { self.loaderView.hide() }
-)
+do {
+    try InAppPurchase.purchase(
+        productId: productIdentifier,
+        callback: { self.loaderView.hide() }
+    )
+} catch IAPError.productNotFound {
+    print("IAPError: the product was not found on the App Store and cannot be purchased.")
+} catch IAPError.purchaseAlreadyInProgress {
+    print("IAPError: a purchase is already in progress.")
+} catch IAPError.userIsNotAllowedToAuthorizePayments {
+    print("IAPError: The user is allowed to authorize payments.")
+} catch {
+    print("An error occurred: \(error)")
+}
 ```
 The `callback` method is called when the purchase has been processed.
 
@@ -129,13 +137,13 @@ Then define your handler:
   // Unlock product related content.
 
   // Finish the product transactions.
-  InAppPurchase.shared.finishTransactions(for: product.productIdentifier)
+  InAppPurchase.finishTransactions(for: product.productIdentifier)
 }
 ```
 
 ##### Simple case
 
-The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.shared.hasActivePurchase(for: productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
+The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.hasActivePurchase(for: productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
 
 ##### Advanced usage
 
@@ -145,7 +153,7 @@ The information sent from Fovea has been verified from Apple's server, which mak
 
 To take advantage of this, you have to inform the library of your application username. It can be provided as a parameter of the `start` method (`applicationUsername`) and updated later by changing the following property:
 ``` swift
-InAppPurchase.shared.applicationUsername = applicationUsername
+InAppPurchase.applicationUsername = applicationUsername
 ```
 
 In this case, you might want to delay calls to `start()` to when your user's session is ready.
@@ -155,7 +163,7 @@ Except if you only sell consumable products, Apple requires that you provide a "
 
 This is the method to call from this button.
 ``` swift
-InAppPurchase.shared.restorePurchases(callback: {
+InAppPurchase.restorePurchases(callback: {
     self.loaderView.hide()
 })
 ```
@@ -164,9 +172,9 @@ The `callback` method is called once the operation is complete. You can unlock t
 ### Purchased products
 As mentioned earlier, the library provides access to the state of your purchases.
 
-Use `hasActivePurchase(for: productId)` to checks if the the user currently own (or is subscribed to) a given product.
+Use `hasActivePurchase(for: productId)` to checks if the user currently own (or is subscribed to) a given product.
 ``` swift
-InAppPurchase.shared.hasActivePurchase(for: productId)
+InAppPurchase.hasActivePurchase(for: productId)
 ```
 
 ### Products list
@@ -180,14 +188,14 @@ class ProductsViewController: UIViewController {
     super.viewDidLoad()
     
     // Load products list.
-    self.products = InAppPurchase.shared.getProducts()
+    self.products = InAppPurchase.getProducts()
     
     // Update products list after retreiving information from the App Store.
     NotificationCenter.default.addObserver(self, selector: #selector(productsRefreshed), name: .iapProductsLoaded, object: nil)
   }
   
   @objc func productsRefreshed() {
-    self.products = InAppPurchase.shared.getProducts()
+    self.products = InAppPurchase.getProducts()
   }
   ...
 }
@@ -208,13 +216,13 @@ The library also extends SKProduct with utility methods.
 
 For subscription products:
 
- - `func isSubscription() -> Bool` - The product is a subscription
+ - `func isSubscription() -> Bool` - The product is a subscription.
  - `func isAutoRenewableSubscription() -> Bool` - The product is an auto-renewable subscription.
- - `func hasIntroductoryPriceAvailable() -> Bool` - The product has an introductory price the user is eligible to.
+ - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
  - `func getLocalizedCurrentPeriod() -> String?` - The current period of the subscription.
  - `func getLocalizedInitialPrice() -> String?` -  The initial cost of the subscription in the local currency.
  - `func getLocalizedInitialPeriod() -> String?` - The initial period of the subscription.
- - `func getLocalizedIntroductoryPricePeriod() -> String?`
+ - `func getLocalizedIntroductoryPricePeriod() -> String?` - The period of the introductory price.
 
 **Example**
 
@@ -236,7 +244,7 @@ if (product.isSubscription()) {
   let period = product.getLocalizedCurrentPeriod()
   priceText = priceText.replacingOccurrences(of: "[period]", with: "\(period ?? "")")
   
-  if product.hasIntroductoryPriceAvailable() {
+  if product.hasIntroductoryPriceEligible() {
     priceText = "\(priceText) for [promo_period] (then [initial_price] / [initial_period])"
     
     let promoPeriod = product.getLocalizedIntroductoryPricePeriod()
@@ -283,31 +291,65 @@ This is the list of notifications published to the by the library to the default
 | `iapReceiptValidationFailed`     | Failed to validate the App Store receipt with Fovea. | may contain the `Error` |
 | `iapReceiptValidationSuccessful` | The App Store receipt is validated.                  |                         |
 
-For an example of using notifications, check [iapProductPurchased](#processing-purchases).
+See an example of using [iapProductPurchased](#processing-purchases) notifications.
+
+**Example**
+
+Register an observer for `iapTransactionFailed` notifications:
+``` swift
+NotificationCenter.default.addObserver(self, selector: #selector(transactionFailed(_:)), name: .iapTransactionFailed, object: nil)
+```
+
+Define your handler:
+``` swift
+@objc func transactionFailed(_ notification: Notification){
+    guard let transaction = notification.object as? SKPaymentTransaction else {
+        return
+    }
+
+    // The error property is defined when transactionState is failed.
+    // You can read the error property to determine why the transaction failed.
+    // For a list of error constants, see https://developer.apple.com/documentation/storekit/skerror/code
+    let errorCode = (transaction.error as? SKError)?.code
+    switch errorCode {
+    case .paymentCancelled:
+        print("transactionFailed: The user canceled the payment request.")
+        break
+    default:
+        print("transactionFailed: \(errorCode!.rawValue).")
+        break
+    }
+}
+```
+
 
 ### Purchases information
 For convenience, the library provides some utility functions to check for your past purchases data (date, expiry date) and agregate information (has active subscription, ...).
 
-`hasAlreadyPurchased()` is a handy method that checks if the user has already purchased at least one product.
+`hasAlreadyPurchased() -> Bool` is a handy method that checks if the user has already purchased at least one product.
 ``` swift
-InAppPurchase.shared.hasAlreadyPurchased()
+InAppPurchase.hasAlreadyPurchased()
 ```
 
-`hasActiveSubscription()` checks if the user has an active subscription.
+`hasActiveSubscription() -> Bool` checks if the user has an active subscription.
 ``` swift
-InAppPurchase.shared.hasActiveSubscription()
+InAppPurchase.hasActiveSubscription()
 ```
 
-`getPurchaseDate(productId)` returns the latest purchased date for a given product (or nil)
+`getPurchaseDate(for: productId) -> Date?` returns the latest purchased date for a given product.
 ``` swift
-InAppPurchase.shared.getPurchaseDate(for: productId)
+InAppPurchase.getPurchaseDate(for: productId)
 ```
 
-`getExpiryDate(productId)` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
+`getExpiryDate(for: productId) -> Date?` returns the expiry date for a subcription. May be past or future.
 ``` swift
-InAppPurchase.shared.getExpiryDate(for: productId)
+InAppPurchase.getExpiryDate(for: productId)
 ```
 
+`getNextExpiryDate(for: productId) -> Date?` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
+``` swift
+InAppPurchase.getNextExpiryDate(for: productId)
+```
 
 ## Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).

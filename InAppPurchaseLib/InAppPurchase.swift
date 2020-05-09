@@ -12,96 +12,107 @@ import StoreKit
 
 class InAppPurchase: NSObject {
     // InAppPurchaseLib version number
-    internal static let versionNumber = "1.0.0"
-    
-    
-    /* MARK: - Shared instance Adopting the Singleton pattern */
-    // - Instance of the class initialized as a static property.
-    @objc static let shared = InAppPurchase()
-    // - Keep the initializer private so no more instances of the class can be created anywhere in the app.
-    private override init() {}
+    internal static let versionNumber = "1.0.1"
     
     
     /* MARK: - Properties */
-    internal let transactionObserver = IAPTransactionObserver()
-    internal let productService = IAPProductService()
-    internal let receiptService = IAPReceiptService()
+    private static let productService = IAPProductService()
+    private static let receiptService = IAPReceiptService()
     
-    public var applicationUsername: String? = nil
-    public var iapProducts: Array<IAPProduct> = []
+    public static var applicationUsername: String? = nil
+    public static var iapProducts: Array<IAPProduct> = []
     
     
     /* MARK: - Main methods */
     // Start In App Purchase services.
-    func start(iapProducts: Array<IAPProduct>, validatorUrlString: String, applicationUsername: String? = nil){
-        self.applicationUsername = applicationUsername
-        self.iapProducts = iapProducts
-        transactionObserver.start()
-        productService.start(productIDs: Set(iapProducts.map { $0.identifier }))
-        receiptService.start(validatorUrlString: validatorUrlString)
+    static func initialize(iapProducts: Array<IAPProduct>, validatorUrlString: String, applicationUsername: String? = nil){
+        InAppPurchase.applicationUsername = applicationUsername
+        InAppPurchase.iapProducts = iapProducts
+        
+        IAPTransactionObserver.shared.start()
+        productService.initialize(productIDs: Set(iapProducts.map { $0.identifier }))
+        receiptService.initialize(validatorUrlString: validatorUrlString)
     }
     
     // Stop In App Purchase services.
-    func stop(){
-        transactionObserver.stop()
+    static func stop(){
+        IAPTransactionObserver.shared.stop()
     }
     
     // Refresh App Store Products and Receipt.
-    func refresh(){
-        // Refresh Products from the App Store.
+    static func refresh(){
+        refreshProducts()
+        refreshReceipt()
+    }
+    
+    // Refresh Products from the App Store.
+    static func refreshProducts(){
         productService.loadProducts()
-        // Refresh and validate the App Store Receipt.
+    }
+    
+    // Refresh and validate the App Store Receipt.
+    static func refreshReceipt(){
         receiptService.validateReceipt()
     }
     
     
     /* MARK: - Product methods */
     // Returns all products retrieved from the App Store.
-    func getProducts() -> Array<SKProduct> {
+    static func getProducts() -> Array<SKProduct> {
         return productService.getProducts()
     }
     
     // Gets the product by its identifier from the list of products retrieved from the App Store.
-    func getProduct(identifier: String) -> SKProduct? {
+    static func getProduct(identifier: String) -> SKProduct? {
         return productService.getProduct(identifier: identifier)
     }
     
     // Returns the product type.
-    func getType(for productId: String) -> IAPProductType?{
+    static func getType(for productId: String) -> IAPProductType? {
         return iapProducts.first{ $0.identifier == productId }?.type
     }
     
     
     /* MARK: - Transaction methods */
     // Request a Payment from the App Store.
-    func purchase(product: SKProduct, quantity: Int = 1, callback: @escaping CallbackBlock){
-        transactionObserver.purchase(product: product, quantity: quantity, applicationUsername: applicationUsername, callback: callback)
+    static func purchase(productId: String, quantity: Int = 1
+        , callback: @escaping CallbackBlock) throws {
+        guard let product = productService.getProduct(identifier: productId) else {
+            callback()
+            throw IAPError.productNotFound
+        }
+        try IAPTransactionObserver.shared.purchase(product: product, quantity: quantity, applicationUsername: applicationUsername, callback: callback)
     }
     
     // Restore purchased products.
-    func restorePurchases(callback: @escaping CallbackBlock){
-        transactionObserver.restorePurchases(callback: callback)
+    static func restorePurchases(callback: @escaping CallbackBlock) {
+        IAPTransactionObserver.shared.restorePurchases(callback: callback)
     }
     
     // Finish all transactions for the product.
-    func finishTransactions(for productId: String) {
-        transactionObserver.finishTransactions(for: productId)
+    static func finishTransactions(for productId: String) {
+        IAPTransactionObserver.shared.finishTransactions(for: productId)
+    }
+    
+    // Checks if the user is allowed to authorize payments.
+    static func canMakePayments() -> Bool {
+        return IAPTransactionObserver.shared.canMakePayments()
     }
     
     
     /* MARK: - Receipt methods */
     // Checks if the user has already purchased at least one product.
-    func hasAlreadyPurchased() -> Bool{
+    static func hasAlreadyPurchased() -> Bool {
         return receiptService.hasAlreadyPurchased()
     }
-
-    // Checks if the product is currently purchased or subscribed.
-    func hasActivePurchase(for productId: String) -> Bool{
+    
+    // Checks if the user currently own (or is subscribed to) a given product.
+    static func hasActivePurchase(for productId: String) -> Bool {
         return receiptService.hasActivePurchase(for: productId)
     }
     
     // Checks if the user has an active subscription.
-    func hasActiveSubscription() -> Bool{
+    static func hasActiveSubscription() -> Bool {
         for productId in (iapProducts.filter{ $0.isSubscription() }.map{ $0.identifier }) {
             if receiptService.hasActivePurchase(for: productId){
                 return true
@@ -109,22 +120,26 @@ class InAppPurchase: NSObject {
         }
         return false;
     }
-
-    // Returns the purchased date for the product or nil.
-    func getPurchaseDate(for productId: String) -> Date?{
+    
+    // Returns the latest purchased date for a given product.
+    static func getPurchaseDate(for productId: String) -> Date? {
         return receiptService.getPurchaseDate(for: productId)
     }
     
-    // Returns the expiry date for the product or nil.
-    // The expiry date is only available if the subscription is not expired.
-    func getExpiryDate(for productId: String) -> Date?{
+    // Returns the expiry date for a subcription. May be past or future.
+    static func getExpiryDate(for productId: String) -> Date? {
         return receiptService.getExpiryDate(for: productId)
+    }
+    
+    // Returns the expiry date for an active subcription. It returns nil if the subscription is expired.
+    static func getNextExpiryDate(for productId: String) -> Date? {
+        return receiptService.getNextExpiryDate(for: productId)
     }
 }
 
 
 /*  MARK: - Service notifications. */
-extension Notification.Name{
+extension Notification.Name {
     // Products are loaded from the App Store.
     static let iapProductsLoaded = Notification.Name("iapProductsLoaded")
     
@@ -168,4 +183,11 @@ enum IAPProductType {
     case nonConsumable
     case subscription
     case autoRenewableSubscription
+}
+
+/* MARK: - Error */
+enum IAPError: Error {
+    case productNotFound
+    case purchaseAlreadyInProgress
+    case userIsNotAllowedToAuthorizePayments
 }

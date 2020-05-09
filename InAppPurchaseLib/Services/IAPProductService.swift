@@ -20,7 +20,7 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     
     /* MARK: - Main methods */
     // Init productIDs list, and load Products from the App Store.
-    func start(productIDs: Set<String>){
+    func initialize(productIDs: Set<String>){
         self.productIDs = productIDs
         self.loadProducts()
     }
@@ -39,25 +39,24 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
         
     // Gets the product by its identifier from the list of products retrieved from the App Store.
     func getProduct(identifier: String) -> SKProduct? {
-        guard let product = (self.products?.filter { $0.productIdentifier.contains(identifier) }.first) else { return nil }
-        return product
+        return self.products?.filter { $0.productIdentifier.contains(identifier) }.first
     }
     
     // Refresh the list of products ineligible for introductory price.
-    func refreshIneligibleForIntroPriceProduct(identifiers: [String]){
+    static func refreshIneligibleForIntroPriceProduct(identifiers: [String]){
         var ineligibleForIntroPriceProductIDs: Set<String> = []
         
         for productId in identifiers {
             // Checks if the product exists and if it has not already been added to the list
             if !ineligibleForIntroPriceProductIDs.contains(productId),
-                let product = getProduct(identifier: productId) {
+                let product = InAppPurchase.getProduct(identifier: productId) {
                 
                 if product.isAutoRenewableSubscription() {
                     // Only one introductory offer can be activated within a group of auto-renewable subscriptions
                     // Add all the identifiers of the group's products
-                    let groupProductIDs = self.products?.filter { $0.isAutoRenewableSubscription()
+                    let groupProductIDs = InAppPurchase.getProducts().filter { $0.isAutoRenewableSubscription()
                             && $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
-                        .map { $0.productIdentifier } ?? []
+                        .map { $0.productIdentifier }
                     
                     ineligibleForIntroPriceProductIDs = ineligibleForIntroPriceProductIDs.union(groupProductIDs)
                     
@@ -82,37 +81,38 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
 
 
 extension SKProduct {
-    // Checks if the product has a subscription period. This property is nil if the product is not a subscription.
-    func isSubscription() -> Bool {
-        return subscriptionPeriod != nil
-    }
-    
-    // All auto-renewable subscriptions must be a part of a group. This property is nil if the product is not an auto-renewable subscription.
-    func isAutoRenewableSubscription() -> Bool {
-        return subscriptionGroupIdentifier != nil
-    }
-    
-    // Checks if the user is eligible and if the product has an introductory price.
-    func hasIntroductoryPriceAvailable() -> Bool {
-        let ineligibleForIntroPriceProductIDs = UserDefaults.standard.object(forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY) as? [String] ?? [String]()
-        return !ineligibleForIntroPriceProductIDs.contains(productIdentifier) && introductoryPrice != nil
-    }
-    
     // Returns a localized string with the current cost of the product, with reduction if available, in the local currency.
     func getLocalizedCurrentPrice() -> String? {
-        if hasIntroductoryPriceAvailable() {
+        if hasIntroductoryPriceEligible() {
             return getLocalizedPrice(locale: introductoryPrice!.priceLocale, price: introductoryPrice!.price)
         } else {
             return getLocalizedPrice(locale: priceLocale, price: price)
         }
     }
     
+    /* MARK: - For subscription products. */
+    // Checks if the product is a subscription.
+    func isSubscription() -> Bool {
+        // subscriptionPeriod is nil if the product is not a subscription.
+        return subscriptionPeriod != nil
+    }
+    
+    // Checks if the product is an auto-renewable subscription..
+    func isAutoRenewableSubscription() -> Bool {
+        // All auto-renewable subscriptions must be a part of a group.
+        // subscriptionGroupIdentifier is nil if the product is not an auto-renewable subscription.
+        return subscriptionGroupIdentifier != nil
+    }
+    
+    // Checks if the product has an introductory price the user is eligible to.
+    func hasIntroductoryPriceEligible() -> Bool {
+        let ineligibleForIntroPriceProductIDs = UserDefaults.standard.object(forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY) as? [String] ?? [String]()
+        return !ineligibleForIntroPriceProductIDs.contains(productIdentifier) && introductoryPrice != nil
+    }
+    
     // Returns a localized string with the current period of the subscription product.
     func getLocalizedCurrentPeriod() -> String? {
-        if !isSubscription() {
-            return ""
-        }
-        let period = hasIntroductoryPriceAvailable() ? introductoryPrice!.subscriptionPeriod : subscriptionPeriod
+        let period = hasIntroductoryPriceEligible() ? introductoryPrice!.subscriptionPeriod : subscriptionPeriod
         return getLocalizedSubscriptionPeriod(subscriptionPeriod: period)
     }
     
@@ -126,13 +126,14 @@ extension SKProduct {
         return getLocalizedSubscriptionPeriod(subscriptionPeriod: subscriptionPeriod)
     }
     
+    // Returns a localized string with the period of the introductory price.
     func getLocalizedIntroductoryPricePeriod() -> String? {
-        if hasIntroductoryPriceAvailable() {
+        if hasIntroductoryPriceEligible() {
             let numberOfUnits = introductoryPrice!.numberOfPeriods
             let period = getLocalizedPeriod(unit: introductoryPrice?.subscriptionPeriod.unit, numberOfUnits: numberOfUnits)
             return "\(numberOfUnits) \(period)"
         } else {
-            return ""
+            return nil
         }
     }
     
@@ -146,7 +147,10 @@ extension SKProduct {
     }
     
     private func getLocalizedSubscriptionPeriod(subscriptionPeriod: SKProductSubscriptionPeriod?) -> String? {
-        let numberOfUnits = subscriptionPeriod?.numberOfUnits ?? 1
+        if subscriptionPeriod == nil {
+            return nil
+        }
+        let numberOfUnits = subscriptionPeriod!.numberOfUnits
         let numUnits = numberOfUnits > 1 ? "\(numberOfUnits) " : ""  // Add space for formatting
         let period = getLocalizedPeriod(unit: subscriptionPeriod?.unit, numberOfUnits: numberOfUnits)
         return "\(numUnits)\(period)"
