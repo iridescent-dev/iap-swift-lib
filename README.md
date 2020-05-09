@@ -307,8 +307,7 @@ Define your handler:
         return
     }
 
-    // The error property is defined when transactionState is failed.
-    // You can read the error property to determine why the transaction failed.
+    // Use the value of the error property to present a message to the user.
     // For a list of error constants, see https://developer.apple.com/documentation/storekit/skerror/code
     let errorCode = (transaction.error as? SKError)?.code
     switch errorCode {
