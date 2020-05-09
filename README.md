@@ -69,7 +69,7 @@ The library must be initialized as soon as possible in order to process pending 
 
 Each **IAPProduct** contains the following fields:
 * `identifier` - The product unique identifier 
-* `type` - The product type (`.consumable`, `.nonConsumable`, `.subscription` or `.autoRenewableSubscription`)
+* `type` - The **IAPProductType** (`consumable`, `nonConsumable`, `subscription` or `autoRenewableSubscription`)
 
 **Example**
 
@@ -99,7 +99,7 @@ func applicationWillTerminate(_ application: UIApplication) {
 
 ``` swift
 InAppPurchase.shared.purchase(
-    product: product, // XXX - Would be simpler to just send the product ID
+    product: product,
     callback: { self.loaderView.hide() }
 )
 ```
@@ -122,14 +122,14 @@ Then define your handler:
 ``` swift
 @objc func productPurchased(_ notification: Notification){
   // Get the product from the notification object.
-  let product = notification.object as? SKProduct
-
-  if product != nil {
-    // Unlock product content here...
-
-    // Finish the product transactions.
-    InAppPurchase.shared.finishTransactions(for: product!.productIdentifier)
+  guard let product = notification.object as? SKProduct else {
+      return
   }
+  
+  // Unlock product related content.
+
+  // Finish the product transactions.
+  InAppPurchase.shared.finishTransactions(for: product.productIdentifier)
 }
 ```
 
@@ -188,8 +188,6 @@ class ProductsViewController: UIViewController {
   
   @objc func productsRefreshed() {
     self.products = InAppPurchase.shared.getProducts()
-    // Refresh view.
-    self.reloadData()
   }
   ...
 }
