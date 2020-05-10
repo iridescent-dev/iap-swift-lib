@@ -13,11 +13,9 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Displaying products](#displaying-products)
   - [Displaying subscriptions](#displaying-subscriptions)
   - [Refreshing](#refreshing)
-  - [Purchase a product](#purchase-a-product)
-    - [Create an order](#create-an-order)
+  - [Purchasing](#purchasing)
+    - [Making a purchase](#making-a-purchase)
     - [Processing purchases](#processing-purchases)
-      - [Simple case](#simple-case)
-      - [Advanced usage](#advanced-usage)
   - [Restore purchases](#restore-purchases)
   - [Purchased products](#purchased-products)
   - [Localization](#localization)
@@ -204,8 +202,8 @@ func viewWillDisappear(_ animated: Bool) {
 The purchase process is generally a little bit more involving that people would expect. Why is it not just: purchase &rarr; on success unlock the feature?
 
 Several reasons:
-- in-app purchases can be initiated outside the app
-- in-app purchases can be deferred, pending parental approval
+- In-app purchases can be initiated outside the app
+- In-app purchases can be deferred, pending parental approval
 - Apple wants to be sure you delivered the product before charging the user
 
 That is why the process looks like so:
@@ -223,6 +221,7 @@ From this callback, you can for example unlock the UI by hiding your loading ind
 *Example:*
 ``` swift
 do {
+    self.loaderView.show()
     try InAppPurchase.purchase(
         productId: productIdentifier,
         callback: { self.loaderView.hide() }
@@ -241,12 +240,18 @@ do {
 #### Processing purchases
 When a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction.
 
-To achieve this, register an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) for `iapProductPurchased` notifications:
+To achieve this, you have to add an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) of `iapProductPurchased` notifications. **Important:** Setup this handler **before** calling `InAppPurchase.initialize()`: purchase events can occur very early, as soon as your app starts.
+
+Keep in mind that purchase notifications might occur even if you never called the `InAppPurchase.purchase()` function: purchases can be made from another device or the AppStore, they can be approved by parents when the app isn't running, purchase flows can be interupted, etc.
+
+*Example:*
+
+When the application did launch, we add our observer:
 ``` swift
 NotificationCenter.default.addObserver(self, selector: #selector(productPurchased(_:)), name: .iapProductPurchased, object: nil)
 ```
 
-Then define your handler:
+Then define the handler:
 ``` swift
 @objc func productPurchased(_ notification: Notification){
   // Get the product from the notification object.
@@ -261,7 +266,15 @@ Then define your handler:
 }
 ```
 
-The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.hasActivePurchase(for: productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
+In simple cases, you can rely of the library to provide you with information about past purchases and no specific action is needed to unlock the product, just call `InAppPurchase.finishTransactions()`.
+
+The last known state of the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productId)` method lets you to retrieve the ownership status of a product or subscription.
+
+For more advanced use cases, implement your own unlocking logic and call `InAppPurchase.finishTransactions()` afterward.
+
+*Note:* `iapProductPurchased` is emitted when a purchase has been confirmed by Fovea's receipt validator. If you have a server, he probably already has been notified of this purchase using the webhook.
+
+*Tip:* After a successful purchase, you should now see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).
 
 ### Restoring purchases
 Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users. In general, it is found in your application settings.
