@@ -10,7 +10,9 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Installation](#installation)
 - [Usage](#usage)
   - [Initialization](#initialization)
-  - [Displaying product information](#displaying-product-information)
+  - [Displaying products](#displaying-products)
+  - [Displaying subscriptions](#displaying-subscriptions)
+  - [Refreshing](#refreshing)
   - [Products list](#products-list)
   - [Purchase a product](#purchase-a-product)
     - [Create an order](#create-an-order)
@@ -107,32 +109,34 @@ func applicationWillTerminate(_ application: UIApplication) {
 
 For more advanced use cases, in particular when you have implemented user login, see the [Server integration](#server-integration) section.
 
-### Displaying product information
+### Displaying products
 Let's start with the simplest case: you have a single product.
 
-You can retrieve all information about this product using the function `InAppPurchase.getProduct("my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with additional methods.
+You can retrieve all information about this product using the function `InAppPurchase.getProduct("my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with helpful methods.
 
-Those are the most important information:
+Those are the most important:
  - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
  - `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
  - `localizedDescription: String` - A description of the product, in the language of the device, as retrieved from the AppStore.
  - `func getLocalizedCurrentPrice() -> String?` - Current cost of the product in the local currency (_method added by this library_).
 
-**Example**
+*Example*:
 
 ``` swift
-guard let product = InAppPurchase.getProduct("my_product_id") else {
-  titleLabel.text = "Product unavailable"
-  return
+@objc func refreshView() {
+  guard let product = InAppPurchase.getProduct("my_product_id") else {
+    self.titleLabel.text = "Product unavailable"
+    return
+  }
+  self.titleLabel.text = product.localizedTitle
+  self.descriptionLabel.text = product.localizedDescription
+  self.priceLabel.text = product.getLocalizedCurrentPrice()
 }
-titleLabel.text = product.localizedTitle
-descriptionLabel.text = product.localizedDescription
-priceLabel.text = product.getLocalizedCurrentPrice()
 ```
 
-#### Subscriptions
+### Displaying subscriptions
 
-For subscription products, you also have information about subscription periods and introductory offers.
+For subscription products, you also have some data about subscription periods and introductory offers.
 
  - `func isSubscription() -> Bool` - The product is a subscription.
  - `func isAutoRenewableSubscription() -> Bool` - The product is an auto-renewable subscription.
@@ -147,42 +151,43 @@ Notice that `getLocalizedCurrentPrice()` already applied introductory prices if 
 **Example**
 
 ``` swift
-titleLabel.text = product.localizedTitle
-descriptionLabel.text = product.localizedDescription
+@objc func refreshView() {
+  guard let product = InAppPurchase.getProduct("my_product_id") else {
+    self.titleLabel.text = "Product unavailable"
+    return
+  }
+  self.titleLabel.text = product.localizedTitle
+  self.descriptionLabel.text = product.localizedDescription
 
-// Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"
-var priceText = "\(product.getLocalizedCurrentPrice()) / \(product.getLocalizedCurrentPeriod() ?? "")"
-if product.hasIntroductoryPriceEligible() {
-  priceText = "\(priceText) for \(product.getLocalizedIntroductoryPricePeriod())" +
-    " (then \(product.getLocalizedInitialPrice()) / \(product.getLocalizedInitialPeriod()))"
+  // Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"
+  var priceText = "\(product.getLocalizedCurrentPrice()) / \(product.getLocalizedCurrentPeriod() ?? "")"
+  if product.hasIntroductoryPriceEligible() {
+    priceText = "\(priceText) for \(product.getLocalizedIntroductoryPricePeriod())" +
+      " (then \(product.getLocalizedInitialPrice()) / \(product.getLocalizedInitialPeriod()))"
+  }
+  self.priceLabel.text = priceText
 }
-priceLabel.text = priceText
 ```
 
-### Products list
-In order to present to the users your list of purchasable in-app products, you have to load the metadata from the AppStore. This is done for you at startup (so they're immediately available when needed). It is also a good idea to refresh the prices when you show your products view (in case they changed since app startup).
+### Refreshing
+Data might change or not be yet available when your "product" view is presented. In order to properly handle those cases, you should add an observer to the `iapProductsLoaded` notification.
+
+The library loads the products metadata at startup, so they're immediately available when needed. But it is also a good idea to refresh the prices when you show your products view, in case have changed since app startup, you want to be sure you're displaying up-to-date information.
+
+To achieve this call `InAppPurchase.refresh()` when your view is presented.
 
 ``` swift
-class ProductsViewController: UIViewController {
-  private var products: [SKProduct] = []
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    // Load products list.
-    self.products = InAppPurchase.getProducts()
-    
-    // Update products list after retreiving information from the App Store.
-    NotificationCenter.default.addObserver(self, selector: #selector(productsRefreshed), name: .iapProductsLoaded, object: nil)
-  }
-  
-  @objc func productsRefreshed() {
-    self.products = InAppPurchase.getProducts()
-  }
-  ...
+func viewWillAppear(_ animated: Bool) {
+  NotificationCenter.default.addObserver(self, selector: #selector(productsRefreshed), name: .iapProductsLoaded, object: nil)
+  InAppPurchase.refresh()
+}
+func viewWillDisappear(_ animated: Bool) {
+  NotificationCenter.default.removeObserver(self)
+}
+@objc func productsRefreshed() {
+  self.refreshView()
 }
 ```
-
 
 ### Purchase a product
 #### Create an order
