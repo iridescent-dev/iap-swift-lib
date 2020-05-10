@@ -106,7 +106,7 @@ func applicationWillTerminate(_ application: UIApplication) {
 
 For more advanced use cases, in particular when you have implemented user login, see the [Server integration](#server-integration) section.
 
-*Tip:* If initialization was succesful, you should see a new receipt validation event in [Fovea's Dashboard](https://billing-dashboard.fovea.cc/events).
+*Tip:* If initialization was successful, you should see a new receipt validation event in [Fovea's Dashboard](https://billing-dashboard.fovea.cc/events).
 
 ### Displaying products
 Let's start with the simplest case: you have a single product.
@@ -209,7 +209,7 @@ Several reasons:
 That is why the process looks like so:
 - being ready to handle purchase events from app startup
 - finalizing transactions when product delivery is complete
-- sending purchase request, for which succesful doesn't mean complete
+- sending purchase request, for which successful doesn't mean complete
 
 #### Making a purchase
 To make a purchase, use the `InAppPurchase.purchase()` function. It takes the `productId` and a `callback` function, called when the purchase has been processed.
