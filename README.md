@@ -13,7 +13,6 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Displaying products](#displaying-products)
   - [Displaying subscriptions](#displaying-subscriptions)
   - [Refreshing](#refreshing)
-  - [Products list](#products-list)
   - [Purchase a product](#purchase-a-product)
     - [Create an order](#create-an-order)
     - [Processing purchases](#processing-purchases)
@@ -186,9 +185,27 @@ func viewWillDisappear(_ animated: Bool) {
 }
 ```
 
-### Purchase a product
-#### Create an order
+### Purchasing
+The purchase process is generally a little bit more involving that people would expect. Why is it not just: purchase &rarr; on success unlock the feature?
 
+Several reasons:
+- in-app purchases can be initiated outside the app
+- in-app purchases can be deferred, pending parental approval
+- Apple wants to be sure you delivered the product before charging the user
+
+That is why the process looks like so:
+- being ready to handle purchase events from app startup
+- finalizing transactions when product delivery is complete
+- sending purchase request, for which succesful doesn't mean complete
+
+#### Making a purchase
+To make a purchase, use the `InAppPurchase.purchase()` function. It takes the `productId` and a `callback` function, called when the purchase has been processed.
+
+**Important**: This callback is not meant to unlock the feature. **purchase processed ≠ purchase successful**
+
+From this callback, you can for example unlock the UI by hiding your loading indicator.
+
+*Example:*
 ``` swift
 do {
     try InAppPurchase.purchase(
@@ -205,11 +222,6 @@ do {
     print("An error occurred: \(error)")
 }
 ```
-The `callback` method is called when the purchase has been processed.
-
-**Important**: This callback is not meant to unlock the feature. **purchase processed ≠ purchase successful**
-
-From this callback, you can for example unlock the UI by hiding your loading indicator.
 
 #### Processing purchases
 
@@ -235,24 +247,9 @@ Then define your handler:
 }
 ```
 
-##### Simple case
-
 The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.hasActivePurchase(for: productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
 
-##### Advanced usage
-
-In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [Webhook on Fovea](https://billing.fovea.cc/documentation/webhook/). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
-
-The information sent from Fovea has been verified from Apple's server, which makes it way more trustable than information sent from your app itself.
-
-To take advantage of this, you have to inform the library of your application username. It can be provided as a parameter of the `start` method (`applicationUsername`) and updated later by changing the following property:
-``` swift
-InAppPurchase.applicationUsername = applicationUsername
-```
-
-In this case, you might want to delay calls to `start()` to when your user's session is ready.
-
-### Restore purchases
+### Restoring purchases
 Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users. In general, from your application settings.
 
 This is the method to call from this button.
@@ -362,7 +359,24 @@ InAppPurchase.getNextExpiryDate(for: productId)
 
 ## Server integration
 
-**TODO**
+In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [Webhook on Fovea](https://billing.fovea.cc/documentation/webhook/). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
+
+The information sent from Fovea has been verified from Apple's server, which makes it way more trustable than information sent from your app itself.
+
+To take advantage of this, you have to inform the library of your application username. This `applicationUsername` can be provided as a parameter of the `InAppPurchase.initialize` method and updated later by changing the associated property.
+
+*Example:*
+``` swift
+InAppPurchase.initialize(
+  iapProducts: [...],
+  validatorUrlString: "..."),
+  applicationUsername: UserSession.getUserId())
+
+// later ...
+InAppPurchase.applicationUsername = UserSession.getUserId()
+```
+
+Of course, in this case, you will want to delay calls to `InAppPurchase.initialize()` to when your user's session is ready.
 
 ## Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).
