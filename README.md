@@ -23,18 +23,20 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Notifications](#notifications)
   - [Purchases information](#purchases-information)
 - [Xcode Demo Project](#xcode-demo-project)
+- [Server integration](#xcode-demo-project)
 - [License](#license)
 
 
 ## Features
 
-* [x] Purchase a product 
-* [x] Restore purchased products
-* [x] Verify transactions with the App Store on Fovea.Billing server
-* [x] Handle and notify payment transaction states
-* [x] Retreive products information from the App Store
-* [x] Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
-* [x] Status of purchases available when offline
+* [✅] Purchase a product 
+* [✅] Restore purchased products
+* [✅] Verify transactions with the App Store on Fovea.Billing server
+* [✅] Handle and notify payment transaction states
+* [✅] Retreive products information from the App Store
+* [✅] Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
+* [✅] Status of purchases available when offline
+* [✅] Server integration with a Webhook
 
 ## Getting Started
 
@@ -56,9 +58,16 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 
 ## Usage
 
+The process of implementing in-app purchases involves several steps:
+1. Displaying the list of purchasable products
+2. Initiating a purchase
+3. Delivering and finalizing a purchase
+4. Checking the current ownership of non-consumables and subscriptions
+5. Implement the Restore Purchases plugin
+
 ### Initialization
 
-The library must be initialized as soon as possible in order to process pending transactions. A good way is to call the `start()` method when the application did finish launching.
+Before everything else the library must be initialized. This has to happen as soon as possible. A good way is to call the `InAppPurchase.initialize()` method when the application did finish launching. In the background, this will load your products and refresh the status of purchases and subscriptions.
 
 `InAppPurchase.initialize()` accepts the following arguments:
 * `iapProducts` - An array of **IAPProduct** (REQUIRED)
@@ -71,17 +80,21 @@ Each **IAPProduct** contains the following fields:
 
 **Example**
 
-Add the following lines to your `AppDelegate.swift` file:
+``` swift
+InAppPurchase.initialize(
+  iapProducts: [
+    IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
+    IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription),
+    IAPProduct(identifier: "disable_ads", type: .nonConsumable)
+  ],
+  validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
+```
+
+A good place is generally in your application delegate's `didFinishLaunchingWithOptions` function, like below:
 
 ``` swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-  InAppPurchase.initialize(
-    iapProducts: [
-      IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
-      IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription)
-    ],
-    validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=iapdemo&apiKey=12345678-1234-1234-1234-12345678")
-  return true
+  // ... initialize here
 }
 ```
 
@@ -91,6 +104,8 @@ func applicationWillTerminate(_ application: UIApplication) {
   InAppPurchase.stop()
 }
 ```
+
+For more advanced use cases, in particular when you have implemented user login, see the [Server integration](#server-integration) section.
 
 ### Purchase a product
 #### Create an order
@@ -349,6 +364,10 @@ InAppPurchase.getExpiryDate(for: productId)
 ``` swift
 InAppPurchase.getNextExpiryDate(for: productId)
 ```
+
+## Server integration
+
+**TODO**
 
 ## Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).
