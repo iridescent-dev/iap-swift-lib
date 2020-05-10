@@ -125,7 +125,7 @@ You can add a function similar to this to your view.
 
 ``` swift
 @objc func refreshView() {
-  guard let product = InAppPurchase.getProduct("my_product_id") else {
+  guard let product = InAppPurchase.getProduct(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
   }
@@ -163,7 +163,7 @@ Notice that `getLocalizedCurrentPrice()` already applied introductory prices if 
 
 ``` swift
 @objc func refreshView() {
-  guard let product = InAppPurchase.getProduct("my_product_id") else {
+  guard let product = InAppPurchase.getProduct(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
   }
@@ -237,7 +237,6 @@ do {
 ```
 
 #### Processing purchases
-
 When a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction.
 
 To achieve this, register an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) for `iapProductPurchased` notifications:
