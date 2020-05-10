@@ -172,20 +172,17 @@ Notice that `getLocalizedCurrentPrice()` already applied introductory prices if 
 ### Refreshing
 Data might change or not be yet available when your "product" view is presented. In order to properly handle those cases, you should add an observer to the `iapProductsLoaded` notification.
 
-The library loads the products metadata at startup, so they're immediately available when needed. But it is also a good idea to refresh the prices when you show your products view, in case have changed since app startup, you want to be sure you're displaying up-to-date information.
+The library loads in-app products metadata at startup, so they're immediately available when needed. But it is also a good idea to refresh the prices when you show your products view, in case the price has changed since app startup. You want to be sure you're displaying up-to-date information.
 
-To achieve this call `InAppPurchase.refresh()` when your view is presented.
+To achieve this, call `InAppPurchase.refresh()` when your view is presented.
 
 ``` swift
 func viewWillAppear(_ animated: Bool) {
-  NotificationCenter.default.addObserver(self, selector: #selector(productsRefreshed), name: .iapProductsLoaded, object: nil)
+  NotificationCenter.default.addObserver(self, selector: #selector(refreshView), name: .iapProductsLoaded, object: nil)
   InAppPurchase.refresh()
 }
 func viewWillDisappear(_ animated: Bool) {
   NotificationCenter.default.removeObserver(self)
-}
-@objc func productsRefreshed() {
-  self.refreshView()
 }
 ```
 
