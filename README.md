@@ -25,7 +25,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Notifications](#notifications)
   - [Purchases information](#purchases-information)
 - [Xcode Demo Project](#xcode-demo-project)
-- [Server integration](#xcode-demo-project)
+- [Server integration](#server-integration)
 - [License](#license)
 
 
@@ -65,7 +65,7 @@ The process of implementing in-app purchases involves several steps:
 2. Initiating a purchase
 3. Delivering and finalizing a purchase
 4. Checking the current ownership of non-consumables and subscriptions
-5. Implement the Restore Purchases plugin
+5. Implementing the Restore Purchases button
 
 ### Initialization
 
