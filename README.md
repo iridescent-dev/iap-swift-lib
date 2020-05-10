@@ -16,13 +16,13 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Purchasing](#purchasing)
     - [Making a purchase](#making-a-purchase)
     - [Processing purchases](#processing-purchases)
-  - [Restore purchases](#restore-purchases)
+  - [Restoring purchases](#restoring-purchases)
   - [Purchased products](#purchased-products)
   - [Localization](#localization)
   - [Notifications](#notifications)
   - [Purchases information](#purchases-information)
-- [Xcode Demo Project](#xcode-demo-project)
 - [Server integration](#server-integration)
+- [Xcode Demo Project](#xcode-demo-project)
 - [License](#license)
 
 
