@@ -79,7 +79,7 @@ Each **IAPProduct** contains the following fields:
 * `identifier` - The product unique identifier 
 * `type` - The **IAPProductType** (`consumable`, `nonConsumable`, `subscription` or `autoRenewableSubscription`)
 
-**Example**
+*Example:*
 
 ``` swift
 InAppPurchase.initialize(
@@ -121,6 +121,8 @@ Those are the most important:
 
 *Example*:
 
+You can add a function similar to this to your view.
+
 ``` swift
 @objc func refreshView() {
   guard let product = InAppPurchase.getProduct("my_product_id") else {
@@ -130,6 +132,16 @@ Those are the most important:
   self.titleLabel.text = product.localizedTitle
   self.descriptionLabel.text = product.localizedDescription
   self.priceLabel.text = product.getLocalizedCurrentPrice()
+}
+```
+
+This example assumes `self.titleLabel` is a UILabel, etc.
+
+Make sure to call this function when the view appears on screen, for instance by calling it from [`viewWillAppear`](https://developer.apple.com/documentation/uikit/uiviewcontroller/1621510-viewwillappear).
+
+``` swift
+func viewWillAppear(_ animated: Bool) {
+  self.refreshView()
 }
 ```
 
@@ -177,6 +189,7 @@ To achieve this, call `InAppPurchase.refresh()` when your view is presented.
 
 ``` swift
 func viewWillAppear(_ animated: Bool) {
+  self.refreshView()
   NotificationCenter.default.addObserver(self, selector: #selector(refreshView), name: .iapProductsLoaded, object: nil)
   InAppPurchase.refresh()
 }
@@ -250,18 +263,23 @@ Then define your handler:
 The library stores the last known state of your purchases as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even offline. The `hasActivePurchase()` method allows you to check the status: `InAppPurchase.hasActivePurchase(for: productId)`. In the simplest cases, this is all you need. You can then skip `// Unlock product content here...`.
 
 ### Restoring purchases
-Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users. In general, from your application settings.
+Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users. In general, it is found in your application settings.
 
-This is the method to call from this button.
+Call this method when this button is pressed.
+
 ``` swift
-InAppPurchase.restorePurchases(callback: {
-    self.loaderView.hide()
-})
+func restorePurchases() {
+  self.loaderView.show()
+  InAppPurchase.restorePurchases(callback: {
+      self.loaderView.hide()
+  })
+}
 ```
-The `callback` method is called once the operation is complete. You can unlock the UI, by hiding your loader for example.
+
+The `callback` method is called once the operation is complete. You can use it to unlock the UI, by hiding your loader for example.
 
 ### Purchased products
-As mentioned earlier, the library provides access to the state of your purchases.
+As mentioned earlier, the library provides access to the state of the users purchases.
 
 Use `hasActivePurchase(for: productId)` to checks if the user currently own (or is subscribed to) a given product.
 ``` swift
