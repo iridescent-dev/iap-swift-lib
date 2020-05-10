@@ -108,6 +108,8 @@ func applicationWillTerminate(_ application: UIApplication) {
 
 For more advanced use cases, in particular when you have implemented user login, see the [Server integration](#server-integration) section.
 
+*Tip:* If initialization was succesful, you should see a new receipt validation event in [Fovea's Dashboard](https://billing-dashboard.fovea.cc/events).
+
 ### Displaying products
 Let's start with the simplest case: you have a single product.
 
