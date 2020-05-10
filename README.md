@@ -10,6 +10,8 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Installation](#installation)
 - [Usage](#usage)
   - [Initialization](#initialization)
+  - [Displaying product information](#displaying-product-information)
+  - [Products list](#products-list)
   - [Purchase a product](#purchase-a-product)
     - [Create an order](#create-an-order)
     - [Processing purchases](#processing-purchases)
@@ -17,8 +19,6 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
       - [Advanced usage](#advanced-usage)
   - [Restore purchases](#restore-purchases)
   - [Purchased products](#purchased-products)
-  - [Products list](#products-list)
-  - [Display products information](#display-products-information)
   - [Localization](#localization)
   - [Notifications](#notifications)
   - [Purchases information](#purchases-information)
@@ -29,14 +29,14 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 
 ## Features
 
-* [✅] Purchase a product 
-* [✅] Restore purchased products
-* [✅] Verify transactions with the App Store on Fovea.Billing server
-* [✅] Handle and notify payment transaction states
-* [✅] Retreive products information from the App Store
-* [✅] Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
-* [✅] Status of purchases available when offline
-* [✅] Server integration with a Webhook
+* ✅ Purchase a product 
+* ✅ Restore purchased products
+* ✅ Verify transactions with the App Store on Fovea.Billing server
+* ✅ Handle and notify payment transaction states
+* ✅ Retreive products information from the App Store
+* ✅ Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
+* ✅ Status of purchases available when offline
+* ✅ Server integration with a Webhook
 
 ## Getting Started
 
@@ -106,6 +106,83 @@ func applicationWillTerminate(_ application: UIApplication) {
 ```
 
 For more advanced use cases, in particular when you have implemented user login, see the [Server integration](#server-integration) section.
+
+### Displaying product information
+Let's start with the simplest case: you have a single product.
+
+You can retrieve all information about this product using the function `InAppPurchase.getProduct("my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with additional methods.
+
+Those are the most important information:
+ - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
+ - `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
+ - `localizedDescription: String` - A description of the product, in the language of the device, as retrieved from the AppStore.
+ - `func getLocalizedCurrentPrice() -> String?` - Current cost of the product in the local currency (_method added by this library_).
+
+**Example**
+
+``` swift
+guard let product = InAppPurchase.getProduct("my_product_id") else {
+  titleLabel.text = "Product unavailable"
+  return
+}
+titleLabel.text = product.localizedTitle
+descriptionLabel.text = product.localizedDescription
+priceLabel.text = product.getLocalizedCurrentPrice()
+```
+
+#### Subscriptions
+
+For subscription products, you also have information about subscription periods and introductory offers.
+
+ - `func isSubscription() -> Bool` - The product is a subscription.
+ - `func isAutoRenewableSubscription() -> Bool` - The product is an auto-renewable subscription.
+ - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
+ - `func getLocalizedCurrentPeriod() -> String?` - The current period of the subscription.
+ - `func getLocalizedInitialPrice() -> String?` -  The initial cost of the subscription in the local currency.
+ - `func getLocalizedInitialPeriod() -> String?` - The initial period of the subscription.
+ - `func getLocalizedIntroductoryPricePeriod() -> String?` - The period of the introductory price.
+
+Notice that `getLocalizedCurrentPrice()` already applied introductory prices if they are available. 
+
+**Example**
+
+``` swift
+titleLabel.text = product.localizedTitle
+descriptionLabel.text = product.localizedDescription
+
+// Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"
+var priceText = "\(product.getLocalizedCurrentPrice()) / \(product.getLocalizedCurrentPeriod() ?? "")"
+if product.hasIntroductoryPriceEligible() {
+  priceText = "\(priceText) for \(product.getLocalizedIntroductoryPricePeriod())" +
+    " (then \(product.getLocalizedInitialPrice()) / \(product.getLocalizedInitialPeriod()))"
+}
+priceLabel.text = priceText
+```
+
+### Products list
+In order to present to the users your list of purchasable in-app products, you have to load the metadata from the AppStore. This is done for you at startup (so they're immediately available when needed). It is also a good idea to refresh the prices when you show your products view (in case they changed since app startup).
+
+``` swift
+class ProductsViewController: UIViewController {
+  private var products: [SKProduct] = []
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    // Load products list.
+    self.products = InAppPurchase.getProducts()
+    
+    // Update products list after retreiving information from the App Store.
+    NotificationCenter.default.addObserver(self, selector: #selector(productsRefreshed), name: .iapProductsLoaded, object: nil)
+  }
+  
+  @objc func productsRefreshed() {
+    self.products = InAppPurchase.getProducts()
+  }
+  ...
+}
+```
+
 
 ### Purchase a product
 #### Create an order
@@ -192,94 +269,10 @@ Use `hasActivePurchase(for: productId)` to checks if the user currently own (or 
 InAppPurchase.hasActivePurchase(for: productId)
 ```
 
-### Products list
-In order to present to the users your list of purchasable in-app products, you have to load the metadata from the AppStore. This is done for you at startup (so they're immediately available when needed). It is also a good idea to refresh the prices when you show your products view (in case they changed since app startup).
-
-``` swift
-class ProductsViewController: UIViewController {
-  private var products: [SKProduct] = []
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    // Load products list.
-    self.products = InAppPurchase.getProducts()
-    
-    // Update products list after retreiving information from the App Store.
-    NotificationCenter.default.addObserver(self, selector: #selector(productsRefreshed), name: .iapProductsLoaded, object: nil)
-  }
-  
-  @objc func productsRefreshed() {
-    self.products = InAppPurchase.getProducts()
-  }
-  ...
-}
-```
-
-### Display products information
-All available products are listed in the `InAppPurchase.getProducts()` array of [SKProduct](https://developer.apple.com/documentation/storekit/skproduct).
-
-Those are the most important attributes.
-
- - `productIdentifier: String` - The string that identifies the product to the Apple App Store.
- - `localizedTitle: String` - The name of the product.
- - `localizedDescription: String` - A description of the product.
-
-The library also extends SKProduct with utility methods.
-
- - `func getLocalizedCurrentPrice() -> String?` - Current cost of the product, with reduction if available, in the local currency.
-
-For subscription products:
-
- - `func isSubscription() -> Bool` - The product is a subscription.
- - `func isAutoRenewableSubscription() -> Bool` - The product is an auto-renewable subscription.
- - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
- - `func getLocalizedCurrentPeriod() -> String?` - The current period of the subscription.
- - `func getLocalizedInitialPrice() -> String?` -  The initial cost of the subscription in the local currency.
- - `func getLocalizedInitialPeriod() -> String?` - The initial period of the subscription.
- - `func getLocalizedIntroductoryPricePeriod() -> String?` - The period of the introductory price.
-
-**Example**
-
-``` swift
-var titleLabel = UILabel()
-var priceLabel = UILabel()
-
-// Show product name in Label.
-titleLabel.text = product.localizedTitle
-
-// Get localized and formatted price text.
-// Example:
-// - consumable, non-consumable => 3,99 €
-// - auto-renewable subscription, non-renewing subscription => 3,99 € / month
-// - auto-renewable subscription with introductory price => 0,99€ / month for 3 months (then 3,99 € / month)
-var priceText = ""
-if (product.isSubscription()) {
-  priceText = "[price] / [period]"
-  let period = product.getLocalizedCurrentPeriod()
-  priceText = priceText.replacingOccurrences(of: "[period]", with: "\(period ?? "")")
-  
-  if product.hasIntroductoryPriceEligible() {
-    priceText = "\(priceText) for [promo_period] (then [initial_price] / [initial_period])"
-    
-    let promoPeriod = product.getLocalizedIntroductoryPricePeriod()
-    let initialPrice = product.getLocalizedInitialPrice()
-    let initialPeriod = product.getLocalizedInitialPeriod()
-    priceText = priceText.replacingOccurrences(of: "[promo_period]", with: "\(promoPeriod ?? "")")
-    priceText = priceText.replacingOccurrences(of: "[initial_price]", with: "\(initialPrice ?? "")")
-    priceText = priceText.replacingOccurrences(of: "[initial_period]", with: "\(initialPeriod ?? "")")
-  }
-} else {
-  priceText = "[price]"
-}
-let price = product.getLocalizedCurrentPrice()
-priceText = priceText.replacingOccurrences(of: "[price]", with: "\(price ?? "")")
-
-// Show product price in Label.
-priceLabel.text = priceText
-```
-
 ### Localization
+
+XXX: cf https://github.com/iridescent-dev/iap-swift-lib/issues/5 -- this should be unnecessary
+
 The period is in English by default. You can add the following keys in your localization file.
 ```
 // Localizable.strings
