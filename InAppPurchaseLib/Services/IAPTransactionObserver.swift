@@ -48,12 +48,10 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     // Request a Payment from the App Store.
     func purchase(product: SKProduct, quantity: Int, applicationUsername: String?, callback: @escaping CallbackBlock) throws {
         guard canMakePayments() else {
-            callback()
-            throw IAPError.userIsNotAllowedToAuthorizePayments
+            return
         }
         guard SKPaymentQueue.default().transactions.last?.transactionState != .purchasing else {
-            callback()
-            throw IAPError.purchaseAlreadyInProgress
+            return
         }
         
         let payment = SKMutablePayment(product: product)
