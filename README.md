@@ -39,11 +39,11 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 * ✅ Server integration with a Webhook
 
 ## Getting Started
+If you haven't already, I highly recommend your read the *Overview* and *Preparing* section of Apple's [In-App Purchase official documentation](https://developer.apple.com/in-app-purchase)
 
 ### Requirements
 * Configure your App and Xcode to support In-App Purchases.
-  * [In-App Purchase Overview](https://developer.apple.com/in-app-purchase)
-  * [StoreKit Documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
+  * [AppStore Connect Setup](https://help.apple.com/app-store-connect/#/devb57be10e7)
 * Create and configure your [Fovea.Billing](https://billing.fovea.cc) project account:
   * Set your bundle ID
   * The iOS Shared Secret (or shared key) is to be retrieved from [AppStoreConnect](https://appstoreconnect.apple.com/)
@@ -416,8 +416,11 @@ Of course, in this case, you will want to delay calls to `InAppPurchase.initiali
 ## Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).
 
-## Troubleshooting
+## References
+- TODO: API documentation - using https://github.com/swiftdocorg/swift-doc (?)
+- [StoreKit Documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
 
+## Troubleshooting
 Common issues are covered here: https://github.com/iridescent-dev/iap-swift-lib/wiki/Troubleshooting
 
 ## License
