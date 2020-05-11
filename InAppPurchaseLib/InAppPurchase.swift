@@ -188,6 +188,4 @@ enum IAPProductType {
 /* MARK: - Error */
 enum IAPError: Error {
     case productNotFound
-    case purchaseAlreadyInProgress
-    case userIsNotAllowedToAuthorizePayments
 }
