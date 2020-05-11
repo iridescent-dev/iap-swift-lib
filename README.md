@@ -345,7 +345,7 @@ NotificationCenter.default.addObserver(self, selector: #selector(transactionFail
 Define your handler:
 ``` swift
 @objc func transactionFailed(_ notification: Notification){
-    guard let transaction: SKProduct = notification.object as? SKPaymentTransaction else {
+    guard let transaction = notification.object as? SKPaymentTransaction else {
         return
     }
 
