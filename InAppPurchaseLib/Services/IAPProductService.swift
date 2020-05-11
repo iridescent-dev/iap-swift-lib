@@ -128,12 +128,9 @@ extension SKProduct {
     // Returns a localized string with the period of the introductory price.
     var localizedIntroductoryPricePeriod: String? {
         if hasIntroductoryPriceEligible() {
-            let numberOfUnits = introductoryPrice!.numberOfPeriods
-            let period = getLocalizedPeriod(unit: introductoryPrice?.subscriptionPeriod.unit, numberOfUnits: numberOfUnits)
-            return "\(numberOfUnits) \(period)"
-        } else {
-            return nil
+            return getLocalizedPeriod(unit: introductoryPrice!.subscriptionPeriod.unit, numberOfUnits: introductoryPrice!.numberOfPeriods)
         }
+        return nil
     }
     
     
@@ -146,28 +143,53 @@ extension SKProduct {
     }
     
     private func getLocalizedSubscriptionPeriod(subscriptionPeriod: SKProductSubscriptionPeriod?) -> String? {
-        if subscriptionPeriod == nil {
-            return nil
+        if subscriptionPeriod != nil {
+            return getLocalizedPeriod(unit: subscriptionPeriod!.unit, numberOfUnits: subscriptionPeriod!.numberOfUnits, dropOne: true)
         }
-        let numberOfUnits = subscriptionPeriod!.numberOfUnits
-        let numUnits = numberOfUnits > 1 ? "\(numberOfUnits) " : ""  // Add space for formatting
-        let period = getLocalizedPeriod(unit: subscriptionPeriod?.unit, numberOfUnits: numberOfUnits)
-        return "\(numUnits)\(period)"
+        return nil
     }
     
-    private func getLocalizedPeriod(unit: SKProduct.PeriodUnit?, numberOfUnits: Int) -> String {
-        let period:String = {
-            switch unit {
-            case .day: return numberOfUnits > 1 ? NSLocalizedString("days", comment: "") : NSLocalizedString("day", comment: "")
-            case .week: return numberOfUnits > 1 ? NSLocalizedString("weeks", comment: "") : NSLocalizedString("week", comment: "")
-            case .month: return numberOfUnits > 1 ? NSLocalizedString("months", comment: "") : NSLocalizedString("month", comment: "")
-            case .year: return numberOfUnits > 1 ? NSLocalizedString("years", comment: "") : NSLocalizedString("year", comment: "")
-            case .none: return ""
-            @unknown default:
-                debugPrint("Unknown period unit")
-                return ""
-            }
-        }()
+    private func getLocalizedPeriod(unit: SKProduct.PeriodUnit, numberOfUnits: Int, dropOne: Bool = false) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.maximumUnitCount = 1
+        formatter.unitsStyle = .full
+        formatter.zeroFormattingBehavior = .dropAll
+        
+        let calendarUnit = unit.toCalendarUnit()
+        var dateComponents = DateComponents()
+        dateComponents.calendar = Calendar.current
+        formatter.allowedUnits = [calendarUnit]
+        
+        switch calendarUnit {
+        case .day: dateComponents.setValue(numberOfUnits, for: .day)
+        case .weekOfMonth: dateComponents.setValue(numberOfUnits, for: .weekOfMonth)
+        case .month: dateComponents.setValue(numberOfUnits, for: .month)
+        case .year: dateComponents.setValue(numberOfUnits, for: .year)
+        default:
+            debugPrint("Unknown period unit")
+            return ""
+        }
+        
+        var period = formatter.string(from: dateComponents)!
+        
+        if numberOfUnits == 1 && dropOne {
+            period = period.replacingOccurrences(of: "1", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         return period
+    }
+}
+
+@available(iOS 11.2, *)
+extension SKProduct.PeriodUnit {
+    func toCalendarUnit() -> NSCalendar.Unit {
+        switch self {
+        case .day: return .day
+        case .month: return .month
+        case .week: return .weekOfMonth
+        case .year: return .year
+        @unknown default:
+            debugPrint("Unknown period unit")
+        }
+        return .day
     }
 }
