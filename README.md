@@ -23,6 +23,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
   - [Purchases information](#purchases-information)
 - [Server integration](#server-integration)
 - [Xcode Demo Project](#xcode-demo-project)
+- [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 
@@ -415,6 +416,9 @@ Of course, in this case, you will want to delay calls to `InAppPurchase.initiali
 ## Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).
 
+## Troubleshooting
+
+Common issues are covered here: https://github.com/iridescent-dev/iap-swift-lib/wiki/Troubleshooting
 
 ## License
 InAppPurchaseLib is open-sourced library licensed under the MIT License. See [LICENSE](LICENSE) for details.
