@@ -36,7 +36,7 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     func getProducts() -> Array<SKProduct> {
         return self.products ?? []
     }
-        
+    
     // Gets the product by its identifier from the list of products retrieved from the App Store.
     func getProduct(identifier: String) -> SKProduct? {
         return self.products?.filter { $0.productIdentifier.contains(identifier) }.first
@@ -55,7 +55,7 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
                     // Only one introductory offer can be activated within a group of auto-renewable subscriptions
                     // Add all the identifiers of the group's products
                     let groupProductIDs = InAppPurchase.getProducts().filter { $0.isAutoRenewableSubscription()
-                            && $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
+                        && $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
                         .map { $0.productIdentifier }
                     
                     ineligibleForIntroPriceProductIDs = ineligibleForIntroPriceProductIDs.union(groupProductIDs)
@@ -81,16 +81,6 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
 
 
 extension SKProduct {
-    // Returns a localized string with the current cost of the product, with reduction if available, in the local currency.
-    func getLocalizedCurrentPrice() -> String? {
-        if hasIntroductoryPriceEligible() {
-            return getLocalizedPrice(locale: introductoryPrice!.priceLocale, price: introductoryPrice!.price)
-        } else {
-            return getLocalizedPrice(locale: priceLocale, price: price)
-        }
-    }
-    
-    /* MARK: - For subscription products. */
     // Checks if the product is a subscription.
     func isSubscription() -> Bool {
         // subscriptionPeriod is nil if the product is not a subscription.
@@ -110,24 +100,33 @@ extension SKProduct {
         return !ineligibleForIntroPriceProductIDs.contains(productIdentifier) && introductoryPrice != nil
     }
     
+    // Returns a localized string with the current cost of the product, with reduction if available, in the local currency.
+    var localizedCurrentPrice: String {
+        if hasIntroductoryPriceEligible() {
+            return getLocalizedPrice(locale: introductoryPrice!.priceLocale, price: introductoryPrice!.price)
+        } else {
+            return getLocalizedPrice(locale: priceLocale, price: price)
+        }
+    }
+    
     // Returns a localized string with the current period of the subscription product.
-    func getLocalizedCurrentPeriod() -> String? {
+    var localizedCurrentPeriod: String? {
         let period = hasIntroductoryPriceEligible() ? introductoryPrice!.subscriptionPeriod : subscriptionPeriod
         return getLocalizedSubscriptionPeriod(subscriptionPeriod: period)
     }
     
     // Returns a localized string with the initial cost of the product in the local currency.
-    func getLocalizedInitialPrice() -> String? {
+    var localizedInitialPrice: String {
         return getLocalizedPrice(locale: priceLocale, price: price)
     }
     
     // Returns a localized string with the initial period of the subscription product.
-    func getLocalizedInitialPeriod() -> String? {
+    var localizedInitialPeriod: String? {
         return getLocalizedSubscriptionPeriod(subscriptionPeriod: subscriptionPeriod)
     }
     
     // Returns a localized string with the period of the introductory price.
-    func getLocalizedIntroductoryPricePeriod() -> String? {
+    var localizedIntroductoryPricePeriod: String? {
         if hasIntroductoryPriceEligible() {
             let numberOfUnits = introductoryPrice!.numberOfPeriods
             let period = getLocalizedPeriod(unit: introductoryPrice?.subscriptionPeriod.unit, numberOfUnits: numberOfUnits)
@@ -139,11 +138,11 @@ extension SKProduct {
     
     
     /* MARK: - Private method. Returns formatted product Price and Period */
-    private func getLocalizedPrice(locale: Locale, price: NSDecimalNumber) -> String? {
+    private func getLocalizedPrice(locale: Locale, price: NSDecimalNumber) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = locale
-        return formatter.string(from: price)
+        return formatter.string(from: price)!
     }
     
     private func getLocalizedSubscriptionPeriod(subscriptionPeriod: SKProductSubscriptionPeriod?) -> String? {
