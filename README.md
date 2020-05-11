@@ -125,7 +125,7 @@ You can add a function similar to this to your view.
 
 ``` swift
 @objc func refreshView() {
-  guard let product = InAppPurchase.getProduct(identifier: "my_product_id") else {
+  guard let product: SKProduct = InAppPurchase.getProduct(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
   }
@@ -163,7 +163,7 @@ Notice that `getLocalizedCurrentPrice()` already applied introductory prices if 
 
 ``` swift
 @objc func refreshView() {
-  guard let product = InAppPurchase.getProduct(identifier: "my_product_id") else {
+  guard let product: SKProduct = InAppPurchase.getProduct(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
   }
@@ -179,6 +179,8 @@ Notice that `getLocalizedCurrentPrice()` already applied introductory prices if 
   self.priceLabel.text = priceText
 }
 ```
+
+*Note:* You have to `import StoreKit` wherever you use `SKProduct`.
 
 ### Refreshing
 Data might change or not be yet available when your "product" view is presented. In order to properly handle those cases, you should add an observer to the `iapProductsLoaded` notification.
@@ -255,7 +257,7 @@ Then define the handler:
 ``` swift
 @objc func productPurchased(_ notification: Notification){
   // Get the product from the notification object.
-  guard let product = notification.object as? SKProduct else {
+  guard let product: SKProduct = notification.object as? SKProduct else {
       return
   }
   
@@ -342,7 +344,7 @@ NotificationCenter.default.addObserver(self, selector: #selector(transactionFail
 Define your handler:
 ``` swift
 @objc func transactionFailed(_ notification: Notification){
-    guard let transaction = notification.object as? SKPaymentTransaction else {
+    guard let transaction: SKProduct = notification.object as? SKPaymentTransaction else {
         return
     }
 
