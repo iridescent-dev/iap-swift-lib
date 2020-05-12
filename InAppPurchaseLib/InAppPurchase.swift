@@ -99,6 +99,11 @@ class InAppPurchase: NSObject {
         return IAPTransactionObserver.shared.canMakePayments()
     }
     
+    // Returns the last transaction state for a given product.
+    static func getLastTransactionState(for productId: String) -> SKPaymentTransactionState? {
+        return IAPTransactionObserver.shared.getLastTransactionState(for: productId)
+    }
+    
     
     /* MARK: - Receipt methods */
     // Checks if the user has already purchased at least one product.

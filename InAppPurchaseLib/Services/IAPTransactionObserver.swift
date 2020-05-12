@@ -18,13 +18,14 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     @objc static let shared = IAPTransactionObserver()
     // - Keep the initializer private so no more instances of the class can be created anywhere in the app.
     private override init() {}
-
+    
     
     /* MARK: - Properties */
     private var callbackBlock: CallbackBlock?
     private var pendingTransactions: Dictionary<String, Array<SKPaymentTransaction>> = [:]
+    private var lastTransactionStates: Dictionary<String, SKPaymentTransactionState> = [:]
     private var started: Bool = false
-
+    
     
     /* MARK: - Main methods */
     // Attach an observer to the payment queue.
@@ -77,11 +78,19 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
         pendingTransactions[productId] = []
     }
     
+    // Returns the last transaction state for a given product.
+    func getLastTransactionState(for productId: String) -> SKPaymentTransactionState? {
+        return lastTransactionStates[productId]
+    }
+    
     
     /* MARK: - SKPayment Transaction Observer */
     // One or more transactions have been updated.
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
+            // Save the transaction state for the product
+            lastTransactionStates[transaction.payment.productIdentifier] = transaction.transactionState
+            
             switch (transaction.transactionState) {
             case .purchased:
                 // The content will be unlocked after validation of the receipt.
@@ -99,13 +108,11 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
                     }
                     pendingTransactions[transaction.payment.productIdentifier]?.append(transaction)
                 }
-                break
                 
             case .restored:
                 // Validate the restored purchases.
                 InAppPurchase.refreshReceipt()
                 SKPaymentQueue.default().finishTransaction(transaction)
-                break
                 
             case .failed:
                 print("[transaction error] \(transaction.error?.localizedDescription ?? "")")
@@ -113,13 +120,11 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
                     NotificationCenter.default.post(name: .iapTransactionFailed, object: transaction)
                 }
                 SKPaymentQueue.default().finishTransaction(transaction)
-                break
                 
             case .deferred:
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: .iapTransactionDeferred, object: transaction)
                 }
-                break
                 
             case .purchasing:
                 break

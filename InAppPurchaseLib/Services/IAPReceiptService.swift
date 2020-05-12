@@ -42,9 +42,8 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
             return nextExpiryDate != nil && nextExpiryDate! > Date()
             
         default:
-            break
+            return false
         }
-        return false
     }
     
     // Returns the latest purchased date for a given product.
