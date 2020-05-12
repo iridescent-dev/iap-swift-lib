@@ -77,6 +77,15 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
             NotificationCenter.default.post(name: .iapProductsLoaded, object: nil)
         }
     }
+    
+    public func request(_ request: SKRequest, didFailWithError error: Error) {
+        if request is SKProductsRequest {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .iapRefreshProductsFailed, object: error)
+            }
+        }
+        print("[product error] \(error.localizedDescription)")
+    }
 }
 
 

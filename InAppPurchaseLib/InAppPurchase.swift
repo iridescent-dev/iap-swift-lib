@@ -143,6 +143,10 @@ extension Notification.Name {
     // Products are loaded from the App Store.
     static let iapProductsLoaded = Notification.Name("iapProductsLoaded")
     
+    // Failed to refresh products from the App Store.
+    // notification.object contains the Error.
+    static let iapRefreshProductsFailed = Notification.Name("iapRefreshProductsFailed")
+    
     // The transaction failed.
     // notification.object contains the SKPaymentTransaction.
     static let iapTransactionFailed = Notification.Name("iapTransactionFailed")
