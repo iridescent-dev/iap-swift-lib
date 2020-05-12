@@ -56,7 +56,7 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
     func getPurchasedQuantity(for productId: String) -> Int? {
         return UserDefaults.standard.object(forKey: "\(productId)_quantity") as? Int
     }
-
+    
     // Returns the expiry date for a subcription. May be past or future.
     func getExpiryDate(for productId: String) -> Date? {
         return UserDefaults.standard.object(forKey: "\(productId)_expiryDate") as? Date
@@ -208,8 +208,12 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
             UserDefaults.standard.set(nextExpiryDate, forKey: "\(product.productIdentifier)_nextExpiryDate")
             UserDefaults.standard.set(quantity, forKey: "\(product.productIdentifier)_quantity")
             
-            // If the purchase date has changed, send a notification.
-            if oldPurchaseDate != purchaseDate {
+            // If the product is newly purchased/restored and still active, send a notification.
+            if oldPurchaseDate != purchaseDate && (
+                // consumables should always be processed
+                InAppPurchase.getType(for: product.productIdentifier) == IAPProductType.consumable
+                    // others must be active to be processed
+                    || hasActivePurchase(for: product.productIdentifier)) {
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: .iapProductPurchased, object: product)
                 }
