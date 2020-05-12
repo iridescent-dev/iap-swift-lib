@@ -118,7 +118,7 @@ Those are the most important:
  - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
  - `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
  - `localizedDescription: String` - A description of the product, in the language of the device, as retrieved from the AppStore.
- - `func getLocalizedCurrentPrice() -> String?` - Current cost of the product in the local currency (_method added by this library_).
+ - `localizedCurrentPrice: String` - Current cost of the product in the local currency (_read-only property added by this library_).
 
 *Example*:
 
@@ -132,7 +132,7 @@ You can add a function similar to this to your view.
   }
   self.titleLabel.text = product.localizedTitle
   self.descriptionLabel.text = product.localizedDescription
-  self.priceLabel.text = product.getLocalizedCurrentPrice()
+  self.priceLabel.text = product.localizedCurrentPrice
 }
 ```
 
@@ -141,7 +141,7 @@ This example assumes `self.titleLabel` is a UILabel, etc.
 Make sure to call this function when the view appears on screen, for instance by calling it from [`viewWillAppear`](https://developer.apple.com/documentation/uikit/uiviewcontroller/1621510-viewwillappear).
 
 ``` swift
-func viewWillAppear(_ animated: Bool) {
+override func viewWillAppear(_ animated: Bool) {
   self.refreshView()
 }
 ```
@@ -153,12 +153,12 @@ For subscription products, you also have some data about subscription periods an
  - `func isSubscription() -> Bool` - The product is a subscription.
  - `func isAutoRenewableSubscription() -> Bool` - The product is an auto-renewable subscription.
  - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
- - `func getLocalizedCurrentPeriod() -> String?` - The current period of the subscription.
- - `func getLocalizedInitialPrice() -> String?` -  The initial cost of the subscription in the local currency.
- - `func getLocalizedInitialPeriod() -> String?` - The initial period of the subscription.
- - `func getLocalizedIntroductoryPricePeriod() -> String?` - The period of the introductory price.
+ - `localizedCurrentPeriod: String?` - The current period of the subscription.
+ - `localizedInitialPrice: String` -  The initial cost of the subscription in the local currency.
+ - `localizedInitialPeriod: String?` - The initial period of the subscription.
+ - `localizedIntroductoryPricePeriod: String?` - The period of the introductory price.
 
-Notice that `getLocalizedCurrentPrice()` already applied introductory prices if they are available. 
+Notice that `localizedCurrentPrice` already applied introductory prices if they are available. 
 
 **Example**
 
@@ -172,10 +172,10 @@ Notice that `getLocalizedCurrentPrice()` already applied introductory prices if 
   self.descriptionLabel.text = product.localizedDescription
 
   // Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"
-  var priceText = "\(product.getLocalizedCurrentPrice()) / \(product.getLocalizedCurrentPeriod() ?? "")"
+  var priceText = "\(product.localizedCurrentPrice) / \(product.localizedCurrentPeriod ?? "")"
   if product.hasIntroductoryPriceEligible() {
-    priceText = "\(priceText) for \(product.getLocalizedIntroductoryPricePeriod())" +
-      " (then \(product.getLocalizedInitialPrice()) / \(product.getLocalizedInitialPeriod()))"
+    priceText = "\(priceText) for \(product.localizedIntroductoryPricePeriod)" +
+      " (then \(product.localizedInitialPrice) / \(product.localizedInitialPeriod))"
   }
   self.priceLabel.text = priceText
 }
@@ -191,12 +191,12 @@ The library loads in-app products metadata at startup, so they're immediately av
 To achieve this, call `InAppPurchase.refresh()` when your view is presented.
 
 ``` swift
-func viewWillAppear(_ animated: Bool) {
+override func viewWillAppear(_ animated: Bool) {
   self.refreshView()
   NotificationCenter.default.addObserver(self, selector: #selector(refreshView), name: .iapProductsLoaded, object: nil)
   InAppPurchase.refresh()
 }
-func viewWillDisappear(_ animated: Bool) {
+override func viewWillDisappear(_ animated: Bool) {
   NotificationCenter.default.removeObserver(self)
 }
 ```
@@ -231,10 +231,6 @@ do {
     )
 } catch IAPError.productNotFound {
     print("IAPError: the product was not found on the App Store and cannot be purchased.")
-} catch IAPError.purchaseAlreadyInProgress {
-    print("IAPError: a purchase is already in progress.")
-} catch IAPError.userIsNotAllowedToAuthorizePayments {
-    print("IAPError: The user is allowed to authorize payments.")
 } catch {
     print("An error occurred: \(error)")
 }
@@ -303,22 +299,6 @@ Use `hasActivePurchase(for: productId)` to checks if the user currently own (or 
 InAppPurchase.hasActivePurchase(for: productId)
 ```
 
-### Localization
-
-XXX: cf https://github.com/iridescent-dev/iap-swift-lib/issues/5 -- this should be unnecessary
-
-The period is in English by default. You can add the following keys in your localization file.
-```
-// Localizable.strings
-"day" = "day";
-"days" = "days";
-"week" = "week";
-"weeks" = "weeks";
-"month" = "month";
-"months" = "months";
-"year" = "year";
-"years" = "years";
-```
 
 ### Notifications
 This is the list of notifications published to the by the library to the default NotificationCenter, for different events.
@@ -367,27 +347,27 @@ Define your handler:
 ### Purchases information
 For convenience, the library provides some utility functions to check for your past purchases data (date, expiry date) and agregate information (has active subscription, ...).
 
-`hasAlreadyPurchased() -> Bool` is a handy method that checks if the user has already purchased at least one product.
+`func hasAlreadyPurchased() -> Bool` is a handy method that checks if the user has already purchased at least one product.
 ``` swift
 InAppPurchase.hasAlreadyPurchased()
 ```
 
-`hasActiveSubscription() -> Bool` checks if the user has an active subscription.
+`func hasActiveSubscription() -> Bool` checks if the user has an active subscription.
 ``` swift
 InAppPurchase.hasActiveSubscription()
 ```
 
-`getPurchaseDate(for: productId) -> Date?` returns the latest purchased date for a given product.
+`func getPurchaseDate(for: productId) -> Date?` returns the latest purchased date for a given product.
 ``` swift
 InAppPurchase.getPurchaseDate(for: productId)
 ```
 
-`getExpiryDate(for: productId) -> Date?` returns the expiry date for a subcription. May be past or future.
+`func getExpiryDate(for: productId) -> Date?` returns the expiry date for a subcription. May be past or future.
 ``` swift
 InAppPurchase.getExpiryDate(for: productId)
 ```
 
-`getNextExpiryDate(for: productId) -> Date?` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
+`func getNextExpiryDate(for: productId) -> Date?` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
 ``` swift
 InAppPurchase.getNextExpiryDate(for: productId)
 ```
