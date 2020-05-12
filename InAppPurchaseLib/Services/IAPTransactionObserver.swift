@@ -142,5 +142,8 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
         // and the callback method has not been called.
         self.callbackBlock?()
         self.callbackBlock = nil
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .iapRestorationCompleted, object: nil)
+        }
     }
 }

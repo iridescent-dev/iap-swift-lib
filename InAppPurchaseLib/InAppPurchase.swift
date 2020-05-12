@@ -155,6 +155,9 @@ extension Notification.Name {
     // notification.object contains the SKPaymentTransaction.
     static let iapTransactionDeferred = Notification.Name("iapTransactionDeferred")
     
+    // All restorable transactions have been processed.
+    static let iapRestorationCompleted = Notification.Name("iapRestorationCompleted")
+
     // The product is purchased.
     // notification.object contains the SKProduct.
     static let iapProductPurchased = Notification.Name("iapProductPurchased")
