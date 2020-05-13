@@ -75,17 +75,17 @@ Before everything else the library must be initialized. This has to happen as so
 * `applicationUsername` - The user name, if your app implements user login (optional)
 
 Each **IAPProduct** contains the following fields:
-* `identifier` - The product unique identifier 
-* `type` - The **IAPProductType** (`consumable`, `nonConsumable`, `subscription` or `autoRenewableSubscription`)
+* `productIdentifier` - The product unique identifier 
+* `productType` - The **IAPProductType** (`consumable`, `nonConsumable`, `nonRenewingSubscription` or `autoRenewableSubscription`)
 
 *Example:*
 
 ``` swift
 InAppPurchase.initialize(
   iapProducts: [
-    IAPProduct(identifier: "monthly_plan", type: .autoRenewableSubscription),
-    IAPProduct(identifier: "yearly_plan", type: .autoRenewableSubscription),
-    IAPProduct(identifier: "disable_ads", type: .nonConsumable)
+    IAPProduct(productIdentifier: "monthly_plan", productType: .autoRenewableSubscription),
+    IAPProduct(productIdentifier: "yearly_plan",  productType: .autoRenewableSubscription),
+    IAPProduct(productIdentifier: "disable_ads",  productType: .nonConsumable)
   ],
   validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
 ```
@@ -112,7 +112,7 @@ For more advanced use cases, in particular when you have implemented user login,
 ### Displaying products
 Let's start with the simplest case: you have a single product.
 
-You can retrieve all information about this product using the function `InAppPurchase.getProduct("my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with helpful methods.
+You can retrieve all information about this product using the function `InAppPurchase.getProductBy(identifier: "my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with helpful methods.
 
 Those are the most important:
  - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
@@ -126,7 +126,7 @@ You can add a function similar to this to your view.
 
 ``` swift
 @objc func refreshView() {
-  guard let product: SKProduct = InAppPurchase.getProduct(identifier: "my_product_id") else {
+  guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
   }
@@ -150,8 +150,6 @@ override func viewWillAppear(_ animated: Bool) {
 
 For subscription products, you also have some data about subscription periods and introductory offers.
 
- - `func isSubscription() -> Bool` - The product is a subscription.
- - `func isAutoRenewableSubscription() -> Bool` - The product is an auto-renewable subscription.
  - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
  - `localizedCurrentPeriod: String?` - The current period of the subscription.
  - `localizedInitialPrice: String` -  The initial cost of the subscription in the local currency.
@@ -164,7 +162,7 @@ Notice that `localizedCurrentPrice` already applied introductory prices if they 
 
 ``` swift
 @objc func refreshView() {
-  guard let product: SKProduct = InAppPurchase.getProduct(identifier: "my_product_id") else {
+  guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
   }
@@ -215,7 +213,7 @@ That is why the process looks like so:
 - sending purchase request, for which successful doesn't mean complete
 
 #### Making a purchase
-To make a purchase, use the `InAppPurchase.purchase()` function. It takes the `productId` and a `callback` function, called when the purchase has been processed.
+To make a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
 
 **Important**: This callback is not meant to unlock the feature. **purchase processed ≠ purchase successful**
 
@@ -226,7 +224,7 @@ From this callback, you can for example unlock the UI by hiding your loading ind
 do {
     self.loaderView.show()
     try InAppPurchase.purchase(
-        productId: productIdentifier,
+        productIdentifier: productIdentifier,
         callback: { self.loaderView.hide() }
     )
 } catch IAPError.productNotFound {
@@ -268,7 +266,7 @@ Then define the handler:
 
 In simple cases, you can rely of the library to provide you with information about past purchases and no specific action is needed to unlock the product, just call `InAppPurchase.finishTransactions()`.
 
-The last known state of the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productId)` method lets you to retrieve the ownership status of a product or subscription.
+The last known state of the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productIdentifier)` method lets you to retrieve the ownership status of a product or subscription.
 
 For more advanced use cases, implement your own unlocking logic and call `InAppPurchase.finishTransactions()` afterward.
 
@@ -295,10 +293,7 @@ The `callback` method is called once the operation is complete. You can use it t
 ### Purchased products
 As mentioned earlier, the library provides access to the state of the users purchases. See the [purchases information](#purchases-information) section.
 
-Use `hasActivePurchase(for: productId)` to checks if the user currently own (or is subscribed to) a given product.
-``` swift
-InAppPurchase.hasActivePurchase(for: productId)
-```
+Use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
 
 
 ### Notifications
@@ -353,25 +348,26 @@ For convenience, the library provides some utility functions to check for your p
   InAppPurchase.hasAlreadyPurchased()
   ```
 
+- `func hasActivePurchase(for productIdentifier: String) -> Bool` checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
+``` swift
+InAppPurchase.hasActivePurchase(for: productIdentifier)
+```
+
 - `func hasActiveSubscription() -> Bool` checks if the user has an active subscription.
   ``` swift
   InAppPurchase.hasActiveSubscription()
   ```
 
-- `func getPurchaseDate(for: productId) -> Date?` returns the latest purchased date for a given product.
+- `func getPurchaseDate(for productIdentifier: String) -> Date?` returns the latest purchased date for a given product.
   ``` swift
-  InAppPurchase.getPurchaseDate(for: productId)
+  InAppPurchase.getPurchaseDate(for: productIdentifier)
   ```
 
-- `func getExpiryDate(for: productId) -> Date?` returns the expiry date for a subcription. May be past or future.
+- `func getExpiryDate(for productIdentifier: String) -> Date?` returns the expiry date for a subcription. May be past or future.
   ``` swift
-  InAppPurchase.getExpiryDate(for: productId)
+  InAppPurchase.getExpiryDate(for: productIdentifier)
   ```
 
-- `func getNextExpiryDate(for: productId) -> Date?` returns the expiry date for an active subcription. It returns nil if the subscription is expired. 
-  ``` swift
-  InAppPurchase.getNextExpiryDate(for: productId)
-  ```
 
 ## Server integration
 

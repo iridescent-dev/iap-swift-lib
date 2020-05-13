@@ -9,7 +9,7 @@
 import Foundation
 import StoreKit
 
-private let INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY = "IneligibleForIntroPriceProductIDs"
+private let INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY = "ineligibleForIntroPriceProductIDs"
 
 class IAPProductService: NSObject, SKProductsRequestDelegate {
     
@@ -38,7 +38,7 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     }
     
     // Gets the product by its identifier from the list of products retrieved from the App Store.
-    func getProduct(identifier: String) -> SKProduct? {
+    func getProductBy(identifier: String) -> SKProduct? {
         return self.products?.filter { $0.productIdentifier.contains(identifier) }.first
     }
     
@@ -46,16 +46,15 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     static func refreshIneligibleForIntroPriceProduct(identifiers: [String]){
         var ineligibleForIntroPriceProductIDs: Set<String> = []
         
-        for productId in identifiers {
+        for productIdentifier in identifiers {
             // Checks if the product exists and if it has not already been added to the list
-            if !ineligibleForIntroPriceProductIDs.contains(productId),
-                let product = InAppPurchase.getProduct(identifier: productId) {
+            if !ineligibleForIntroPriceProductIDs.contains(productIdentifier),
+                let product = InAppPurchase.getProductBy(identifier: productIdentifier) {
                 
-                if product.isAutoRenewableSubscription() {
+                if product.subscriptionGroupIdentifier != nil {
                     // Only one introductory offer can be activated within a group of auto-renewable subscriptions
                     // Add all the identifiers of the group's products
-                    let groupProductIDs = InAppPurchase.getProducts().filter { $0.isAutoRenewableSubscription()
-                        && $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
+                    let groupProductIDs = InAppPurchase.getProducts().filter { $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
                         .map { $0.productIdentifier }
                     
                     ineligibleForIntroPriceProductIDs = ineligibleForIntroPriceProductIDs.union(groupProductIDs)
@@ -66,7 +65,7 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
                 }
             }
         }
-        UserDefaults.standard.set(ineligibleForIntroPriceProductIDs.map{$0}, forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY)
+        IAPStorageService.setStringArray(ineligibleForIntroPriceProductIDs.map{$0}, forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY)
     }
     
     
@@ -90,22 +89,9 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
 
 
 extension SKProduct {
-    // Checks if the product is a subscription.
-    func isSubscription() -> Bool {
-        // subscriptionPeriod is nil if the product is not a subscription.
-        return subscriptionPeriod != nil
-    }
-    
-    // Checks if the product is an auto-renewable subscription..
-    func isAutoRenewableSubscription() -> Bool {
-        // All auto-renewable subscriptions must be a part of a group.
-        // subscriptionGroupIdentifier is nil if the product is not an auto-renewable subscription.
-        return subscriptionGroupIdentifier != nil
-    }
-    
     // Checks if the product has an introductory price the user is eligible to.
     func hasIntroductoryPriceEligible() -> Bool {
-        let ineligibleForIntroPriceProductIDs = UserDefaults.standard.object(forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY) as? [String] ?? [String]()
+        let ineligibleForIntroPriceProductIDs = IAPStorageService.getStringArray(forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY)
         return !ineligibleForIntroPriceProductIDs.contains(productIdentifier) && introductoryPrice != nil
     }
     

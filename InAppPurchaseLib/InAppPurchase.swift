@@ -12,7 +12,7 @@ import StoreKit
 
 class InAppPurchase: NSObject {
     // InAppPurchaseLib version number
-    internal static let versionNumber = "1.0.1"
+    internal static let versionNumber = "1.0.2"
     
     
     /* MARK: - Properties */
@@ -30,7 +30,7 @@ class InAppPurchase: NSObject {
         InAppPurchase.iapProducts = iapProducts
         
         IAPTransactionObserver.shared.start()
-        productService.initialize(productIDs: Set(iapProducts.map { $0.identifier }))
+        productService.initialize(productIDs: Set(iapProducts.map { $0.productIdentifier }))
         receiptService.initialize(validatorUrlString: validatorUrlString)
     }
     
@@ -63,22 +63,15 @@ class InAppPurchase: NSObject {
     }
     
     // Gets the product by its identifier from the list of products retrieved from the App Store.
-    static func getProduct(identifier: String) -> SKProduct? {
-        return productService.getProduct(identifier: identifier)
-    }
-    
-    // Returns the product type.
-    static func getType(for productId: String) -> IAPProductType? {
-        return iapProducts.first{ $0.identifier == productId }?.type
+    static func getProductBy(identifier: String) -> SKProduct? {
+        return productService.getProductBy(identifier: identifier)
     }
     
     
     /* MARK: - Transaction methods */
     // Request a Payment from the App Store.
-    static func purchase(productId: String, quantity: Int = 1
-        , callback: @escaping CallbackBlock) throws {
-        guard let product = productService.getProduct(identifier: productId) else {
-            callback()
+    static func purchase(productIdentifier: String, quantity: Int = 1, callback: @escaping CallbackBlock) throws {
+        guard let product = productService.getProductBy(identifier: productIdentifier) else {
             throw IAPError.productNotFound
         }
         try IAPTransactionObserver.shared.purchase(product: product, quantity: quantity, applicationUsername: applicationUsername, callback: callback)
@@ -86,12 +79,12 @@ class InAppPurchase: NSObject {
     
     // Restore purchased products.
     static func restorePurchases(callback: @escaping CallbackBlock) {
-        IAPTransactionObserver.shared.restorePurchases(callback: callback)
+        IAPTransactionObserver.shared.restorePurchases(applicationUsername: applicationUsername, callback: callback)
     }
     
     // Finish all transactions for the product.
-    static func finishTransactions(for productId: String) {
-        IAPTransactionObserver.shared.finishTransactions(for: productId)
+    static func finishTransactions(for productIdentifier: String) {
+        IAPTransactionObserver.shared.finishTransactions(for: productIdentifier)
     }
     
     // Checks if the user is allowed to authorize payments.
@@ -100,8 +93,8 @@ class InAppPurchase: NSObject {
     }
     
     // Returns the last transaction state for a given product.
-    static func getTransactionState(for productId: String) -> SKPaymentTransactionState? {
-        return IAPTransactionObserver.shared.getTransactionState(for: productId)
+    static func getTransactionState(for productIdentifier: String) -> SKPaymentTransactionState? {
+        return IAPTransactionObserver.shared.getTransactionState(for: productIdentifier)
     }
     
     
@@ -111,15 +104,15 @@ class InAppPurchase: NSObject {
         return receiptService.hasAlreadyPurchased()
     }
     
-    // Checks if the user currently own (or is subscribed to) a given product.
-    static func hasActivePurchase(for productId: String) -> Bool {
-        return receiptService.hasActivePurchase(for: productId)
+    // Checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
+    static func hasActivePurchase(for productIdentifier: String) -> Bool {
+        return receiptService.hasActivePurchase(for: productIdentifier)
     }
     
-    // Checks if the user has an active subscription.
+    // Checks if the user has an active auto renewable subscription.
     static func hasActiveSubscription() -> Bool {
-        for productId in (iapProducts.filter{ $0.isSubscription() }.map{ $0.identifier }) {
-            if receiptService.hasActivePurchase(for: productId){
+        for productIdentifier in (iapProducts.filter{ $0.productType == IAPProductType.autoRenewableSubscription }.map{ $0.productIdentifier }) {
+            if receiptService.hasActivePurchase(for: productIdentifier){
                 return true
             }
         }
@@ -127,18 +120,13 @@ class InAppPurchase: NSObject {
     }
     
     // Returns the latest purchased date for a given product.
-    static func getPurchaseDate(for productId: String) -> Date? {
-        return receiptService.getPurchaseDate(for: productId)
+    static func getPurchaseDate(for productIdentifier: String) -> Date? {
+        return receiptService.getPurchaseDate(for: productIdentifier)
     }
     
     // Returns the expiry date for a subcription. May be past or future.
-    static func getExpiryDate(for productId: String) -> Date? {
-        return receiptService.getExpiryDate(for: productId)
-    }
-    
-    // Returns the expiry date for an active subcription. It returns nil if the subscription is expired.
-    static func getNextExpiryDate(for productId: String) -> Date? {
-        return receiptService.getNextExpiryDate(for: productId)
+    static func getExpiryDate(for productIdentifier: String) -> Date? {
+        return receiptService.getExpiryDate(for: productIdentifier)
     }
 }
 
@@ -161,8 +149,8 @@ extension Notification.Name {
     static let iapTransactionDeferred = Notification.Name("iapTransactionDeferred")
     
     // All restorable transactions have been processed.
-    static let iapRestorationCompleted = Notification.Name("iapRestorationCompleted")
-
+    static let iapRestoreCompleted = Notification.Name("iapRestoreCompleted")
+    
     // The product is purchased.
     // notification.object contains the SKProduct.
     static let iapProductPurchased = Notification.Name("iapProductPurchased")
@@ -182,22 +170,33 @@ extension Notification.Name {
 
 /* MARK: - IAP Product and Type definition. */
 struct IAPProduct {
-    var identifier: String
-    var type: IAPProductType
-    
-    func isSubscription() -> Bool{
-        return type == IAPProductType.autoRenewableSubscription || type == IAPProductType.subscription
-    }
+    var productIdentifier: String
+    var productType: IAPProductType
 }
 
 enum IAPProductType {
     case consumable
     case nonConsumable
-    case subscription
+    case nonRenewingSubscription
     case autoRenewableSubscription
 }
 
 /* MARK: - Error */
 enum IAPError: Error {
     case productNotFound
+    case cannotMakePurchase
+    case alreadyPurchasing
+}
+
+extension IAPError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .productNotFound:
+            return NSLocalizedString("The product was not found on the App Store and cannot be purchased.", comment: "Product Not Found")
+        case .cannotMakePurchase:
+            return NSLocalizedString("The user is not allowed to authorize payments.", comment: "Cannot Make Purchase")
+        case .alreadyPurchasing:
+            return NSLocalizedString("A purchase is already in progress.", comment: "Already Purchasing")
+        }
+    }
 }
