@@ -207,12 +207,12 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
             UserDefaults.standard.set(nextExpiryDate, forKey: "\(product.productIdentifier)_nextExpiryDate")
             UserDefaults.standard.set(quantity, forKey: "\(product.productIdentifier)_quantity")
             
-            // If the product is newly purchased/restored and still active, send a notification.
-            if oldPurchaseDate != purchaseDate && (
-                // consumables should always be processed
-                InAppPurchase.getType(for: product.productIdentifier) == IAPProductType.consumable
-                    // others must be active to be processed
-                    || hasActivePurchase(for: product.productIdentifier)) {
+            // If the product is a consumable or is newly purchased/restored and still active, send a notification.
+            // - Consumables should always be processed if present in the receipt
+            if  (InAppPurchase.getType(for: product.productIdentifier) == IAPProductType.consumable && receipt != nil)
+                // - Other products must have been updated and still be active to be processed
+                || (oldPurchaseDate != purchaseDate && hasActivePurchase(for: product.productIdentifier)) {
+                
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: .iapProductPurchased, object: product)
                 }
