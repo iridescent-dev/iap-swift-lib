@@ -245,9 +245,12 @@ Keep in mind that purchase notifications might occur even if you never called th
 
 *Example:*
 
-When the application did launch, we add our observer:
+When the application did launch (*generally in the application delegate's `application didFinishLaunchingWithOptions` function*), we add our observer:
 ``` swift
-NotificationCenter.default.addObserver(self, selector: #selector(productPurchased(_:)), name: .iapProductPurchased, object: nil)
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  NotificationCenter.default.addObserver(self, selector: #selector(productPurchased(_:)), name: .iapProductPurchased, object: nil)
+  InAppPurchase.initialize(...)
+}
 ```
 
 Then define the handler:
@@ -265,13 +268,13 @@ Then define the handler:
 }
 ```
 
-In simple cases, you can rely of the library to provide you with information about past purchases and no specific action is needed to unlock the product, just call `InAppPurchase.finishTransactions()`.
+In simple cases, you can rely on the library to provide you with information about past purchases and no specific action is needed to unlock the product, just call `InAppPurchase.finishTransactions()`.
 
 The last known state of the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productId)` method lets you to retrieve the ownership status of a product or subscription.
 
 For more advanced use cases, implement your own unlocking logic and call `InAppPurchase.finishTransactions()` afterward.
 
-*Note:* `iapProductPurchased` is emitted when a purchase has been confirmed by Fovea's receipt validator. If you have a server, he probably already has been notified of this purchase using the webhook.
+*Note:* `iapProductPurchased` is emitted when a purchase has been confirmed by Fovea's receipt validator. If you have a server, it has probably already been notified of this purchase using the webhook.
 
 *Tip:* After a successful purchase, you should now see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).
 
