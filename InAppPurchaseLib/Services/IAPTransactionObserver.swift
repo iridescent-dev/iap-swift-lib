@@ -23,7 +23,7 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     /* MARK: - Properties */
     private var callbackBlock: CallbackBlock?
     private var pendingTransactions: Dictionary<String, Array<SKPaymentTransaction>> = [:]
-    private var lastTransactionStates: Dictionary<String, SKPaymentTransactionState> = [:]
+    private var transactionStates: Dictionary<String, SKPaymentTransactionState> = [:]
     private var started: Bool = false
     
     
@@ -79,8 +79,8 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     }
     
     // Returns the last transaction state for a given product.
-    func getLastTransactionState(for productId: String) -> SKPaymentTransactionState? {
-        return lastTransactionStates[productId]
+    func getTransactionState(for productId: String) -> SKPaymentTransactionState? {
+        return transactionStates[productId]
     }
     
     
@@ -89,7 +89,7 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
             // Save the transaction state for the product
-            lastTransactionStates[transaction.payment.productIdentifier] = transaction.transactionState
+            transactionStates[transaction.payment.productIdentifier] = transaction.transactionState
             
             switch (transaction.transactionState) {
             case .purchased:

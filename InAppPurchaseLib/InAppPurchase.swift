@@ -100,8 +100,8 @@ class InAppPurchase: NSObject {
     }
     
     // Returns the last transaction state for a given product.
-    static func getLastTransactionState(for productId: String) -> SKPaymentTransactionState? {
-        return IAPTransactionObserver.shared.getLastTransactionState(for: productId)
+    static func getTransactionState(for productId: String) -> SKPaymentTransactionState? {
+        return IAPTransactionObserver.shared.getTransactionState(for: productId)
     }
     
     
