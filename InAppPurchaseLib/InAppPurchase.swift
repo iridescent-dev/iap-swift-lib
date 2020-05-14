@@ -11,7 +11,7 @@ import StoreKit
 
 
 class InAppPurchase: NSObject {
-    // InAppPurchaseLib version number
+    /// InAppPurchaseLib version number
     internal static let versionNumber = "1.0.2"
     
     
@@ -25,34 +25,46 @@ class InAppPurchase: NSObject {
     
     /* MARK: - Main methods */
     // Start In App Purchase services.
-    static func initialize(iapProducts: Array<IAPProduct>, validatorUrlString: String, applicationUsername: String? = nil){
+    static func initialize(iapProducts: Array<IAPProduct>, validatorUrlString: String, applicationUsername: String? = nil) {
+        
         InAppPurchase.applicationUsername = applicationUsername
         InAppPurchase.iapProducts = iapProducts
         
-        IAPTransactionObserver.shared.start()
+        IAPTransactionObserver.shared.start(receiptService: receiptService)
         productService.initialize(productIDs: Set(iapProducts.map { $0.productIdentifier }))
-        receiptService.initialize(validatorUrlString: validatorUrlString)
+        receiptService.initialize(validatorUrlString: validatorUrlString, productService: productService)
     }
     
     // Stop In App Purchase services.
-    static func stop(){
+    static func stop() {
         IAPTransactionObserver.shared.stop()
     }
     
     // Refresh App Store Products and Receipt.
-    static func refresh(){
-        refreshProducts()
-        refreshReceipt()
-    }
-    
-    // Refresh Products from the App Store.
-    static func refreshProducts(){
-        productService.loadProducts()
-    }
-    
-    // Refresh and validate the App Store Receipt.
-    static func refreshReceipt(){
-        receiptService.validateReceipt()
+    static func refresh(callback: @escaping IAPRefreshCallback) {
+        var productLoaded = false
+        var receiptRefreshed = false
+        
+        let asyncGroup = DispatchGroup()
+        
+        asyncGroup.enter()
+        productService.refresh(callback: { result in
+            productLoaded = result.state == .succeeded
+            asyncGroup.leave()
+        })
+        asyncGroup.enter()
+        receiptService.refresh(callback: { result in
+            receiptRefreshed = result.state == .succeeded
+            asyncGroup.leave()
+        })
+        
+        asyncGroup.notify(queue: .main) {
+            if productLoaded && receiptRefreshed {
+                callback(IAPRefreshResult(state: .succeeded))
+            } else {
+                callback(IAPRefreshResult(state: .failed))
+            }
+        }
     }
     
     
@@ -70,16 +82,16 @@ class InAppPurchase: NSObject {
     
     /* MARK: - Transaction methods */
     // Request a Payment from the App Store.
-    static func purchase(productIdentifier: String, quantity: Int = 1, callback: @escaping CallbackBlock) throws {
+    static func purchase(productIdentifier: String, quantity: Int = 1, callback: @escaping IAPPurchaseCallback) throws {
         guard let product = productService.getProductBy(identifier: productIdentifier) else {
-            throw IAPError.productNotFound
+            throw IAPPurchaseError(code: .productNotFound)
         }
         try IAPTransactionObserver.shared.purchase(product: product, quantity: quantity, applicationUsername: applicationUsername, callback: callback)
     }
     
     // Restore purchased products.
-    static func restorePurchases(callback: @escaping CallbackBlock) {
-        IAPTransactionObserver.shared.restorePurchases(applicationUsername: applicationUsername, callback: callback)
+    static func restorePurchases(callback: @escaping IAPRefreshCallback) {
+        receiptService.refresh(callback: callback)
     }
     
     // Finish all transactions for the product.
@@ -131,49 +143,43 @@ class InAppPurchase: NSObject {
 }
 
 
-/*  MARK: - Service notifications. */
+/*  MARK: - IAP Notifications */
 extension Notification.Name {
-    // Products are loaded from the App Store.
-    static let iapProductsLoaded = Notification.Name("iapProductsLoaded")
-    
-    // Failed to refresh products from the App Store.
-    // notification.object contains the Error.
-    static let iapRefreshProductsFailed = Notification.Name("iapRefreshProductsFailed")
-    
-    // The transaction failed.
-    // notification.object contains the SKPaymentTransaction.
-    static let iapTransactionFailed = Notification.Name("iapTransactionFailed")
-    
-    // The transaction is deferred.
-    // notification.object contains the SKPaymentTransaction.
-    static let iapTransactionDeferred = Notification.Name("iapTransactionDeferred")
-    
-    // All restorable transactions have been processed.
-    static let iapRestoreCompleted = Notification.Name("iapRestoreCompleted")
-    
     // The product is purchased.
-    // notification.object contains the SKProduct.
+    // `notification.object` contains the productIdentifier.
     static let iapProductPurchased = Notification.Name("iapProductPurchased")
-    
-    // Failed to refresh the App Store receipt.
-    // notification.object contains the Error.
-    static let iapRefreshReceiptFailed = Notification.Name("iapRefreshReceiptFailed")
-    
-    // Failed to validate the App Store receipt with Fovea.Billing.
-    // notification.object may contain the Error.
-    static let iapReceiptValidationFailed = Notification.Name("iapReceiptValidationFailed")
-    
-    // The the App Store receipt is validated.
-    static let iapReceiptValidationSuccessful = Notification.Name("iapReceiptValidationSuccessful")
 }
 
 
-/* MARK: - IAP Product and Type definition. */
+/* MARK: - Callback */
+typealias IAPRefreshCallback = (IAPRefreshResult) -> Void
+typealias IAPPurchaseCallback = (IAPPurchaseResult) -> Void
+
+struct IAPPurchaseResult {
+    var state: IAPPurchaseResultState
+    var errorLocalizedDescription: String? = nil
+    var skErrorCode: SKError.Code? = nil
+}
+enum IAPPurchaseResultState {
+    case purchased
+    case failed
+    case cancelled
+    case deferred
+}
+struct IAPRefreshResult {
+    var state: IAPRefreshResultState
+}
+enum IAPRefreshResultState {
+    case succeeded
+    case failed
+}
+
+
+/* MARK: - IAP Product and Type definition */
 struct IAPProduct {
     var productIdentifier: String
     var productType: IAPProductType
 }
-
 enum IAPProductType {
     case consumable
     case nonConsumable
@@ -181,16 +187,12 @@ enum IAPProductType {
     case autoRenewableSubscription
 }
 
-/* MARK: - Error */
-enum IAPError: Error {
-    case productNotFound
-    case cannotMakePurchase
-    case alreadyPurchasing
-}
 
-extension IAPError: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
+/* MARK: - IAP Purchase Error */
+struct IAPPurchaseError: IAPPurchaseErrorProtocol {
+    var code: IAPPurchaseErrorCode
+    var localizedDescription: String {
+        switch code {
         case .productNotFound:
             return NSLocalizedString("The product was not found on the App Store and cannot be purchased.", comment: "Product Not Found")
         case .cannotMakePurchase:
@@ -199,4 +201,12 @@ extension IAPError: LocalizedError {
             return NSLocalizedString("A purchase is already in progress.", comment: "Already Purchasing")
         }
     }
+}
+protocol IAPPurchaseErrorProtocol: LocalizedError {
+    var code: IAPPurchaseErrorCode { get }
+}
+enum IAPPurchaseErrorCode {
+    case productNotFound
+    case cannotMakePurchase
+    case alreadyPurchasing
 }

@@ -14,7 +14,9 @@ private let INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY = "ineligibleForIntroPric
 class IAPProductService: NSObject, SKProductsRequestDelegate {
     
     /* MARK: - Properties */
-    @objc private var products : Array<SKProduct>?
+    private var callbackBlock: IAPRefreshCallback?
+    
+    private var products : Array<SKProduct>?
     private var productIDs: Set<String> = []
     
     
@@ -22,11 +24,12 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     // Init productIDs list, and load Products from the App Store.
     func initialize(productIDs: Set<String>){
         self.productIDs = productIDs
-        self.loadProducts()
+        self.refresh(callback: {_ in})
     }
     
     // Load Products from the App Store.
-    @objc func loadProducts(){
+    func refresh(callback: @escaping IAPRefreshCallback){
+        self.callbackBlock = callback
         let request = SKProductsRequest.init(productIdentifiers: self.productIDs)
         request.delegate = self
         request.start()
@@ -43,18 +46,18 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     }
     
     // Refresh the list of products ineligible for introductory price.
-    static func refreshIneligibleForIntroPriceProduct(identifiers: [String]){
+    func refreshIneligibleForIntroPriceProduct(identifiers: [String]){
         var ineligibleForIntroPriceProductIDs: Set<String> = []
         
         for productIdentifier in identifiers {
             // Checks if the product exists and if it has not already been added to the list
             if !ineligibleForIntroPriceProductIDs.contains(productIdentifier),
-                let product = InAppPurchase.getProductBy(identifier: productIdentifier) {
+                let product = getProductBy(identifier: productIdentifier) {
                 
                 if product.subscriptionGroupIdentifier != nil {
                     // Only one introductory offer can be activated within a group of auto-renewable subscriptions
                     // Add all the identifiers of the group's products
-                    let groupProductIDs = InAppPurchase.getProducts().filter { $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
+                    let groupProductIDs = getProducts().filter { $0.subscriptionGroupIdentifier == product.subscriptionGroupIdentifier }
                         .map { $0.productIdentifier }
                     
                     ineligibleForIntroPriceProductIDs = ineligibleForIntroPriceProductIDs.union(groupProductIDs)
@@ -72,18 +75,20 @@ class IAPProductService: NSObject, SKProductsRequestDelegate {
     /* MARK: - SKProducts Request Delegate */
     public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         products = response.products
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: .iapProductsLoaded, object: nil)
-        }
+        notifyIsRefreshed(state: .succeeded)
     }
     
     public func request(_ request: SKRequest, didFailWithError error: Error) {
         if request is SKProductsRequest {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .iapRefreshProductsFailed, object: error)
-            }
+            notifyIsRefreshed(state: .failed)
         }
         print("[product error] \(error.localizedDescription)")
+    }
+    
+    /* MARK: - Private methods. */
+    private func notifyIsRefreshed(state: IAPRefreshResultState) {
+        self.callbackBlock?(IAPRefreshResult(state: state))
+        self.callbackBlock = nil
     }
 }
 

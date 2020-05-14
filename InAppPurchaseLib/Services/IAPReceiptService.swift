@@ -18,15 +18,34 @@ private let QUANTITY_KEY = "quantity"
 class IAPReceiptService: NSObject, SKRequestDelegate {
     
     /* MARK: - Properties */
-    private var lastValidationDate: Date?
+    private var productService: IAPProductService?
+    
     private var validatorUrlString: String?
+    private var lastValidationDate: Date?
+
+    private var refreshCallbackBlock: IAPRefreshCallback?
+    private var purchaseCallbackBlock: IAPPurchaseCallback?
+    private var purchaseProductIdentifier: String?
     
     
     /* MARK: - Main methods */
     // Init Fovea.Billing validator URL, and validate App Store receipt.
-    func initialize(validatorUrlString: String){
+    func initialize(validatorUrlString: String, productService: IAPProductService){
         self.validatorUrlString = validatorUrlString
-        self.validateReceipt()
+        self.productService = productService
+        self.refresh(callback: {_ in })
+    }
+    
+    // Refresh the App Store Receipt
+    func refresh(callback: @escaping IAPRefreshCallback){
+        self.refreshCallbackBlock = callback
+        refreshReceipt()
+    }
+    // Refresh the App Store Receipt to validate a purchase.
+    func refreshAfterPurchased(callback: @escaping IAPPurchaseCallback, purchasingProductIdentifier: String){
+        self.purchaseCallbackBlock = callback
+        self.purchaseProductIdentifier = purchasingProductIdentifier
+        refreshReceipt()
     }
     
     // Checks if the user has already purchased at least one product.
@@ -66,21 +85,43 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
         return IAPStorageService.getDate(forKey: EXPIRY_DATE_KEY, productIdentifier: productIdentifier)
     }
     
+    // MARK: - SKReceipt Refresh Request Delegate
+    func requestDidFinish(_ request: SKRequest) {
+        if request is SKReceiptRefreshRequest {
+            self.validateReceipt()
+        }
+    }
+    
+    func request(_ request: SKRequest, didFailWithError error: Error){
+        if request is SKReceiptRefreshRequest {
+            self.notifyFailed()
+        }
+        print("[receipt error] \(error.localizedDescription)")
+    }
+    
+    
+    /* MARK: - Private methods. */
+    private func refreshReceipt() {
+        let request = SKReceiptRefreshRequest(receiptProperties: nil)
+        request.delegate = self
+        request.start()
+    }
     
     // Validate App Store receipt using Fovea.Billing validator.
-    @objc func validateReceipt(){
+    private func validateReceipt(){
         guard let appStoreReceiptURL = Bundle.main.appStoreReceiptURL, FileManager.default.fileExists(atPath: appStoreReceiptURL.path) else {
-            refreshReceipt()
-            // validateReceipt will be called again after receipt refreshing finishes.
+            refreshReceipt() // validateReceipt will be called again after receipt refreshing finishes.
             return
         }
         
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+            self.notifyFailed()
             print("[receipt error] Bundle Identifier invalid.")
             return
         }
         
         guard let url = URL(string: validatorUrlString!) else {
+            self.notifyFailed()
             print("[receipt error] Validator URL String invalid: \(validatorUrlString ?? "nil")")
             return
         }
@@ -122,53 +163,23 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
                             self.parseReceipt(json as! Dictionary<String, Any>)
                             return
                         }
-                    } else {
-                        print("[receipt error] Failed to validate receipt: \(error?.localizedDescription ?? "")")
                     }
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .iapReceiptValidationFailed, object: error)
-                    }
+                    print("[receipt error] Failed to validate receipt: \(error?.localizedDescription ?? "")")
+                    self.notifyFailed()
                 }
             }.resume()
         }
-    }
-    
-    
-    // MARK: - SKReceipt Refresh Request Delegate
-    func requestDidFinish(_ request: SKRequest) {
-        if request is SKReceiptRefreshRequest {
-            self.validateReceipt()
-        }
-    }
-    
-    func request(_ request: SKRequest, didFailWithError error: Error){
-        if request is SKReceiptRefreshRequest {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .iapRefreshReceiptFailed, object: error)
-            }
-        }
-        print("[receipt error] \(error.localizedDescription)")
-    }
-    
-    
-    /* MARK: - Private methods. */
-    private func refreshReceipt(){
-        let request = SKReceiptRefreshRequest(receiptProperties: nil)
-        request.delegate = self
-        request.start()
     }
     
     // Get user purchases informations from Fovea.Billing validator
     // (subscription expiration date, eligibility for introductory price, ...)
     private func parseReceipt(_ json : Dictionary<String, Any>) {
         guard let data = json["data"] as? [String: Any], let collection = data["collection"] as? [[String: Any]] else {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .iapReceiptValidationFailed, object: nil)
-            }
+            self.notifyFailed()
             return
         }
         
-        IAPProductService.refreshIneligibleForIntroPriceProduct(identifiers: data["ineligible_for_intro_price"] as? [String] ?? [])
+        productService?.refreshIneligibleForIntroPriceProduct(identifiers: data["ineligible_for_intro_price"] as? [String] ?? [])
         
         IAPStorageService.setBool(!collection.isEmpty, forKey: HAS_ALREADY_PURCHASED_KEY)
         
@@ -212,15 +223,45 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
             // If the product has a pending transaction OR is newly purchased/restored and still active, send a notification.
             if  (purchase != nil && IAPTransactionObserver.shared.hasPendingTransaction(for: productIdentifier))
                 || (oldPurchaseDate != purchaseDate && hasActivePurchase(for: productIdentifier)) {
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .iapProductPurchased, object: product)
-                }
+                
+                notifyIsPurchased(for: productIdentifier, state: .purchased)
             }
         }
         
         // Notify the end of receipt validation.
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: .iapReceiptValidationSuccessful, object: nil)
+        if purchaseProductIdentifier != nil {
+            // Purchase product failed: Product is not present in the receipt.
+            notifyIsPurchased(for: purchaseProductIdentifier!, state: .failed)
+        } else {
+            // Refresh successful.
+            notifyIsRefreshed(state: .succeeded)
+        }
+    }
+    
+    private func notifyFailed() {
+        if refreshCallbackBlock != nil {
+            notifyIsRefreshed(state: .failed)
+        } else if purchaseCallbackBlock != nil && purchaseProductIdentifier != nil{
+            notifyIsPurchased(for: purchaseProductIdentifier!, state: .failed)
+        }
+    }
+    
+    private func notifyIsRefreshed(state: IAPRefreshResultState) {
+        refreshCallbackBlock?(IAPRefreshResult(state: state))
+        refreshCallbackBlock = nil
+    }
+    
+    private func notifyIsPurchased(for productIdentifier: String, state: IAPPurchaseResultState) {
+        if (productIdentifier == purchaseProductIdentifier) {
+            // The product is currently purchasing.
+            purchaseCallbackBlock?(IAPPurchaseResult(state: state))
+            purchaseCallbackBlock = nil
+            purchaseProductIdentifier = nil
+        } else if state == .purchased {
+            // The product was purchased from an other way.
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .iapProductPurchased, object: productIdentifier)
+            }
         }
     }
 }

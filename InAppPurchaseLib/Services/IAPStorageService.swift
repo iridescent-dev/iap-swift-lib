@@ -8,9 +8,7 @@
 
 import Foundation
 
-
 class IAPStorageService {
-    
     private static let prefix = "iaplib"
     
     static func getBool(forKey key: String, productIdentifier: String = "") -> Bool {
