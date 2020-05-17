@@ -1,9 +1,8 @@
 //
 //  IAPReceiptService.swift
-//  
 //
-//  Created by Veronique on 30/04/2020.
-//  Copyright © 2020 Iridescent. All rights reserved.
+//
+//  Created by Iridescent on 30/04/2020.
 //
 
 import Foundation
@@ -233,9 +232,7 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
                 
                 notifyIsPurchased(for: productIdentifier, state: .purchased)
                 
-                InAppPurchase.iapPurchaseDelegate?.productPurchased(identifier: productIdentifier, callback: {
-                    IAPTransactionObserver.shared.finishTransactions(for: productIdentifier)
-                })
+                InAppPurchase.iapPurchaseDelegate?.productPurchased(productIdentifier: productIdentifier)
             }
         }
         

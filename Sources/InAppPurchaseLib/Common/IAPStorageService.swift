@@ -1,9 +1,8 @@
 //
 //  IAPStorageService.swift
-//  
 //
-//  Created by Veronique on 13/05/2020.
-//  Copyright © 2020 Iridescent. All rights reserved.
+//
+//  Created by Iridescent on 30/04/2020.
 //
 
 import Foundation

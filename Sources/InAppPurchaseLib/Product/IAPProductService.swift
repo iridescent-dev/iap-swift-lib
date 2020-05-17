@@ -2,8 +2,7 @@
 //  IAPProductService.swift
 //
 //
-//  Created by Veronique on 30/04/2020.
-//  Copyright © 2020 Iridescent. All rights reserved.
+//  Created by Iridescent on 30/04/2020.
 //
 
 import Foundation

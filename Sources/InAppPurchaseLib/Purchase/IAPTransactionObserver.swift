@@ -2,8 +2,7 @@
 //  IAPTransactionObserver.swift
 //
 //
-//  Created by Veronique on 30/04/2020.
-//  Copyright © 2020 Iridescent. All rights reserved.
+//  Created by Iridescent on 30/04/2020.
 //
 
 import Foundation
@@ -46,7 +45,7 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     func canMakePayments() -> Bool {
         // Make sure the observer is attached to the payment queue.
         start()
-
+        
         return SKPaymentQueue.canMakePayments()
     }
     
@@ -107,7 +106,7 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
                     pendingTransactions[productIdentifier] = []
                 }
                 pendingTransactions[productIdentifier]?.append(transaction)
-                                
+                
                 // The content will be unlocked after validation of the receipt.
                 if (productIdentifier == purchasingProductIdentifier && callbackBlock != nil) {
                     IAPReceiptService.shared.refreshAfterPurchased(callback: callbackBlock!, purchasingProductIdentifier: productIdentifier)

@@ -1,9 +1,8 @@
 //
 //  InAppPurchase.swift
-//  InAppPurchaseLib
 //
-//  Created by Veronique on 30/04/2020.
-//  Copyright © 2020 Iridescent. All rights reserved.
+//
+//  Created by Iridescent on 30/04/2020.
 //
 
 import Foundation
@@ -17,7 +16,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     internal static var initialized: Bool {
         return !iapProducts.isEmpty && iapPurchaseDelegate != nil && validatorUrlString != nil
     }
-
+    
     
     /* MARK: - Properties */
     public static var iapProducts: Array<IAPProduct> = []
@@ -125,6 +124,11 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     // Checks if the user is allowed to authorize payments.
     public static func canMakePayments() -> Bool {
         return IAPTransactionObserver.shared.canMakePayments()
+    }
+    
+    // Finish all transactions for the product.
+    public static func finishTransactions(for productIdentifier: String) {
+        IAPTransactionObserver.shared.finishTransactions(for: productIdentifier)
     }
     
     // Returns the last transaction state for a given product.

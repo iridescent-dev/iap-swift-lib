@@ -18,8 +18,8 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
     - [Processing purchases](#processing-purchases)
   - [Restoring purchases](#restoring-purchases)
   - [Purchased products](#purchased-products)
-  - [Notifications](#notifications)
   - [Purchases information](#purchases-information)
+  - [Errors](#errors)
 - [Server integration](#server-integration)
 - [Xcode Demo Project](#xcode-demo-project)
 - [References](#references)
@@ -50,11 +50,21 @@ If you haven't already, I highly recommend your read the *Overview* and *Prepari
   * The iOS Subscription Status URL (only if you want subscriptions)
 
 ### Installation
-* [Download](https://github.com/iridescent-dev/iap-swift-lib/archive/master.zip) and extract.
-* Drag the `InAppPurchaseLib` folder to your project tree in XCode. When asked, set options as follows:
-  * Select *Copy items if needed*.
-  * Select *Create groups*.
-  * Make sure your project is selected in *add to target*.
+
+<p align="center">
+  <img src="ScreenshotInstallation.png" title="Installation">
+</p>
+
+* Select your project in Xcode
+* Go to the section *Swift Package*
+* Click on *(+) Add Package Dependancy*
+* Copy the Git URL: *https://github.com/iridescent-dev/iap-swift-lib.git*
+* Click on *Next* > *Next*
+* Make sure your project is selected in *Add to target*
+* Click on *Finish*
+
+*Note:* You have to `import InAppPurchaseLib` wherever you use the library.
+
 
 ## Usage
 
@@ -71,6 +81,7 @@ Before everything else the library must be initialized. This has to happen as so
 
 `InAppPurchase.initialize()` accepts the following arguments:
 * `iapProducts` - An array of **IAPProduct** (REQUIRED)
+* `iapPurchaseDelegate` - A class instance that adopts the **IAPPurchaseDelegate** protocol (REQUIRED) - see [Processing purchases](#processing-purchases)
 * `validatorUrlString` - The validator url retrieved from [Fovea](https://billing.fovea.cc) (REQUIRED)
 * `applicationUsername` - The user name, if your app implements user login (optional)
 
@@ -87,6 +98,7 @@ InAppPurchase.initialize(
     IAPProduct(productIdentifier: "yearly_plan",  productType: .autoRenewableSubscription),
     IAPProduct(productIdentifier: "disable_ads",  productType: .nonConsumable)
   ],
+  iapPurchaseDelegate: PurchaseDelegate(),
   validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
 ```
 
@@ -118,7 +130,7 @@ Those are the most important:
  - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
  - `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
  - `localizedDescription: String` - A description of the product, in the language of the device, as retrieved from the AppStore.
- - `localizedCurrentPrice: String` - Current cost of the product in the local currency (_read-only property added by this library_).
+ - `localizedPrice: String` - The cost of the product in the local currency (_read-only property added by this library_).
 
 *Example*:
 
@@ -132,7 +144,7 @@ You can add a function similar to this to your view.
   }
   self.titleLabel.text = product.localizedTitle
   self.descriptionLabel.text = product.localizedDescription
-  self.priceLabel.text = product.localizedCurrentPrice
+  self.priceLabel.text = product.localizedPrice
 }
 ```
 
@@ -151,12 +163,10 @@ override func viewWillAppear(_ animated: Bool) {
 For subscription products, you also have some data about subscription periods and introductory offers.
 
  - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
- - `localizedCurrentPeriod: String?` - The current period of the subscription.
- - `localizedInitialPrice: String` -  The initial cost of the subscription in the local currency.
- - `localizedInitialPeriod: String?` - The initial period of the subscription.
- - `localizedIntroductoryPricePeriod: String?` - The period of the introductory price.
-
-Notice that `localizedCurrentPrice` already applied introductory prices if they are available. 
+ - `localizedSubscriptionPeriod: String?` - The period of the subscription.
+ - `localizedIntroductoryPrice: String?` -  The cost of the introductory offer if available in the local currency.
+ - `localizedIntroductoryPeriod: String?` - The subscription period of the introductory offer.
+ - `localizedIntroductoryDuration: String?` - The duration of the introductory offer.
 
 **Example**
 
@@ -170,10 +180,15 @@ Notice that `localizedCurrentPrice` already applied introductory prices if they 
   self.descriptionLabel.text = product.localizedDescription
 
   // Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"
-  var priceText = "\(product.localizedCurrentPrice) / \(product.localizedCurrentPeriod!)"
+  var priceText = "\(product.localizedPrice) / \(product.localizedSubscriptionPeriod!)"
   if product.hasIntroductoryPriceEligible() {
-    priceText = "\(priceText) for \(product.localizedIntroductoryPricePeriod!)" +
-      " (then \(product.localizedInitialPrice) / \(product.localizedInitialPeriod!))"
+      if product.introductoryPrice!.numberOfPeriods == 1 {
+          priceText = "\(product.localizedIntroductoryPrice!) for \(product.localizedIntroductoryDuration!)" +
+          " (then \(priceText))"
+      } else {
+          priceText = "\(product.localizedIntroductoryPrice!) / \(product.localizedIntroductoryPeriod!)" +
+          " for \(product.localizedIntroductoryDuration!) (then \(priceText))"
+      }
   }
   self.priceLabel.text = priceText
 }
@@ -182,20 +197,16 @@ Notice that `localizedCurrentPrice` already applied introductory prices if they 
 *Note:* You have to `import StoreKit` wherever you use `SKProduct`.
 
 ### Refreshing
-Data might change or not be yet available when your "product" view is presented. In order to properly handle those cases, you should add an observer to the `iapProductsLoaded` notification.
-
-The library loads in-app products metadata at startup, so they're immediately available when needed. But it is also a good idea to refresh the prices when you show your products view, in case the price has changed since app startup. You want to be sure you're displaying up-to-date information.
+Data might change or not be yet available when your "product" view is presented. In order to properly handle those cases, you should refresh your view after refreshing in-app products metadata. You want to be sure you're displaying up-to-date information.
 
 To achieve this, call `InAppPurchase.refresh()` when your view is presented.
 
 ``` swift
 override func viewWillAppear(_ animated: Bool) {
   self.refreshView()
-  NotificationCenter.default.addObserver(self, selector: #selector(refreshView), name: .iapProductsLoaded, object: nil)
-  InAppPurchase.refresh()
-}
-override func viewWillDisappear(_ animated: Bool) {
-  NotificationCenter.default.removeObserver(self)
+  InAppPurchase.refresh(callback: { _ in
+      self.refreshView()
+  })
 }
 ```
 
@@ -215,65 +226,78 @@ That is why the process looks like so:
 #### Making a purchase
 To make a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
 
-**Important**: This callback is not meant to unlock the feature. **purchase processed ≠ purchase successful**
+**Important**: Do not process the purchase here, this is the role of your PurchaseDelegate.
 
-From this callback, you can for example unlock the UI by hiding your loading indicator.
+From this callback, you can for example unlock the UI by hiding your loading indicator and display the adapted message to the user.
 
 *Example:*
 ``` swift
-do {
-    self.loaderView.show()
-    try InAppPurchase.purchase(
-        productIdentifier: productIdentifier,
-        callback: { self.loaderView.hide() }
-    )
-} catch IAPError.productNotFound {
-    print("IAPError: the product was not found on the App Store and cannot be purchased.")
-} catch {
-    print("An error occurred: \(error)")
-}
+self.loaderView.show()
+InAppPurchase.purchase(
+    productIdentifier: productIdentifier,
+    callback: { result in
+        self.loaderView.hide()
+        switch result.state {
+        case .purchased:
+            print("Product purchased successful.")
+            // Do not process the purchase here
+            
+        case .failed:
+            if result.skError != nil {
+                print("Purchase failed: \(result.skError!.localizedDescription).")
+                
+            } else if result.iapError != nil {
+                print("Purchase failed: \(result.iapError!.localizedDescription).")
+            }
+            
+        case .cancelled:
+            print("The user canceled the payment request.")
+            
+        case .deferred:
+            print("The purchase was deferred.")
+        }
+})
 ```
+
+If the purchase fails, you must have a `SKError` or an `IAPError`.
+* See [`SKError.Code`](https://developer.apple.com/documentation/storekit/skerror/code)
+* See [`IAPErrorCode`](#errors)
+
 
 #### Processing purchases
 When a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction.
 
-To achieve this, you have to add an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) of `iapProductPurchased` notifications. **Important:** Setup this handler **before** calling `InAppPurchase.initialize()`: purchase events can occur very early, as soon as your app starts.
+To achieve this, you have to instanciate an instance of class that adopts the **IAPPurchaseDelegate** protocol. This instance  will be provided by calling `InAppPurchase.initialize()`.
 
 Keep in mind that purchase notifications might occur even if you never called the `InAppPurchase.purchase()` function: purchases can be made from another device or the AppStore, they can be approved by parents when the app isn't running, purchase flows can be interupted, etc.
 
 *Example:*
 
-When the application did launch (*generally in the application delegate's `application didFinishLaunchingWithOptions` function*), we add our observer:
+Define the class that adopts the **IAPPurchaseDelegate** protocol:
 ``` swift
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-  NotificationCenter.default.addObserver(self, selector: #selector(productPurchased(_:)), name: .iapProductPurchased, object: nil)
-  InAppPurchase.initialize(...)
+import Foundation
+import InAppPurchaseLib
+
+class PurchaseDelegate: IAPPurchaseDelegate {
+    required init(){}
+
+    func productPurchased(productIdentifier: String) {
+        // Unlock product related content.
+        unlockContent(for: productIdentifier)
+        
+        // Finish the purchase transaction.
+        InAppPurchase.finishTransactions(for: productIdentifier)
+    }
 }
 ```
 
-Then define the handler:
-``` swift
-@objc func productPurchased(_ notification: Notification){
-  // Get the product from the notification object.
-  guard let product = notification.object as? SKProduct else {
-      return
-  }
-  
-  // Unlock product related content.
-
-
-  // Finish the product transactions.
-  InAppPurchase.finishTransactions(for: product.productIdentifier)
-}
-```
-
-In simple cases, you can rely on the library to provide you with information about past purchases and no specific action is needed to unlock the product, just call `InAppPurchase.finishTransactions()`.
+In simple cases, you can rely of the library to provide you with information about past purchases and no specific action is needed to unlock the product, just call `InAppPurchase.finishTransactions()`.
 
 The last known state of the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productIdentifier)` method lets you to retrieve the ownership status of a product or subscription.
 
 For more advanced use cases, implement your own unlocking logic and call `InAppPurchase.finishTransactions()` afterward.
 
-*Note:* `iapProductPurchased` is emitted when a purchase has been confirmed by Fovea's receipt validator. If you have a server, it has probably already been notified of this purchase using the webhook.
+*Note:* `iapProductPurchased` is emitted when a purchase has been confirmed by Fovea's receipt validator. If you have a server, he probably already has been notified of this purchase using the webhook.
 
 *Tip:* After a successful purchase, you should now see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).
 
@@ -283,64 +307,30 @@ Except if you only sell consumable products, Apple requires that you provide a "
 Call this method when this button is pressed.
 
 ``` swift
-func restorePurchases() {
-  self.loaderView.show()
-  InAppPurchase.restorePurchases(callback: {
-      self.loaderView.hide()
-  })
-}
+self.loaderView.show()
+InAppPurchase.restorePurchases(callback: { result in
+    self.loaderView.hide()
+    switch result.state {
+    case .succeeded:
+        if result.addedPurchases > 0 {
+            print("Restore purchases successful.")
+        } else {
+            print("No purchase to restore.")
+        }
+    case .failed:
+        print("Restore purchases failed.")
+    }
+})
 ```
 
-The `callback` method is called once the operation is complete. You can use it to unlock the UI, by hiding your loader for example.
+The `callback` method is called once the operation is complete. You can use it to unlock the UI, by hiding your loader for example, and display the adapted message to the user.
 
 ### Purchased products
-As mentioned earlier, the library provides access to the state of the users purchases. See the [purchases information](#purchases-information) section.
+As mentioned earlier, the library provides access to the state of the users purchases.
 
 Use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
 
-
-### Notifications
-This is the list of notifications published to the by the library to the default NotificationCenter, for different events.
-
-| name                             | description                                          | notification.object                                                                               |
-| -------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `iapProductsLoaded`              | Products are loaded from the App Store.              |                                                                                                   |
-| `iapRefreshProductsFailed`       | Failed to refresh products from the App Store.       | [`Error`](https://developer.apple.com/documentation/swift/error)                                  |
-| `iapTransactionFailed`           | The transaction failed. See [`SKError.Code`](https://developer.apple.com/documentation/storekit/skerror/code). | [`SKPaymentTransaction`](https://developer.apple.com/documentation/storekit/skpaymenttransaction) |
-| `iapTransactionDeferred`         | The transaction is deferred.                         | [`SKPaymentTransaction`](https://developer.apple.com/documentation/storekit/skpaymenttransaction) |
-| `iapRestorationCompleted`        | All restorable transactions have been processed.     |                                                                                                   |
-| `iapProductPurchased`            | The product is purchased.                            | [`SKProduct`](https://developer.apple.com/documentation/storekit/skproduct)                       |
-| `iapRefreshReceiptFailed`        | Failed to refresh the App Store receipt.             | [`Error`](https://developer.apple.com/documentation/swift/error)                                  |
-| `iapReceiptValidationFailed`     | Failed to validate the App Store receipt with Fovea. | May contain the [`Error`](https://developer.apple.com/documentation/swift/error)                  |
-| `iapReceiptValidationSuccessful` | The App Store receipt is validated.                  |                                                                                                   |
-
-See an example of using [iapProductPurchased](#processing-purchases) notifications.
-
-**Example**
-
-Register an [observer](https://developer.apple.com/documentation/foundation/notificationcenter/1415360-addobserver) for `iapTransactionFailed` notifications:
-``` swift
-NotificationCenter.default.addObserver(self, selector: #selector(transactionFailed(_:)), name: .iapTransactionFailed, object: nil)
-```
-
-Define your handler:
-``` swift
-@objc func transactionFailed(_ notification: Notification){
-    guard let transaction = notification.object as? SKPaymentTransaction else {
-        return
-    }
-
-    // Use the value of the error property to present a message to the user.
-    // For a list of error constants, see https://developer.apple.com/documentation/storekit/skerror/code
-    let errorCode = (transaction.error as? SKError)?.code
-    switch errorCode {
-    case .paymentCancelled:
-        print("transactionFailed: The user canceled the payment request.")
-    default:
-        print("transactionFailed: \(errorCode!.rawValue).")
-    }
-}
-```
+If you only have auto-renewable subscriptions from the same group, you can use `InAppPurchase.hasActiveSubscription()` to check if the user has an active subscription, regardless of the product identifier.
 
 
 ### Purchases information
@@ -371,6 +361,27 @@ InAppPurchase.hasActivePurchase(for: productIdentifier)
   InAppPurchase.getExpiryDate(for: productIdentifier)
   ```
 
+### Errors
+
+When calling `refresh()`, `purchase()` or `restorePurchases()`, the callback can return an `IAPError` if the state is `failed`.
+Here is the list of `IAPErrorCode` you can receive:
+
+* Errors returned by `refresh()`, `purchase()` or `restorePurchases()`
+  - `libraryNotInitialized` - You must call the `initialize` fuction before using the library.
+  - `bundleIdentifierInvalid` - The Bundle Identifier is invalid.
+  - `validatorUrlInvalid` - The Validator URL String is invalid.
+  - `refreshReceiptFailed` - Failed to refresh the App Store receipt.
+  - `validateReceiptFailed` - Failed to validate the App Store receipt with Fovea.
+  - `readReceiptFailed` - Failed to read the receipt validation.
+
+* Errors returned by `refresh()`
+  - `refreshProductsFailed` - Failed to refresh products from the App Store.
+
+* Errors returned by `purchase()`
+  - `productNotFound` - The product was not found on the App Store and cannot be purchased.
+  - `cannotMakePurchase` - The user is not allowed to authorize payments.
+  - `alreadyPurchasing` - A purchase is already in progress.
+
 
 ## Server integration
 
@@ -394,7 +405,7 @@ InAppPurchase.applicationUsername = UserSession.getUserId()
 Of course, in this case, you will want to delay calls to `InAppPurchase.initialize()` to when your user's session is ready.
 
 ## Xcode Demo Project
-Do not hesitate to check the demo project available on here: [iap-swift-demo](https://github.com/iridescent-dev/iap-swift-demo).
+Do not hesitate to check the demo project available on here: [iap-swift-lib-demo](https://github.com/iridescent-dev/iap-swift-lib-demo).
 
 ## References
 - TODO: API documentation - using https://github.com/swiftdocorg/swift-doc (?)
