@@ -1,6 +1,6 @@
 //
 //  IAPTransactionObserver.swift
-//  InAppPurchaseLib
+//
 //
 //  Created by Veronique on 30/04/2020.
 //  Copyright © 2020 Iridescent. All rights reserved.
@@ -9,22 +9,24 @@
 import Foundation
 import StoreKit
 
-internal typealias CallbackBlock = () -> Void
 
 class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     
     /* MARK: - Shared instance Adopting the Singleton pattern */
     // - Instance of the class initialized as a static property.
-    @objc static let shared = IAPTransactionObserver()
+    internal static let shared = IAPTransactionObserver()
     // - Keep the initializer private so no more instances of the class can be created anywhere in the app.
     private override init() {}
-
+    
     
     /* MARK: - Properties */
-    private var callbackBlock: CallbackBlock?
-    private var pendingTransactions: Dictionary<String, Array<SKPaymentTransaction>> = [:]
     private var started: Bool = false
-
+    
+    private var callbackBlock: IAPPurchaseCallback?
+    private var purchasingProductIdentifier: String?
+    
+    private var pendingTransactions: Dictionary<String, Array<SKPaymentTransaction>> = [:]
+    private var transactionStates: Dictionary<String, SKPaymentTransactionState> = [:]
     
     /* MARK: - Main methods */
     // Attach an observer to the payment queue.
@@ -42,15 +44,20 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     
     // Checks if the user is allowed to authorize payments.
     func canMakePayments() -> Bool {
+        // Make sure the observer is attached to the payment queue.
+        start()
+
         return SKPaymentQueue.canMakePayments()
     }
     
     // Request a Payment from the App Store.
-    func purchase(product: SKProduct, quantity: Int, applicationUsername: String?, callback: @escaping CallbackBlock) throws {
+    func purchase(product: SKProduct, quantity: Int, applicationUsername: String?, callback: @escaping IAPPurchaseCallback) {
         guard canMakePayments() else {
+            callback(IAPPurchaseResult(state: .failed, iapError: IAPError(code: .cannotMakePurchase)))
             return
         }
         guard SKPaymentQueue.default().transactions.last?.transactionState != .purchasing else {
+            callback(IAPPurchaseResult(state: .failed, iapError: IAPError(code: .alreadyPurchasing)))
             return
         }
         
@@ -59,22 +66,28 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
         payment.applicationUsername = applicationUsername
         
         self.callbackBlock = callback
+        self.purchasingProductIdentifier = product.productIdentifier
+        
         SKPaymentQueue.default().add(payment)
     }
     
-    // Restore purchased products.
-    func restorePurchases(callback: @escaping CallbackBlock){
-        self.callbackBlock = callback
-        SKPaymentQueue.default().restoreCompletedTransactions()
+    // Checks if the product has a pending transaction.
+    func hasPendingTransaction(for productIdentifier: String) -> Bool {
+        return pendingTransactions[productIdentifier] != nil && !pendingTransactions[productIdentifier]!.isEmpty
     }
     
     // Finish all transactions for the product.
-    func finishTransactions(for productId: String) {
-        for transaction in pendingTransactions[productId] ?? [] {
+    func finishTransactions(for productIdentifier: String) {
+        for transaction in pendingTransactions[productIdentifier] ?? [] {
             SKPaymentQueue.default().finishTransaction(transaction)
         }
         // Clean the pending transactions list for this product.
-        pendingTransactions[productId] = []
+        pendingTransactions[productIdentifier] = []
+    }
+    
+    // Returns the last transaction state for a given product.
+    func getTransactionState(for productIdentifier: String) -> SKPaymentTransactionState? {
+        return transactionStates[productIdentifier]
     }
     
     
@@ -82,65 +95,64 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
     // One or more transactions have been updated.
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
+            let productIdentifier = transaction.payment.productIdentifier
+            
+            // Save the transaction state for the product
+            transactionStates[productIdentifier] = transaction.transactionState
+            
             switch (transaction.transactionState) {
             case .purchased:
-                // The content will be unlocked after validation of the receipt.
-                InAppPurchase.refreshReceipt()
-                
-                if InAppPurchase.getType(for: transaction.payment.productIdentifier) != IAPProductType.consumable {
-                    // For non-consumable and subscription transactions, we can finish
-                    // the transaction now as they will always be present in the receipt.
-                    SKPaymentQueue.default().finishTransaction(transaction)
-                } else {
-                    // Consumables must be processed before finishing the transaction.
-                    // Add the transaction to the dictionnary of pending transactions.
-                    if pendingTransactions[transaction.payment.productIdentifier] == nil {
-                        pendingTransactions[transaction.payment.productIdentifier] = []
-                    }
-                    pendingTransactions[transaction.payment.productIdentifier]?.append(transaction)
+                // Add the transaction to the dictionnary of pending transactions.
+                if pendingTransactions[productIdentifier] == nil {
+                    pendingTransactions[productIdentifier] = []
                 }
-                break
+                pendingTransactions[productIdentifier]?.append(transaction)
+                                
+                // The content will be unlocked after validation of the receipt.
+                if (productIdentifier == purchasingProductIdentifier && callbackBlock != nil) {
+                    IAPReceiptService.shared.refreshAfterPurchased(callback: callbackBlock!, purchasingProductIdentifier: productIdentifier)
+                    callbackBlock = nil
+                    purchasingProductIdentifier = nil
+                } else {
+                    IAPReceiptService.shared.refresh(callback: {_ in})
+                }
                 
             case .restored:
-                // Validate the restored purchases.
-                InAppPurchase.refreshReceipt()
                 SKPaymentQueue.default().finishTransaction(transaction)
-                break
                 
             case .failed:
-                print("[transaction error] \(transaction.error?.localizedDescription ?? "")")
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .iapTransactionFailed, object: transaction)
-                }
                 SKPaymentQueue.default().finishTransaction(transaction)
-                break
+                print("[transaction error] \(transaction.error?.localizedDescription ?? "")")
+                
+                // For a list of error constants,
+                // see https://developer.apple.com/documentation/storekit/skerror/code
+                let skError = (transaction.error as? SKError)!
+                switch skError.code {
+                case .paymentCancelled:
+                    notifyIsPurchased(for: productIdentifier, state: .cancelled)
+                default:
+                    notifyIsPurchased(for: productIdentifier, state: .failed, skError: skError)
+                }
                 
             case .deferred:
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .iapTransactionDeferred, object: transaction)
-                }
-                break
+                notifyIsPurchased(for: productIdentifier, state: .deferred)
                 
             case .purchasing:
                 break
-                
             default:
                 break
-            }
-            
-            if transaction.transactionState != .purchasing {
-                self.callbackBlock?()
-                self.callbackBlock = nil
             }
         }
     }
     
-    // All restorable transactions have been processed by the payment queue.
-    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
-        // If the user has no transactions to restore,
-        // the payment queue will not have received any transactions
-        // and the callback method has not been called.
-        self.callbackBlock?()
-        self.callbackBlock = nil
+    /* MARK: - Private method. */
+    private func notifyIsPurchased(for productIdentifier: String, state: IAPPurchaseResultState, iapError: IAPError? = nil, skError: SKError? = nil) {
+        DispatchQueue.main.async {
+            if (productIdentifier == self.purchasingProductIdentifier) {
+                self.callbackBlock?(IAPPurchaseResult(state: state, iapError: iapError, skError: skError))
+                self.callbackBlock = nil
+                self.purchasingProductIdentifier = nil
+            }
+        }
     }
 }
