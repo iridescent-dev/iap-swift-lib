@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
+  <img src="https://github.com/iridescent-dev/iap-swift-lib/blob/master/InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
 </p>
 
 InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Billing for receipts validation.
@@ -52,12 +52,12 @@ If you haven't already, I highly recommend your read the *Overview* and *Prepari
 ### Installation
 
 <p align="center">
-  <img src="ScreenshotInstallation.png" title="Installation">
+  <img src="https://github.com/iridescent-dev/iap-swift-lib/blob/master/ScreenshotInstallation.png" title="Installation">
 </p>
 
 * Select your project in Xcode
 * Go to the section *Swift Package*
-* Click on *(+) Add Package Dependancy*
+* Click on *(+) Add Package Dependency*
 * Copy the Git URL: *https://github.com/iridescent-dev/iap-swift-lib.git*
 * Click on *Next* > *Next*
 * Make sure your project is selected in *Add to target*
