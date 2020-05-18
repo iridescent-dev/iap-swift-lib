@@ -259,9 +259,7 @@ InAppPurchase.purchase(
 })
 ```
 
-If the purchase fails, you must have a `SKError` or an `IAPError`.
-* See [`SKError.Code`](https://developer.apple.com/documentation/storekit/skerror/code)
-* See [`IAPErrorCode`](#errors)
+If the purchase fails, you must have a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) or an [`IAPError`](#errors).
 
 
 #### Processing purchases
@@ -307,20 +305,22 @@ Except if you only sell consumable products, Apple requires that you provide a "
 Call this method when this button is pressed.
 
 ``` swift
-self.loaderView.show()
-InAppPurchase.restorePurchases(callback: { result in
-    self.loaderView.hide()
-    switch result.state {
-    case .succeeded:
-        if result.addedPurchases > 0 {
-            print("Restore purchases successful.")
-        } else {
-            print("No purchase to restore.")
-        }
-    case .failed:
-        print("Restore purchases failed.")
-    }
-})
+@IBAction func restorePurchases(_ sender: Any) {
+  self.loaderView.show()
+  InAppPurchase.restorePurchases(callback: { result in
+      self.loaderView.hide()
+      switch result.state {
+      case .succeeded:
+          if result.addedPurchases > 0 {
+              print("Restore purchases successful.")
+          } else {
+              print("No purchase to restore.")
+          }
+      case .failed:
+          print("Restore purchases failed.")
+      }
+  })
+}
 ```
 
 The `callback` method is called once the operation is complete. You can use it to unlock the UI, by hiding your loader for example, and display the adapted message to the user.
