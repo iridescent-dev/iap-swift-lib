@@ -102,7 +102,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, IAPPurchaseDelegate {
         IAPProduct(productIdentifier: "yearly_plan",  productType: .autoRenewableSubscription),
         IAPProduct(productIdentifier: "disable_ads",  productType: .nonConsumable)
       ],
-      iapPurchaseDelegate: self,
       validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
   }
 
@@ -212,7 +211,7 @@ override func viewWillAppear(_ animated: Bool) {
 ```
 
 ## Purchasing
-The purchase process is generally a little bit more involving that people would expect. Why is it not just: purchase &rarr; on success unlock the feature?
+The purchase process is generally a little bit more involving than most people would expect. Why is it not just: purchase &rarr; on success unlock the feature?
 
 Several reasons:
 - In-app purchases can be initiated outside the app
@@ -222,14 +221,14 @@ Several reasons:
 That is why the process looks like so:
 - being ready to handle purchase events from app startup
 - finalizing transactions when product delivery is complete
-- sending purchase request, for which successful doesn't mean complete
+- sending purchase request, for which successful doesn't always mean complete
 
 ### Initiating a purchase
 To initiate a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
 
-**Important**: Do not process the purchase here, this is the role of your PurchaseDelegate.
+**Important**: Do not process the purchase here, we'll handle that later!
 
-From this callback, you can for example unlock the UI by hiding your loading indicator and display the adapted message to the user.
+From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.
 
 *Example:*
 ``` swift
@@ -257,81 +256,92 @@ InAppPurchase.purchase(
 
 If the purchase fails, result will contain either `.skError`, a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) from StoreKit, or `.iapError`, an [`IAPError`](#errors).
 
-## Non-Consumables
-As mentioned earlier, the library provides access to the state of the users purchases.
+*Tip:* After a successful purchase, you should see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).
 
-Use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
+## Handling purchases
+Finally, the magic happened: a user purchased one of your products! Let's see how we handle the different types of products.
 
-If you only have auto-renewable subscriptions from the same group, you can use `InAppPurchase.hasActiveSubscription()` to check if the user has an active subscription, regardless of the product identifier.## Auto-Renewable Subscriptions
-## Consumables
-## Non-Renewing Subscriptions
+### Non-Consumables
+Wherever your app needs to know if a non-consumable product has been purchased, use `InAppPurchase.hasActivePurchase(for: 
+productIdentifier)`. This will return true if the user currently owns the product.
 
-Finally, the magic happened: a user purchased one of your products!
+**Note:** The last known state for the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline.
 
-Two cases:
+If you have a server that needs to know about the purchase. You should rely on Fovea's webhook instead of doing anything in here. We will see that later in the [Server integration](#server-integration) section.
 
- - For **non-consumables** and/or **auto-renewable subscriptions**:
-   - The library has already done all the required processing.
-   - ... Yet, it is useful to know that a purchase or a renewal occured.
- - For **consumables** and/or **non-renewing subscriptions**:
-   - You have some processing to do to deliver the content.
-   - You need to finish the transaction so the product can be purchased again.
+### Auto-Renewable Subscriptions
+As with non-consumables, you will use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to check if the user is an active subscriber to a given product.
 
-* `iapPurchaseDelegate` - An object that adopts the **IAPPurchaseDelegate** protocol (REQUIRED)
-  * We will learn more about it in the [Processing purchases](#processing-purchases) section
+You might also like to call refresh regularly, for example when entering your main view. When appropriate, the library will refresh the receipt to detect subscription renewals or expiry.
 
-Remember at initialization, we gave `InAppPurchase.initialize()` an **IAPPurchaseDelegate** instance. This object implements the **productPurchased(productIdentifier:)** function, which is called whenever a purchase is approved.
-
-Here's a sample implementation:
+As we've seend in the [Refreshing](#refreshing) section:
 
 ``` swift
-import InAppPurchaseLib
-class SomeClass: IAPPurchaseDelegate {
+override func viewWillAppear(_ animated: Bool) {
+  self.refreshView()
+  InAppPurchase.refresh(callback: { _ in
+      self.refreshView()
+  })
+}
+```
+
+**Note:** Don't be reluctant to call `refresh()` often. Internally, the library ensures heavy operation are only performed if necessary: for example when a subscription just expired. So in 99% of cases this call will result in no-operations.
+
+### Consumables
+If the purchased products in a **consumable**, your app is responsible for delivering the purchase then acknowlege that you've done so. Delivering generally consists in increasing a counter for some sort of virtual currency. 
+
+Your app can be notified of a purchase at any time. So the library asks you to provide an **IAPPurchaseDelegate** from initialization.
+
+In `InAppPurchase.initialize()`, we can pass an **IAPPurchaseDelegate** instance. This object implements the **productPurchased(productIdentifier:)** function, which is called whenever a purchase is approved.
+
+Here's a example implementation:
+
+``` swift
+class AppDelegate: UIResponder, UIApplicationDelegate, IAPPurchaseDelegate {
   ...
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    InAppPurchase.initialize(
+      iapProducts: [...],
+      iapPurchaseDelegate: self, // ADDED: iapPurchaseDelegate
+      validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
+  }
+
+  // IAPPurchaseDelegate implementation
   func productPurchased(productIdentifier: String) {
-    InAppPurchase.finishTransactions(for: productIdentifier)
+    // TODO
   }
 }
 ```
 
-**Important**: Keep in mind that purchase notifications might occur even if you never called the `InAppPurchase.purchase()` function: purchases can be made from another device or the AppStore, they can be approved by parents when the app isn't running, purchase flows can be interupted, etc.
+It's also important to know that when a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction. That is why we have to call `InAppPurchase.finishTransactions(for: productIdentifier)` as soon as we delivered the product.
 
-Let's learn more about it in different cases.
+**Example**
 
-#### Non-Consumables and Auto-Renewable Subscriptions
-
-If the purchased products in a **non-consumable** or an **auto-renewable subscription**, no processing is required. All you need is to ask for the ownership status of the product using `InAppPurchase.hasActivePurchase(for: productIdentifier)`, as we will see in the [Purchased products](#purchased-products) section.
-
-If you have a server that needs to know about the purchase. You should rely on Fovea's webhook instead of doing anything in here. We will see that in the [Server integration](#server-integration) section.
-
-#### Consumables and Non-Renewing Subscriptions
-If the purchased products in a **consumable** or an **non-renewing subscription**, your app is responsible for delivering the purchase then acknowlege that you've done so. For consumables, delivering generally consists in increasing a counter for some sort of virtual currency. For non-renewing subscriptions, delivering consists in increasing the amount of time a user can access a given feature.
-
-It's important to know that when a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction. That is why we are calling `InAppPurchase.finishTransactions(for: productIdentifier)`.
-
-#### Example
 Let's define a class that adopts the **IAPPurchaseDelegate** protocol, it can very well be your application delegate.
 
-The last known state for the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productIdentifier)` method lets you to retrieve the ownership status of a product or subscription.
-
 ``` swift
-import InAppPurchaseLib
-class AppDelegate: UIResponder, UIApplicationDelegate, IAPPurchaseDelegate {
-  func productPurchased(productIdentifier: String) {
-    if productIdenfier == "10_silver" {
-      addSilver(10)
-    }
-    InAppPurchase.finishTransactions(for: productIdentifier)
-    Analytics.notify("purchased", productIdentifier)
+func productPurchased(productIdentifier: String) {
+  switch productIdenfier {
+  case "10_silver":
+    addSilver(10)
+  case "100_silver":
+    addSilver(100)
   }
+  InAppPurchase.finishTransactions(for: productIdentifier)
+  Analytics.notify("purchased", productIdentifier)
 }
 ```
 
-Here, we implement your own unlocking logic and call `InAppPurchase.finishTransactions()` afterward (assuming `addSilver` is synchronous).
+Here, we implement our own unlocking logic and call `InAppPurchase.finishTransactions()` afterward (assuming `addSilver` is synchronous).
 
 *Note:* `iapProductPurchased` is called when a purchase has been confirmed by Fovea's receipt validator. If you have a server, he probably already has been notified of this purchase using the webhook.
 
-*Tip:* After a successful purchase, you should now see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).
+**Reminder**: Keep in mind that purchase notifications might occur even if you never called the `InAppPurchase.purchase()` function: purchases can be made from another device or the AppStore, they can be approved by parents when the app isn't running, purchase flows can be interupted, etc. The pattern above ensures your app is always ready to handle purchase events.
+
+### Non-Renewing Subscriptions
+For non-renewing subscriptions, delivering consists in increasing the amount of time a user can access a given feature. Apple doesn't manage the length and expiry of non-renewing subscriptions: you have to do this yourself, as for consumables.
+
+Basically, everything is identical to consumables.
 
 ## Restoring purchases
 Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users. In general, it is found in your application settings.
