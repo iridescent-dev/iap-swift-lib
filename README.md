@@ -334,7 +334,7 @@ func productPurchased(productIdentifier: String) {
 
 Here, we implement our own unlocking logic and call `InAppPurchase.finishTransactions()` afterward (assuming `addSilver` is synchronous).
 
-*Note:* `iapProductPurchased` is called when a purchase has been confirmed by Fovea's receipt validator. If you have a server, he probably already has been notified of this purchase using the webhook.
+*Note:* `productPurchased` is called when a purchase has been confirmed by Fovea's receipt validator. If you have a server, he probably already has been notified of this purchase using the webhook.
 
 **Reminder**: Keep in mind that purchase notifications might occur even if you never called the `InAppPurchase.purchase()` function: purchases can be made from another device or the AppStore, they can be approved by parents when the app isn't running, purchase flows can be interupted, etc. The pattern above ensures your app is always ready to handle purchase events.
 
@@ -401,7 +401,7 @@ InAppPurchase.hasDeferredTransaction(for productIdentifier: String) -> Bool
 ```
 
 ### Example
-Here's an example that covers what has been discussed above. Let's update our example `refreshView` function from before:
+Here's an example that covers what has been discussed above. We will update our example `refreshView` function from before:
 
 ``` swift
 @objc func refreshView() {
