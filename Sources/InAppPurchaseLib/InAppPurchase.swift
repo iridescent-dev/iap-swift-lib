@@ -69,7 +69,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
                 refreshProductResult = result
                 asyncGroup.leave()
             })
-            IAPProductService.shared.refresh(callback: { result in
+            IAPReceiptService.shared.refresh(callback: { result in
                 refreshReceiptResult = result
                 asyncGroup.leave()
             })
