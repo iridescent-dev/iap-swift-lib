@@ -47,6 +47,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     public static func refresh(callback: @escaping IAPRefreshCallback) {
         if !initialized {
             callback(IAPRefreshResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
+            return
         }
         
         var refreshProductResult: IAPRefreshResult? = nil
@@ -103,6 +104,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     public static func purchase(productIdentifier: String, quantity: Int, callback: @escaping IAPPurchaseCallback) {
         if !initialized {
             callback(IAPPurchaseResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
+            return
         }
         
         guard let product = IAPProductService.shared.getProductBy(identifier: productIdentifier) else {
@@ -116,6 +118,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     public static func restorePurchases(callback: @escaping IAPRefreshCallback) {
         if !initialized {
             callback(IAPRefreshResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
+            return
         }
         
         IAPReceiptService.shared.refresh(callback: callback)
