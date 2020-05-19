@@ -27,7 +27,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     
     /* MARK: - Main methods */
     // Start observing the payment queue, as soon as possible, and refresh Product list and user Receipt.
-    public static func initialize(iapProducts: Array<IAPProduct>, iapPurchaseDelegate: IAPPurchaseDelegate, validatorUrlString: String, applicationUsername: String? = nil) {
+    public static func initialize(iapProducts: Array<IAPProduct>, iapPurchaseDelegate: IAPPurchaseDelegate, validatorUrlString: String, applicationUsername: String?) {
         
         InAppPurchase.iapProducts = iapProducts
         InAppPurchase.iapPurchaseDelegate = iapPurchaseDelegate

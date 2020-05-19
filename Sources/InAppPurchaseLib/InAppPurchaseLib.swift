@@ -70,8 +70,8 @@ public protocol InAppPurchaseLib {
 
 public extension InAppPurchaseLib {
     // Sets default IAPPurchaseDelegate
-    static func initialize(iapProducts: Array<IAPProduct>, iapPurchaseDelegate: IAPPurchaseDelegate = DefaultPurchaseDelegate(), validatorUrlString: String, applicationUsername: String?) {
-        return initialize(iapProducts: iapProducts, iapPurchaseDelegate: iapPurchaseDelegate, validatorUrlString: validatorUrlString, applicationUsername:applicationUsername)
+    static func initialize(iapProducts: Array<IAPProduct>, iapPurchaseDelegate: IAPPurchaseDelegate = DefaultPurchaseDelegate(), validatorUrlString: String, applicationUsername: String? = nil) {
+        return initialize(iapProducts: iapProducts, iapPurchaseDelegate: iapPurchaseDelegate, validatorUrlString: validatorUrlString, applicationUsername: applicationUsername)
     }
     
     // Sets 1 as default value for the quantity.
