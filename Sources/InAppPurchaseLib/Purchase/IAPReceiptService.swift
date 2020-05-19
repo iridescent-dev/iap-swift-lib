@@ -42,7 +42,7 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
         return IAPStorageService.getBool(forKey: HAS_ALREADY_PURCHASED_KEY)
     }
     
-    // Checks if the user currently own (or is subscribed to) a given product.
+    // Checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
     func hasActivePurchase(for productIdentifier: String) -> Bool {
         let productType = InAppPurchase.iapProducts.first{ $0.productIdentifier == productIdentifier }?.productType
         switch productType {
@@ -51,13 +51,32 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
             return purchaseDate != nil
             
         case .autoRenewableSubscription:
-            let nextExpiryDate = IAPStorageService.getDate(forKey: NEXT_EXPIRY_DATE_KEY, productIdentifier: productIdentifier)
-            return nextExpiryDate != nil && nextExpiryDate! > Date()
+            let nextExpiryDate = getNextExpiryDate(for: productIdentifier)
+            return (nextExpiryDate != nil && nextExpiryDate! > Date()) || hasJustExpiredSubscription(for: productIdentifier)
             
         default:
             return false
         }
     }
+    
+    // Checks if the user has a subscription that has just expired (less than 2 minutes ago) for a given product.
+    func hasJustExpiredSubscription(for productIdentifier: String) -> Bool {
+        guard let expiryDate = getExpiryDate(for: productIdentifier) else { return false }
+        let nextExpiryDate = getNextExpiryDate(for: productIdentifier)
+        
+        return nextExpiryDate == nil && expiryDate.addingTimeInterval(120) > Date()
+    }
+    
+    // Refresh is required if a subscription has just expired.
+    func refreshRequired() -> Bool {
+        for productIdentifier in InAppPurchase.iapProducts.filter({ $0.productType == .autoRenewableSubscription }).map({ $0.productIdentifier }) {
+            if hasJustExpiredSubscription(for: productIdentifier) {
+                return true
+            }
+        }
+        return false
+    }
+    
     
     // Returns the latest purchased date for a given product.
     func getPurchaseDate(for productIdentifier: String) -> Date? {
@@ -72,6 +91,11 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
     // Returns the expiry date for a subcription. May be past or future.
     func getExpiryDate(for productIdentifier: String) -> Date? {
         return IAPStorageService.getDate(forKey: EXPIRY_DATE_KEY, productIdentifier: productIdentifier)
+    }
+    
+    // Returns the next expiry date for a subcription. Returns nil if expired.
+    func getNextExpiryDate(for productIdentifier: String) -> Date? {
+        return IAPStorageService.getDate(forKey: NEXT_EXPIRY_DATE_KEY, productIdentifier: productIdentifier)
     }
     
     // MARK: - SKReceipt Refresh Request Delegate

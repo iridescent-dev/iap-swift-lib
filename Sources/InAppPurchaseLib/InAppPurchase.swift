@@ -16,6 +16,10 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     internal static var initialized: Bool {
         return !iapProducts.isEmpty && iapPurchaseDelegate != nil && validatorUrlString != nil
     }
+    /// Callbacks that are waiting for the refresh.
+    private static var refreshCallbacks: Array<IAPRefreshCallback> = []
+    /// The date of the last refresh.
+    private static var lastRefreshDate: Date? = nil
     
     
     /* MARK: - Properties */
@@ -50,11 +54,21 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
             return
         }
         
+        let refreshInterval: TimeInterval = IAPReceiptService.shared.refreshRequired() ? 60 : 3600 // every minute if refresh is required, every hour otherwise.
+        if lastRefreshDate != nil && lastRefreshDate!.addingTimeInterval(refreshInterval) > Date() {
+            callback(IAPRefreshResult(state: .skipped)) // Do not refresh again if the last one is not far enough.
+            return
+        }
+        
+        refreshCallbacks.append(callback) // Add the callback to the queue.
+        if refreshCallbacks.count > 1 { return } // Refresh is already running.
+        
+        // Now we can start to refresh!
         var refreshProductResult: IAPRefreshResult? = nil
         var refreshReceiptResult: IAPRefreshResult? = nil
         
         let asyncGroup = DispatchGroup()
-        if IAPProductService.shared.getProducts().isEmpty {
+        if IAPProductService.shared.getProducts().isEmpty { // Load products before receipt.
             asyncGroup.enter()
             IAPProductService.shared.refresh(callback: { result in
                 refreshProductResult = result
@@ -63,7 +77,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
                     asyncGroup.leave()
                 })
             })
-        } else {
+        } else { // Refresh products and receipt at the same time.
             asyncGroup.enter()
             asyncGroup.enter()
             IAPProductService.shared.refresh(callback: { result in
@@ -77,11 +91,20 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
         }
         
         asyncGroup.notify(queue: .main) {
+            var result = IAPRefreshResult(state: .succeeded)
             if refreshProductResult?.state == .succeeded && refreshReceiptResult?.state == .succeeded {
-                callback(refreshReceiptResult!)
+                result.addedPurchases = refreshReceiptResult!.addedPurchases
+                result.updatedPurchases = refreshReceiptResult!.updatedPurchases
             } else {
-                let iapError = refreshProductResult?.state != .succeeded ? IAPError(code: .refreshProductsFailed) : refreshReceiptResult?.iapError
-                callback(IAPRefreshResult(state: .failed, iapError: iapError))
+                result.state = .failed
+                result.iapError = refreshProductResult?.state != .succeeded ? IAPError(code: .refreshProductsFailed) : refreshReceiptResult?.iapError
+            }
+            
+            lastRefreshDate = Date()
+            let tmp = refreshCallbacks
+            refreshCallbacks = []
+            for refreshCallback in tmp {
+                refreshCallback(result)
             }
         }
     }
