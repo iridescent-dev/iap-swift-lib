@@ -2,7 +2,7 @@
   <img src="https://github.com/iridescent-dev/iap-swift-lib/blob/master/InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
 </p>
 
-InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Billing for receipts validation.
+> An easy-to-use library for In-App Purchases, using Fovea.Billing for receipts validation.
 
 - [Features](#features)
 - [Getting Started](#getting-started)
@@ -27,7 +27,7 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 - [License](#license)
 
 
-## Features
+# Features
 
 * ✅ Purchase a product 
 * ✅ Restore purchased products
@@ -38,10 +38,10 @@ InAppPurchaseLib is an easy-to-use library for In-App Purchases, using Fovea.Bil
 * ✅ Status of purchases available when offline
 * ✅ Server integration with a Webhook
 
-## Getting Started
+# Getting Started
 If you haven't already, I highly recommend your read the *Overview* and *Preparing* section of Apple's [In-App Purchase official documentation](https://developer.apple.com/in-app-purchase)
 
-### Requirements
+## Requirements
 * Configure your App and Xcode to support In-App Purchases.
   * [AppStore Connect Setup](https://help.apple.com/app-store-connect/#/devb57be10e7)
 * Create and configure your [Fovea.Billing](https://billing.fovea.cc/?ref=iap-swift-lib) project account:
@@ -49,8 +49,7 @@ If you haven't already, I highly recommend your read the *Overview* and *Prepari
   * The iOS Shared Secret (or shared key) is to be retrieved from [AppStoreConnect](https://appstoreconnect.apple.com/)
   * The iOS Subscription Status URL (only if you want subscriptions)
 
-### Installation
-
+## Installation
 <p align="center">
   <img src="https://github.com/iridescent-dev/iap-swift-lib/blob/master/ScreenshotInstallation.png" title="Installation">
 </p>
@@ -66,7 +65,7 @@ If you haven't already, I highly recommend your read the *Overview* and *Prepari
 *Note:* You have to `import InAppPurchaseLib` wherever you use the library.
 
 
-## Usage
+# Usage
 
 The process of implementing in-app purchases involves several steps:
 1. Displaying the list of purchasable products
@@ -75,14 +74,11 @@ The process of implementing in-app purchases involves several steps:
 4. Checking the current ownership of non-consumables and subscriptions
 5. Implementing the Restore Purchases button
 
-### Initialization
-
+## Initialization
 Before everything else the library must be initialized. This has to happen as soon as possible. A good way is to call the `InAppPurchase.initialize()` method when the application did finish launching. In the background, this will load your products and refresh the status of purchases and subscriptions.
 
 `InAppPurchase.initialize()` accepts the following arguments:
 * `iapProducts` - An array of **IAPProduct** (REQUIRED)
-* `iapPurchaseDelegate` - An object that adopts the **IAPPurchaseDelegate** protocol (REQUIRED)
-  * We will learn more about it in the [Processing purchases](#processing-purchases) section
 * `validatorUrlString` - The validator url retrieved from [Fovea](https://billing.fovea.cc/?ref=iap-swift-lib) (REQUIRED)
 * `applicationUsername` - The user name, if your app implements user login (optional)
 
@@ -127,7 +123,7 @@ For more advanced use cases, in particular when you have implemented user login,
 
 *Tip:* If initialization was successful, you should see a new receipt validation event in [Fovea's Dashboard](https://billing-dashboard.fovea.cc/events).
 
-### Displaying products
+## Displaying products
 Let's start with the simplest case: you have a single product.
 
 You can retrieve all information about this product using the function `InAppPurchase.getProductBy(identifier: "my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with helpful methods.
@@ -164,8 +160,7 @@ override func viewWillAppear(_ animated: Bool) {
 }
 ```
 
-### Displaying subscriptions
-
+## Displaying subscriptions
 For subscription products, you also have some data about subscription periods and introductory offers.
 
  - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
@@ -202,7 +197,7 @@ For subscription products, you also have some data about subscription periods an
 
 *Note:* You have to `import StoreKit` wherever you use `SKProduct`.
 
-### Refreshing
+## Refreshing
 Data might change or not be yet available when your "product" view is presented. In order to properly handle those cases, you should refresh your view after refreshing in-app products metadata. You want to be sure you're displaying up-to-date information.
 
 To achieve this, call `InAppPurchase.refresh()` when your view is presented.
@@ -216,7 +211,7 @@ override func viewWillAppear(_ animated: Bool) {
 }
 ```
 
-### Purchasing
+## Purchasing
 The purchase process is generally a little bit more involving that people would expect. Why is it not just: purchase &rarr; on success unlock the feature?
 
 Several reasons:
@@ -229,8 +224,8 @@ That is why the process looks like so:
 - finalizing transactions when product delivery is complete
 - sending purchase request, for which successful doesn't mean complete
 
-#### Making a purchase
-To make a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
+### Initiating a purchase
+To initiate a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
 
 **Important**: Do not process the purchase here, this is the role of your PurchaseDelegate.
 
@@ -262,7 +257,15 @@ InAppPurchase.purchase(
 
 If the purchase fails, result will contain either `.skError`, a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) from StoreKit, or `.iapError`, an [`IAPError`](#errors).
 
-#### Processing purchases
+## Non-Consumables
+As mentioned earlier, the library provides access to the state of the users purchases.
+
+Use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
+
+If you only have auto-renewable subscriptions from the same group, you can use `InAppPurchase.hasActiveSubscription()` to check if the user has an active subscription, regardless of the product identifier.## Auto-Renewable Subscriptions
+## Consumables
+## Non-Renewing Subscriptions
+
 Finally, the magic happened: a user purchased one of your products!
 
 Two cases:
@@ -273,6 +276,9 @@ Two cases:
  - For **consumables** and/or **non-renewing subscriptions**:
    - You have some processing to do to deliver the content.
    - You need to finish the transaction so the product can be purchased again.
+
+* `iapPurchaseDelegate` - An object that adopts the **IAPPurchaseDelegate** protocol (REQUIRED)
+  * We will learn more about it in the [Processing purchases](#processing-purchases) section
 
 Remember at initialization, we gave `InAppPurchase.initialize()` an **IAPPurchaseDelegate** instance. This object implements the **productPurchased(productIdentifier:)** function, which is called whenever a purchase is approved.
 
@@ -292,18 +298,18 @@ class SomeClass: IAPPurchaseDelegate {
 
 Let's learn more about it in different cases.
 
-##### Non-Consumables and Auto-Renewable Subscriptions
+#### Non-Consumables and Auto-Renewable Subscriptions
 
 If the purchased products in a **non-consumable** or an **auto-renewable subscription**, no processing is required. All you need is to ask for the ownership status of the product using `InAppPurchase.hasActivePurchase(for: productIdentifier)`, as we will see in the [Purchased products](#purchased-products) section.
 
 If you have a server that needs to know about the purchase. You should rely on Fovea's webhook instead of doing anything in here. We will see that in the [Server integration](#server-integration) section.
 
-##### Consumables and Non-Renewing Subscriptions
+#### Consumables and Non-Renewing Subscriptions
 If the purchased products in a **consumable** or an **non-renewing subscription**, your app is responsible for delivering the purchase then acknowlege that you've done so. For consumables, delivering generally consists in increasing a counter for some sort of virtual currency. For non-renewing subscriptions, delivering consists in increasing the amount of time a user can access a given feature.
 
 It's important to know that when a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction. That is why we are calling `InAppPurchase.finishTransactions(for: productIdentifier)`.
 
-##### Example
+#### Example
 Let's define a class that adopts the **IAPPurchaseDelegate** protocol, it can very well be your application delegate.
 
 The last known state for the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productIdentifier)` method lets you to retrieve the ownership status of a product or subscription.
@@ -327,7 +333,7 @@ Here, we implement your own unlocking logic and call `InAppPurchase.finishTransa
 
 *Tip:* After a successful purchase, you should now see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).
 
-### Restoring purchases
+## Restoring purchases
 Except if you only sell consumable products, Apple requires that you provide a "Restore Purchases" button to your users. In general, it is found in your application settings.
 
 Call this method when this button is pressed.
@@ -353,20 +359,14 @@ Call this method when this button is pressed.
 
 The `callback` method is called once the operation is complete. You can use it to unlock the UI, by hiding your loader for example, and display the adapted message to the user.
 
-### Purchased products
-As mentioned earlier, the library provides access to the state of the users purchases.
 
-Use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
-
-If you only have auto-renewable subscriptions from the same group, you can use `InAppPurchase.hasActiveSubscription()` to check if the user has an active subscription, regardless of the product identifier.
-
-### Displaying products with purchases
+## Displaying products with purchases
 In your store screen, where you present your products titles and prices with a purchase button, there are some cases to handle that we skipped. Owned products and deferred purchases.
 
-#### Owned products
+### Owned products
 Non-consumables and active auto-renewing subscriptions cannot be purchased again. You should adjust your UI to reflect that state. Refer to `InAppPurchase.hasActivePurchase()` to and to the example later in this section.
 
-#### Deferred purchases
+### Deferred purchases
 Apple's **Ask to Buy** feature lets parents approve any purchases initiated by children, including in-app purchases.
 
 With **Ask to Buy** enabled, when a child requests to make a purchase, the app is notified that the purchase is awaiting the parent’s approval in the purchase callback:
@@ -390,7 +390,7 @@ We will use the `hasDeferredTransaction` method:
 InAppPurchase.hasDeferredTransaction(for productIdentifier: String) -> Bool
 ```
 
-#### Example
+### Example
 Here's an example that covers what has been discussed above. Let's update our example `refreshView` function from before:
 
 ``` swift
@@ -420,7 +420,7 @@ Here's an example that covers what has been discussed above. Let's update our ex
 
 When a product is owned or has a deferred purchase, we make sure the purchase button is grayed out. We also use a status label to display some details. Of course, you are free to design your UI as you see fit.
 
-### Errors
+## Errors
 
 When calling `refresh()`, `purchase()` or `restorePurchases()`, the callback can return an `IAPError` if the state is `failed`.
 Here is the list of `IAPErrorCode` you can receive:
@@ -441,9 +441,7 @@ Here is the list of `IAPErrorCode` you can receive:
   - `cannotMakePurchase` - The user is not allowed to authorize payments.
   - `alreadyPurchasing` - A purchase is already in progress.
 
-
 ## Server integration
-
 In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [Webhook on Fovea](https://billing.fovea.cc/documentation/webhook/?ref=iap-swift-lib). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
 
 The information sent from Fovea has been verified from Apple's server, which makes it way more trustable than information sent from your app itself.
@@ -463,15 +461,15 @@ InAppPurchase.applicationUsername = UserSession.getUserId()
 
 Of course, in this case, you will want to delay calls to `InAppPurchase.initialize()` to when your user's session is ready.
 
-## Xcode Demo Project
+# Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-lib-demo](https://github.com/iridescent-dev/iap-swift-lib-demo).
 
-## References
+# References
 - TODO: API documentation - using https://github.com/swiftdocorg/swift-doc (?)
 - [StoreKit Documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
 
-## Troubleshooting
+# Troubleshooting
 Common issues are covered here: https://github.com/iridescent-dev/iap-swift-lib/wiki/Troubleshooting
 
-## License
+# License
 InAppPurchaseLib is open-sourced library licensed under the MIT License. See [LICENSE](LICENSE) for details.
