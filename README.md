@@ -360,48 +360,65 @@ Use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to checks if the u
 
 If you only have auto-renewable subscriptions from the same group, you can use `InAppPurchase.hasActiveSubscription()` to check if the user has an active subscription, regardless of the product identifier.
 
+### Displaying products with purchases
+In your store screen, where you present your products titles and prices with a purchase button, there are some cases to handle that we skipped. Owned products and deferred purchases.
 
-### Purchases information
-For convenience, the library provides some utility functions to check for your past purchases data (date, expiry date) and agregate information (has active subscription, ...).
+#### Owned products
+Non-consumables and active auto-renewing subscriptions cannot be purchased again. You should adjust your UI to reflect that state. Refer to `InAppPurchase.hasActivePurchase()` to and to the example later in this section.
 
-- `func hasAlreadyPurchased() -> Bool` is a handy method that checks if the user has already purchased at least one product.
-  ``` swift
-  InAppPurchase.hasAlreadyPurchased()
-  ```
+#### Deferred purchases
+Apple's **Ask to Buy** feature lets parents approve any purchases initiated by children, including in-app purchases.
 
-- `func hasActivePurchase(for productIdentifier: String) -> Bool` checks if the user currently own (or is subscribed to) a given product (nonConsumable or autoRenewableSubscription).
-``` swift
-InAppPurchase.hasActivePurchase(for: productIdentifier)
-```
-
-- `func hasActiveSubscription() -> Bool` checks if the user has an active subscription.
-  ``` swift
-  InAppPurchase.hasActiveSubscription()
-  ```
-
-- `func getPurchaseDate(for productIdentifier: String) -> Date?` returns the latest purchased date for a given product.
-  ``` swift
-  InAppPurchase.getPurchaseDate(for: productIdentifier)
-  ```
-
-- `func getExpiryDate(for productIdentifier: String) -> Date?` returns the expiry date for a subcription. May be past or future.
-  ``` swift
-  InAppPurchase.getExpiryDate(for: productIdentifier)
-  ```
-
-### Deferred purchases
-
-**Ask to Buy** lets parents approve any purchases initiated by children, including in-app purchases.
-
-When a child requests to make a purchase, the app will be notified this purchase is awaiting the parent’s approval by setting it in the deferred state. You should update your UI to reflect this deferred state. Avoid blocking your UI or gameplay while waiting for the transaction to be updated.
-
-**Note:** The parent has 24 hours to approve or cancel their child's purchase after the Ask to Buy process has begun. If the parent fails to respond within the 24 hours, the Ask to Buy request is deleted from iTunes Store servers and your app's observer does not receive any additional notifications.
-
-To implement this feature properly, you just have to make sure you show in your UI that a purchase is waiting for parental approval. Use the `hasDeferredTransaction` method to check for this:
+With **Ask to Buy** enabled, when a child requests to make a purchase, the app is notified that the purchase is awaiting the parent’s approval in the purchase callback:
 
 ``` swift
-InAppPurchase.hasDeferredTransaction(for: productIdenfier)
+InAppPurchase.purchase(
+  productIdentifier: productIdentifier,
+  callback: { result in
+    switch result.state {
+    case .deferred:
+      // Pending parent approval
+  }
+})
 ```
+
+In the _deferred_ case, the child has been notified by StoreKit that the parents have to approve the purchase. He might then close the app and come back later. You don't have much to do, but to display in your UI that there is a purchase waiting for parental approval in your views.
+
+We will use the `hasDeferredTransaction` method:
+
+``` swift
+InAppPurchase.hasDeferredTransaction(for productIdentifier: String) -> Bool
+```
+
+#### Example
+Here's an example that covers what has been discussed above. Let's update our example `refreshView` function from before:
+
+``` swift
+@objc func refreshView() {
+  guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
+    self.titleLabel.text = "Product unavailable"
+    return
+  }
+  self.titleLabel.text = product.localizedTitle
+  // ...
+
+  // "Ask to Buy" deferred purchase waiting for parent's approval
+  if InAppPurchase.hasDeferredTransaction(for: "my_product_id") {
+    self.statusLabel.text = "Waiting for Approval..."
+    self.purchaseButton.isPointerInteractionEnabled = false
+  }
+  // "Owned" product
+  else if InAppPurchase.hasActivePurchase(for: "my_product_id") {
+    self.statusLabel.text = "OWNED"
+    self.purchaseButton.isPointerInteractionEnabled = false
+  }
+  else {
+    self.purchaseButton.isPointerInteractionEnabled = true
+  }
+}
+```
+
+When a product is owned or has a deferred purchase, we make sure the purchase button is grayed out. We also use a status label to display some details. Of course, you are free to design your UI as you see fit.
 
 ### Errors
 
