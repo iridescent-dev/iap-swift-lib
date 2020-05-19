@@ -69,6 +69,11 @@ public protocol InAppPurchaseLib {
 }
 
 public extension InAppPurchaseLib {
+    // Sets default IAPPurchaseDelegate
+    static func initialize(iapProducts: Array<IAPProduct>, iapPurchaseDelegate: IAPPurchaseDelegate? = DefaultPurchaseDelegate(), validatorUrlString: String, applicationUsername: String?) {
+        
+    }
+    
     // Sets 1 as default value for the quantity.
     static func purchase(productIdentifier: String, quantity: Int = 1, callback: @escaping IAPPurchaseCallback) {
         return purchase(productIdentifier: productIdentifier, quantity: quantity, callback: callback)
@@ -83,4 +88,14 @@ public protocol IAPPurchaseDelegate {
     
     // Called when a product is newly purchased, updated or restored.
     func productPurchased(productIdentifier: String)
+}
+
+
+// The default implementation of IAPPurchaseDelegate if no other is provided.
+public class DefaultPurchaseDelegate: IAPPurchaseDelegate {
+    public required init(){}
+    public func productPurchased(productIdentifier: String) {
+        // Finish the product transactions.
+        InAppPurchase.finishTransactions(for: productIdentifier)
+    }
 }
