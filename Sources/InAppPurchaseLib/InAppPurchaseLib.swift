@@ -47,8 +47,8 @@ public protocol InAppPurchaseLib {
     // Finish all transactions for the product.
     static func finishTransactions(for productIdentifier: String)
     
-    // Returns the last transaction state for a given product.
-    static func getTransactionState(for productIdentifier: String) -> SKPaymentTransactionState?
+    // Checks if the last transaction state for a given product was deferred.
+    static func hasDeferredTransaction(for productIdentifier: String) -> Bool
     
     
     /* MARK: - Purchases information */

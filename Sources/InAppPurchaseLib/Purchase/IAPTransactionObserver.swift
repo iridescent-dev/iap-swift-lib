@@ -84,9 +84,9 @@ class IAPTransactionObserver: NSObject, SKPaymentTransactionObserver {
         pendingTransactions[productIdentifier] = []
     }
     
-    // Returns the last transaction state for a given product.
-    func getTransactionState(for productIdentifier: String) -> SKPaymentTransactionState? {
-        return transactionStates[productIdentifier]
+    // Checks if the last transaction state for a given product was deferred.
+    func hasDeferredTransaction(for productIdentifier: String) -> Bool {
+        return transactionStates[productIdentifier] == SKPaymentTransactionState.deferred
     }
     
     

@@ -131,9 +131,9 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
         IAPTransactionObserver.shared.finishTransactions(for: productIdentifier)
     }
     
-    // Returns the last transaction state for a given product.
-    public static func getTransactionState(for productIdentifier: String) -> SKPaymentTransactionState? {
-        return IAPTransactionObserver.shared.getTransactionState(for: productIdentifier)
+    // Checks if the last transaction state for a given product was deferred.
+    public static func hasDeferredTransaction(for productIdentifier: String) -> Bool {
+        return IAPTransactionObserver.shared.hasDeferredTransaction(for: productIdentifier)
     }
     
     
