@@ -35,4 +35,5 @@ public struct IAPRefreshResult {
 public enum IAPRefreshResultState {
     case succeeded
     case failed
+    case skipped
 }
