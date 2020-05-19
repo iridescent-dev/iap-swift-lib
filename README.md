@@ -44,7 +44,7 @@ If you haven't already, I highly recommend your read the *Overview* and *Prepari
 ### Requirements
 * Configure your App and Xcode to support In-App Purchases.
   * [AppStore Connect Setup](https://help.apple.com/app-store-connect/#/devb57be10e7)
-* Create and configure your [Fovea.Billing](https://billing.fovea.cc) project account:
+* Create and configure your [Fovea.Billing](https://billing.fovea.cc/?ref=iap-swift-lib) project account:
   * Set your bundle ID
   * The iOS Shared Secret (or shared key) is to be retrieved from [AppStoreConnect](https://appstoreconnect.apple.com/)
   * The iOS Subscription Status URL (only if you want subscriptions)
@@ -83,7 +83,7 @@ Before everything else the library must be initialized. This has to happen as so
 * `iapProducts` - An array of **IAPProduct** (REQUIRED)
 * `iapPurchaseDelegate` - An object that adopts the **IAPPurchaseDelegate** protocol (REQUIRED)
   * We will learn more about it in the [Processing purchases](#processing-purchases) section
-* `validatorUrlString` - The validator url retrieved from [Fovea](https://billing.fovea.cc) (REQUIRED)
+* `validatorUrlString` - The validator url retrieved from [Fovea](https://billing.fovea.cc/?ref=iap-swift-lib) (REQUIRED)
 * `applicationUsername` - The user name, if your app implements user login (optional)
 
 Each **IAPProduct** contains the following fields:
@@ -427,7 +427,7 @@ Here is the list of `IAPErrorCode` you can receive:
 
 ## Server integration
 
-In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [Webhook on Fovea](https://billing.fovea.cc/documentation/webhook/). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
+In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [Webhook on Fovea](https://billing.fovea.cc/documentation/webhook/?ref=iap-swift-lib). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
 
 The information sent from Fovea has been verified from Apple's server, which makes it way more trustable than information sent from your app itself.
 
