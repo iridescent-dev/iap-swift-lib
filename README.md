@@ -390,7 +390,18 @@ InAppPurchase.hasActivePurchase(for: productIdentifier)
   ```
 
 ### Deferred purchases
-Talk about it here.
+
+**Ask to Buy** lets parents approve any purchases initiated by children, including in-app purchases.
+
+When a child requests to make a purchase, the app will be notified this purchase is awaiting the parent’s approval by setting it in the deferred state. You should update your UI to reflect this deferred state. Avoid blocking your UI or gameplay while waiting for the transaction to be updated.
+
+**Note:** The parent has 24 hours to approve or cancel their child's purchase after the Ask to Buy process has begun. If the parent fails to respond within the 24 hours, the Ask to Buy request is deleted from iTunes Store servers and your app's observer does not receive any additional notifications.
+
+To implement this feature properly, you just have to make sure you show in your UI that a purchase is waiting for parental approval. Use the `hasDeferredTransaction` method to check for this:
+
+``` swift
+InAppPurchase.hasDeferredTransaction(for: productIdenfier)
+```
 
 ### Errors
 
