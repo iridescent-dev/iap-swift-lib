@@ -240,33 +240,27 @@ From this callback, you can for example unlock the UI by hiding your loading ind
 ``` swift
 self.loaderView.show()
 InAppPurchase.purchase(
-    productIdentifier: productIdentifier,
-    callback: { result in
-        self.loaderView.hide()
-        switch result.state {
-        case .purchased:
-            print("Product purchased successful.")
-            // Do not process the purchase here
-            
-        case .failed:
-            if result.skError != nil {
-                print("Purchase failed: \(result.skError!.localizedDescription).")
-                
-            } else if result.iapError != nil {
-                print("Purchase failed: \(result.iapError!.localizedDescription).")
-            }
-            
-        case .cancelled:
-            print("The user canceled the payment request.")
-            
-        case .deferred:
-            print("The purchase was deferred.")
-        }
+  productIdentifier: productIdentifier,
+  callback: { result in
+    self.loaderView.hide()
+    switch result.state {
+    case .purchased:
+      print("Product purchased successful.") // Do not process the purchase here
+    case .failed:
+      if result.skError != nil {
+        print("Purchase failed: \(result.skError!.localizedDescription).")
+      } else if result.iapError != nil {
+        print("Purchase failed: \(result.iapError!.localizedDescription).")
+      }
+    case .cancelled:
+      print("The user canceled the payment request.")
+    case .deferred:
+      print("The purchase was deferred.") // Pending parent approval
+  }
 })
 ```
 
-If the purchase fails, you must have a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) or an [`IAPError`](#errors).
-
+If the purchase fails, result will contain either `.skError`, a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) from StoreKit, or `.iapError`, an [`IAPError`](#errors).
 
 #### Processing purchases
 Finally, the magic happened: a user purchased one of your products!
@@ -298,20 +292,18 @@ class SomeClass: IAPPurchaseDelegate {
 
 Let's learn more about it in different cases.
 
-#### Non-Consumables and Auto-Renewable Subscriptions
+##### Non-Consumables and Auto-Renewable Subscriptions
 
 If the purchased products in a **non-consumable** or an **auto-renewable subscription**, no processing is required. All you need is to ask for the ownership status of the product using `InAppPurchase.hasActivePurchase(for: productIdentifier)`, as we will see in the [Purchased products](#purchased-products) section.
 
 If you have a server that needs to know about the purchase. You should rely on Fovea's webhook instead of doing anything in here. We will see that in the [Server integration](#server-integration) section.
 
-#### Consumables and Non-Renewing Subscriptions
-
+##### Consumables and Non-Renewing Subscriptions
 If the purchased products in a **consumable** or an **non-renewing subscription**, your app is responsible for delivering the purchase then acknowlege that you've done so. For consumables, delivering generally consists in increasing a counter for some sort of virtual currency. For non-renewing subscriptions, delivering consists in increasing the amount of time a user can access a given feature.
 
 It's important to know that when a purchase is approved, money isn't yet to reach your bank account. You have to acknowledge delivery of the (virtual) item to finalize the transaction. That is why we are calling `InAppPurchase.finishTransactions(for: productIdentifier)`.
 
-#### Example
-
+##### Example
 Let's define a class that adopts the **IAPPurchaseDelegate** protocol, it can very well be your application delegate.
 
 The last known state for the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. The `InAppPurchase.hasActivePurchase(for: productIdentifier)` method lets you to retrieve the ownership status of a product or subscription.
@@ -396,6 +388,9 @@ InAppPurchase.hasActivePurchase(for: productIdentifier)
   ``` swift
   InAppPurchase.getExpiryDate(for: productIdentifier)
   ```
+
+### Deferred purchases
+Talk about it here.
 
 ### Errors
 
