@@ -545,7 +545,7 @@ Do not hesitate to check the demo project available on here: [iap-swift-lib-demo
 Generate the documentation, using [this fork](https://github.com/johankool/swift-doc/tree/access-level-option) of swift-doc (on `--minimum-access-level` is part of the main distrib).
 
 ```
-swift-doc generate sources --module-name InAppPurchase --format html --output Documentation --minimum-access-level public --base-url /iap-swift-lib/api/
+swift-doc generate sources --module-name InAppPurchase --format html --output docs --minimum-access-level public --base-url /iap-swift-lib/
 ```
 
 # Troubleshooting
