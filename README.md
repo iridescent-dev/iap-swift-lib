@@ -231,25 +231,43 @@ To initiate a purchase, use the `InAppPurchase.purchase()` function. It takes th
 From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.
 
 *Example:*
+
 ``` swift
 self.loaderView.show()
 InAppPurchase.purchase(
-  productIdentifier: productIdentifier,
+  productIdentifier: "my_product_id",
+  callback: { _ in
+    self.loaderView.hide()
+})
+```
+
+This simple example locks the UI with a loader when the purchase is in progress. We'll see later how the purchase has to be processed by your applicaiton.
+
+The callback also gives more information about the outcome of the purchase, you might want to use it to update your UI as well. Note that some events are useful for analytics. So here's a more complete example.
+
+``` swift
+self.loaderView.show()
+InAppPurchase.purchase(
+  productIdentifier: "my_product_id",
   callback: { result in
     self.loaderView.hide()
+
     switch result.state {
     case .purchased:
-      print("Product purchased successful.") // Do not process the purchase here
+      // Product successfully purchased
+      // Reminder: Do not process the purchase here, only update your UI.
+      //           that's why we do not send data to analytics.
+      openThankYouScreen()
     case .failed:
-      if result.skError != nil {
-        print("Purchase failed: \(result.skError!.localizedDescription).")
-      } else if result.iapError != nil {
-        print("Purchase failed: \(result.iapError!.localizedDescription).")
-      }
-    case .cancelled:
-      print("The user canceled the payment request.")
+      // Purchase failed
+      // - Human formated reason can be found in result.localizedDescription
+      // - More details in either result.skError or result.iapError
+      showError(result.localizedDescription)
     case .deferred:
-      print("The purchase was deferred.") // Pending parent approval
+      // The purchase is deferred, waiting for the parent's approval
+      openWaitingParentApprovalScreen()
+    case .cancelled:
+      // The user canceled the request, generally only useful for analytics.
   }
 })
 ```
@@ -328,7 +346,7 @@ func productPurchased(productIdentifier: String) {
     addSilver(100)
   }
   InAppPurchase.finishTransactions(for: productIdentifier)
-  Analytics.notify("purchased", productIdentifier)
+  Analytics.trackEvent("purchase succeeded", productIdentifier)
 }
 ```
 
@@ -450,6 +468,49 @@ Here is the list of `IAPErrorCode` you can receive:
   - `productNotFound` - The product was not found on the App Store and cannot be purchased.
   - `cannotMakePurchase` - The user is not allowed to authorize payments.
   - `alreadyPurchasing` - A purchase is already in progress.
+  
+## Analytics
+Tracking the purchase flow is a common things in apps. Especially as it's core to your revenue model.
+
+We can track 5 events, which step in the purchase pipeline a user reached.
+1. `purchase initiated`
+2. `purchase cancelled`
+3. `purchase failed`
+4. `purchase deferred`
+5. `purchase succeeded`
+
+Here's a quick example showing how to implement this correctly.
+
+``` swift
+func makePurchase() {
+  Analytics.trackEvent("purchase initiated")
+  InAppPurchase.purchase(
+    productIdentifier: "my_product_id",
+    callback: { result in
+      switch result.state {
+      case .purchased:
+        // Reminder: We are not processing the purchase here, only updating your UI.
+        //           That's why we do not send an event to analytics.
+      case .failed:
+        Analytics.trackEvent("purchase failed")
+      case .deferred:
+        Analytics.trackEvent("purchase deferred")
+      case .cancelled:
+        Analytics.trackEvent("purchase cancelled")
+    }
+  })
+}
+
+// IAPPurchaseDelegate implementation
+func productPurchased(productIdentifier: String) {
+  Analytics.trackEvent("purchase succeeded")
+  InAppPurchase.finishTransactions(for: productIdentifier)
+}
+```
+
+The important part to remember is that a purchase can occur outside your app (or be approved when the app is not running), that's why tracking `purchase succeeded` has to be part of the `productPurchased` delegate function.
+ 
+Refer to the [Consumables](#consumables) section to learn more about the `productPurchased` function.
 
 ## Server integration
 In more advanced use cases, you have a server component. Users are logged in and you'll like to unlock the content for this user on your server. The safest approach is to setup a [Webhook on Fovea](https://billing.fovea.cc/documentation/webhook/?ref=iap-swift-lib). You'll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.
@@ -469,7 +530,9 @@ InAppPurchase.initialize(
 InAppPurchase.applicationUsername = UserSession.getUserId()
 ```
 
-Of course, in this case, you will want to delay calls to `InAppPurchase.initialize()` to when your user's session is ready.
+If a user account is mandatory in your app, you will want to delay calls to `InAppPurchase.initialize()` to when your user's session is ready.
+
+Do not hesitate to [contact Fovea](mailto:support@fovea.cc) for help.
 
 # Xcode Demo Project
 Do not hesitate to check the demo project available on here: [iap-swift-lib-demo](https://github.com/iridescent-dev/iap-swift-lib-demo).
