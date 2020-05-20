@@ -475,8 +475,15 @@ Of course, in this case, you will want to delay calls to `InAppPurchase.initiali
 Do not hesitate to check the demo project available on here: [iap-swift-lib-demo](https://github.com/iridescent-dev/iap-swift-lib-demo).
 
 # References
-- TODO: API documentation - using https://github.com/swiftdocorg/swift-doc (?)
+- [API documentation](https://billing.fovea.cc/iap-swift-lib/api)
 - [StoreKit Documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
+
+# Coding
+Generate the documentation, using [this fork](https://github.com/johankool/swift-doc/tree/access-level-option) of swift-doc (on `--minimum-access-level` is part of the main distrib).
+
+```
+swift-doc generate sources --module-name InAppPurchase --format html --output Documentation --minimum-access-level public --base-url /iap-swift-lib/api/
+```
 
 # Troubleshooting
 Common issues are covered here: https://github.com/iridescent-dev/iap-swift-lib/wiki/Troubleshooting
