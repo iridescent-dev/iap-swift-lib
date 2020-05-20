@@ -14,6 +14,12 @@ public struct IAPPurchaseResult {
     public internal(set) var state: IAPPurchaseResultState
     public internal(set) var iapError: IAPError? = nil
     public internal(set) var skError: SKError? = nil
+    
+    public var localizedDescription: String? {
+        if skError != nil { return skError!.localizedDescription }
+        if iapError != nil { return iapError!.localizedDescription }
+        return nil
+    }
 }
 
 public enum IAPPurchaseResultState {

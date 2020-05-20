@@ -83,9 +83,6 @@ public extension InAppPurchaseLib {
 
 /* MARK: - The protocol that you must adopt. */
 public protocol IAPPurchaseDelegate {
-    // Initialize the IAPPurchaseDelegate instance.
-    init()
-    
     // Called when a product is newly purchased, updated or restored.
     func productPurchased(productIdentifier: String)
 }
@@ -93,7 +90,7 @@ public protocol IAPPurchaseDelegate {
 
 // The default implementation of IAPPurchaseDelegate if no other is provided.
 public class DefaultPurchaseDelegate: IAPPurchaseDelegate {
-    public required init(){}
+    public init(){}
     public func productPurchased(productIdentifier: String) {
         // Finish the product transactions.
         InAppPurchase.finishTransactions(for: productIdentifier)
