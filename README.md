@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/iridescent-dev/iap-swift-lib/blob/master/Documentation/Images/InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
+  <img src="img/InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
 </p>
 
 > An easy-to-use Swift library for In-App Purchases, using Fovea.Billing for receipts validation.

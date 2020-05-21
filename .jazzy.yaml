@@ -1,7 +1,7 @@
 # `jazzy --help config`
 
 output: docs
-clean: true
+clean: false
 author: Iridescent
 author_url: https://iridescent.dev
 module: InAppPurchaseLib
