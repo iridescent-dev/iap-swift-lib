@@ -1,0 +1,52 @@
+# `jazzy --help config`
+
+output: docs
+clean: true
+author: Iridescent
+author_url: https://iridescent.dev
+module: InAppPurchaseLib
+title: InAppPurchaseLib documentation
+copyright: "Copyright © 2020 [Iridescent](https://iridescent.dev)."
+documentation: Documentation/*/*.md
+abstract: Documentation/*.md
+github_url: https://github.com/iridescent-dev/iap-swift-lib
+hide_documentation_coverage: false
+custom_categories:
+  - name: "Getting Started"
+    children:
+    - "Installation"
+    - "Micro Example"
+    - "License"
+  - name: "Usage"
+    children:
+    - "Initialization"
+    - "Displaying products"
+    - "Displaying subscriptions"
+    - "Refreshing"
+    - "Purchasing"
+    - "Handling purchases"
+    - "Restoring purchases"
+    - "Displaying products with purchases"
+    - "Errors"
+    - "Analytics"
+    - "Server integration"
+  - name: "API documentation"
+    children:
+    - InAppPurchase
+    - InAppPurchaseLib
+    - DefaultPurchaseDelegate
+    - IAPPurchaseDelegate
+    - IAPProduct
+    - IAPProductType
+    - SKProduct
+    - IAPPeriodFormat
+    - IAPPurchaseCallback
+    - IAPRefreshCallback
+    - IAPPurchaseResult
+    - IAPRefreshResult
+    - IAPPurchaseResultState
+    - IAPRefreshResultState
+    - IAPError
+    - IAPErrorCode
+    - IAPErrorProtocol
+theme: fullwidth

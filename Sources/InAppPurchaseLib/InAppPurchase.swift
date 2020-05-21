@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-
+/// 
 public class InAppPurchase: NSObject, InAppPurchaseLib {
     // InAppPurchaseLib version number.
     internal static let versionNumber = "1.0.2"
@@ -58,7 +58,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     
     /// Refresh Product list and user Receipt.
     /// - Parameter callback: The function that will be called after processing.
-    /// - See also:`IAPRefreshCallback` and `IAPRefreshResult`.
+    /// - See also: `IAPRefreshResult`
     public static func refresh(callback: @escaping IAPRefreshCallback) {
         if !initialized {
             callback(IAPRefreshResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
@@ -124,7 +124,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     /* MARK: - Products information */
     /// Gets all products retrieved from the App Store
     /// - Returns: An array of products.
-    /// - See also: `SKProduct`.
+    /// - See also: `SKProduct`
     public static func getProducts() -> Array<SKProduct> {
         return IAPProductService.shared.getProducts()
     }
@@ -132,7 +132,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     /// Gets the product by its identifier from the list of products retrieved from the App Store.
     /// - Parameter identifier: The identifier of the product.
     /// - Returns: The product if it was retrieved from the App Store.
-    /// - See also: `SKProduct`.
+    /// - See also: `SKProduct`
     public static func getProductBy(identifier: String) -> SKProduct? {
         return IAPProductService.shared.getProductBy(identifier: identifier)
     }
@@ -150,7 +150,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     ///     - productIdentifier: The identifier of the product to purchase.
     ///     - quantity: The quantity to purchase (default value = 1).
     ///     - callback: The function that will be called after processing.
-    /// - See also:`IAPPurchaseCallback` and `IAPPurchaseResult`.
+    /// - See also: `IAPPurchaseResult`
     public static func purchase(productIdentifier: String, quantity: Int, callback: @escaping IAPPurchaseCallback) {
         if !initialized {
             callback(IAPPurchaseResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
@@ -166,7 +166,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     
     /// Restore purchased products.
     /// - Parameter callback: The function that will be called after processing.
-    /// - See also:`IAPRefreshCallback` and `IAPRefreshResult`.
+    /// - See also: `IAPRefreshResult`
     public static func restorePurchases(callback: @escaping IAPRefreshCallback) {
         if !initialized {
             callback(IAPRefreshResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))

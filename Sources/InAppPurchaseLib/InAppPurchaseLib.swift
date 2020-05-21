@@ -9,7 +9,7 @@ import Foundation
 import StoreKit
 
 
-/// The protocol that `InAppPurchase`` adopts.
+/// The protocol that `InAppPurchase` adopts.
 public protocol InAppPurchaseLib {
     /// The array of `IAPProduct`.
     static var iapProducts: Array<IAPProduct> { get }
@@ -33,20 +33,20 @@ public protocol InAppPurchaseLib {
     
     /// Refresh Product list and user Receipt.
     /// - Parameter callback: The function that will be called after processing.
-    /// - See also:`IAPRefreshCallback` and `IAPRefreshResult`.
+    /// - See also:`IAPRefreshResult`
     static func refresh(callback: @escaping IAPRefreshCallback) -> Void
     
     
     /* MARK: - Products information */
     /// Gets all products retrieved from the App Store
     /// - Returns: An array of products.
-    /// - See also: `SKProduct`.
+    /// - See also: `SKProduct`
     static func getProducts() -> Array<SKProduct>
     
     /// Gets the product by its identifier from the list of products retrieved from the App Store.
     /// - Parameter identifier: The identifier of the product.
     /// - Returns: The product if it was retrieved from the App Store.
-    /// - See also: `SKProduct`.
+    /// - See also: `SKProduct`
     static func getProductBy(identifier: String) -> SKProduct?
     
     
@@ -60,12 +60,12 @@ public protocol InAppPurchaseLib {
     ///     - productIdentifier: The identifier of the product to purchase.
     ///     - quantity: The quantity to purchase (default value = 1).
     ///     - callback: The function that will be called after processing.
-    /// - See also:`IAPPurchaseCallback` and `IAPPurchaseResult`.
+    /// - See also:`IAPPurchaseResult`
     static func purchase(productIdentifier: String, quantity: Int, callback: @escaping IAPPurchaseCallback) -> Void
     
     /// Restore purchased products.
     /// - Parameter callback: The function that will be called after processing.
-    /// - See also:`IAPRefreshCallback` and `IAPRefreshResult`.
+    /// - See also:`IAPRefreshResult`
     static func restorePurchases(callback: @escaping IAPRefreshCallback) -> Void
     
     /// Finish all transactions for the product.
@@ -116,8 +116,7 @@ public extension InAppPurchaseLib {
 }
 
 
-/* MARK: - The protocol that you must adopt. */
-/// The protocol that you must adopt if you have `consumable` and/or `nonRenewingSubscription` products.
+/// The protocol that you must adopt if you have *consumable* and/or *non-renewing subscription* products.
 public protocol IAPPurchaseDelegate {
     /// Called when a product is newly purchased, updated or restored.
     /// - Parameter productIdentifier: The identifier of the product.
@@ -127,7 +126,7 @@ public protocol IAPPurchaseDelegate {
 }
 
 
-/// The default implementation of `IAPPurchaseDelegate` if no other is provided.
+/// The default implementation of `IAPPurchaseDelegate` if no other is provided. It is enough if you only have *non-consumable* and/or *auto-renewable subscription* products.
 public class DefaultPurchaseDelegate: IAPPurchaseDelegate {
     public init(){}
     

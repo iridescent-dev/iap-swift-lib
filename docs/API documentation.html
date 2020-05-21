@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>API documentation  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Section/API documentation" class="dashAnchor"></a>
+
+    <a title="API documentation  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          InAppPurchaseLib documentation
+        </a>
+         (77% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/iridescent-dev/iap-swift-lib">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">InAppPurchaseLib Reference</a>
+      <img class="carat" src="img/carat.png" />
+      API documentation  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Getting%20Started.html">Getting Started</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="installation.html">Installation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="micro-example.html">Micro Example</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Usage.html">Usage</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="initialization.html">Initialization</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="displaying-products.html">Displaying products</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="displaying-subscriptions.html">Displaying subscriptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="refreshing.html">Refreshing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="purchasing.html">Purchasing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="handling-purchases.html">Handling purchases</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="restoring-purchases.html">Restoring purchases</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="displaying-products-with-purchases.html">Displaying products with purchases</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="errors.html">Errors</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="analytics.html">Analytics</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="server-integration.html">Server integration</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="API%20documentation.html">API documentation</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/InAppPurchase.html">InAppPurchase</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/InAppPurchaseLib.html">InAppPurchaseLib</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/DefaultPurchaseDelegate.html">DefaultPurchaseDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/IAPPurchaseDelegate.html">IAPPurchaseDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/IAPProduct.html">IAPProduct</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/IAPProductType.html">IAPProductType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/SKProduct.html">SKProduct</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/IAPPeriodFormat.html">IAPPeriodFormat</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="API%20documentation.html#/s:16InAppPurchaseLib19IAPPurchaseCallbacka">IAPPurchaseCallback</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="API%20documentation.html#/s:16InAppPurchaseLib18IAPRefreshCallbacka">IAPRefreshCallback</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/IAPPurchaseResult.html">IAPPurchaseResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/IAPRefreshResult.html">IAPRefreshResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/IAPPurchaseResultState.html">IAPPurchaseResultState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/IAPRefreshResultState.html">IAPRefreshResultState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/IAPError.html">IAPError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/IAPErrorCode.html">IAPErrorCode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/IAPErrorProtocol.html">IAPErrorProtocol</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>API documentation</h1>
+            <h1 id='classes-and-protocols' class='heading'>Classes and Protocols</h1>
+
+<p>The most important class is <code><a href="Classes/InAppPurchase.html">InAppPurchase</a></code>. All the functions you need are defined in this class.</p>
+
+<p>If you have <em>consumable</em> and/or <em>non-renewing subscription</em> products in your application, you must have a class that adopts the <code><a href="Protocols/IAPPurchaseDelegate.html">IAPPurchaseDelegate</a></code> protocol.</p>
+<h1 id='products' class='heading'>Products</h1>
+
+<ul>
+<li><p>Input: the library requires an array of <code><a href="Structs/IAPProduct.html">IAPProduct</a></code> when it is initialized.</p></li>
+<li><p>Output: the library will returns <a href="https://developer.apple.com/documentation/storekit/skproduct">SKProduct</a> extended with helpful methods. See the <a href="Extensions/SKProduct.html"><code>SKProduct</code> extension</a>.</p></li>
+</ul>
+<h1 id='callbacks' class='heading'>Callbacks</h1>
+
+<p><code>refresh()</code>, <code>purchase()</code> and <code>restorePurchases()</code> are asynchronous functions. You must provide a callback that will allow you to perform actions depending on the result.</p>
+
+<ul>
+<li><p>For <code>refresh()</code> and <code>restorePurchases()</code> functions, the result will be <code><a href="Structs/IAPRefreshResult.html">IAPRefreshResult</a></code>.</p></li>
+<li><p>For <code>purchase()</code> function, the result will be <code><a href="Structs/IAPPurchaseResult.html">IAPPurchaseResult</a></code>.</p></li>
+</ul>
+<h1 id='errors' class='heading'>Errors</h1>
+
+<p>When calling <code>refresh()</code>, <code>purchase()</code> or <code>restorePurchases()</code>, the callback can return an <code><a href="Structs/IAPError.html">IAPError</a></code> if the state is <code>failed</code>. Look at <code><a href="Enums/IAPErrorCode.html">IAPErrorCode</a></code> to see the list of error codes you can receive.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@InAppPurchaseLib@objc(cs)InAppPurchase"></a>
+                    <a name="//apple_ref/swift/Class/InAppPurchase" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@InAppPurchaseLib@objc(cs)InAppPurchase">InAppPurchase</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                        <a href="Classes/InAppPurchase.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">InAppPurchase</span> <span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt"><a href="Protocols/InAppPurchaseLib.html">InAppPurchaseLib</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLibAAP"></a>
+                    <a name="//apple_ref/swift/Protocol/InAppPurchaseLib" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLibAAP">InAppPurchaseLib</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The protocol that <code><a href="Classes/InAppPurchase.html">InAppPurchase</a></code> adopts.</p>
+
+                        <a href="Protocols/InAppPurchaseLib.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">InAppPurchaseLib</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib07DefaultC8DelegateC"></a>
+                    <a name="//apple_ref/swift/Class/DefaultPurchaseDelegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib07DefaultC8DelegateC">DefaultPurchaseDelegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The default implementation of <code><a href="Protocols/IAPPurchaseDelegate.html">IAPPurchaseDelegate</a></code> if no other is provided. It is enough if you only have <em>non-consumable</em> and/or <em>auto-renewable subscription</em> products.</p>
+
+                        <a href="Classes/DefaultPurchaseDelegate.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">DefaultPurchaseDelegate</span> <span class="p">:</span> <span class="kt"><a href="Protocols/IAPPurchaseDelegate.html">IAPPurchaseDelegate</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib19IAPPurchaseDelegateP"></a>
+                    <a name="//apple_ref/swift/Protocol/IAPPurchaseDelegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib19IAPPurchaseDelegateP">IAPPurchaseDelegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The protocol that you must adopt if you have <em>consumable</em> and/or <em>non-renewing subscription</em> products.</p>
+
+                        <a href="Protocols/IAPPurchaseDelegate.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">IAPPurchaseDelegate</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib10IAPProductV"></a>
+                    <a name="//apple_ref/swift/Struct/IAPProduct" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib10IAPProductV">IAPProduct</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                        <a href="Structs/IAPProduct.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">IAPProduct</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib14IAPProductTypeO"></a>
+                    <a name="//apple_ref/swift/Enum/IAPProductType" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib14IAPProductTypeO">IAPProductType</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                        <a href="Enums/IAPProductType.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">IAPProductType</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)SKProduct"></a>
+                    <a name="//apple_ref/swift/Extension/SKProduct" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)SKProduct">SKProduct</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                        <a href="Extensions/SKProduct.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">SKProduct</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib15IAPPeriodFormatO"></a>
+                    <a name="//apple_ref/swift/Enum/IAPPeriodFormat" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib15IAPPeriodFormatO">IAPPeriodFormat</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                        <a href="Enums/IAPPeriodFormat.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">IAPPeriodFormat</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib19IAPPurchaseCallbacka"></a>
+                    <a name="//apple_ref/swift/Alias/IAPPurchaseCallback" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib19IAPPurchaseCallbacka">IAPPurchaseCallback</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">IAPPurchaseCallback</span> <span class="o">=</span> <span class="p">(</span><span class="kt"><a href="Structs/IAPPurchaseResult.html">IAPPurchaseResult</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib18IAPRefreshCallbacka"></a>
+                    <a name="//apple_ref/swift/Alias/IAPRefreshCallback" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib18IAPRefreshCallbacka">IAPRefreshCallback</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">IAPRefreshCallback</span> <span class="o">=</span> <span class="p">(</span><span class="kt"><a href="Structs/IAPRefreshResult.html">IAPRefreshResult</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib17IAPPurchaseResultV"></a>
+                    <a name="//apple_ref/swift/Struct/IAPPurchaseResult" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib17IAPPurchaseResultV">IAPPurchaseResult</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The result returned in the <code>purchase()</code> callback.</p>
+
+                        <a href="Structs/IAPPurchaseResult.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">IAPPurchaseResult</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib16IAPRefreshResultV"></a>
+                    <a name="//apple_ref/swift/Struct/IAPRefreshResult" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib16IAPRefreshResultV">IAPRefreshResult</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The result returned in the <code>refresh()</code> or <code>restorePurchases()</code> callback.</p>
+
+                        <a href="Structs/IAPRefreshResult.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">IAPRefreshResult</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib22IAPPurchaseResultStateO"></a>
+                    <a name="//apple_ref/swift/Enum/IAPPurchaseResultState" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib22IAPPurchaseResultStateO">IAPPurchaseResultState</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The list of the different states of the <code><a href="Structs/IAPPurchaseResult.html">IAPPurchaseResult</a></code>.</p>
+
+                        <a href="Enums/IAPPurchaseResultState.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">IAPPurchaseResultState</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib21IAPRefreshResultStateO"></a>
+                    <a name="//apple_ref/swift/Enum/IAPRefreshResultState" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib21IAPRefreshResultStateO">IAPRefreshResultState</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The list of the different states of the <code><a href="Structs/IAPRefreshResult.html">IAPRefreshResult</a></code>.</p>
+
+                        <a href="Enums/IAPRefreshResultState.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">IAPRefreshResultState</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib8IAPErrorV"></a>
+                    <a name="//apple_ref/swift/Struct/IAPError" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib8IAPErrorV">IAPError</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>When calling <code>refresh()</code>, <code>purchase()</code> or <code>restorePurchases()</code>, the callback can return an <code>IAPError</code> if the state is <code>failed</code>.</p>
+
+                        <a href="Structs/IAPError.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">IAPError</span> <span class="p">:</span> <span class="kt"><a href="Protocols/IAPErrorProtocol.html">IAPErrorProtocol</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO"></a>
+                    <a name="//apple_ref/swift/Enum/IAPErrorCode" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO">IAPErrorCode</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The list of error codes that can be returned by the library.</p>
+
+                        <a href="Enums/IAPErrorCode.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">IAPErrorCode</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib16IAPErrorProtocolP"></a>
+                    <a name="//apple_ref/swift/Protocol/IAPErrorProtocol" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib16IAPErrorProtocolP">IAPErrorProtocol</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                        <a href="Protocols/IAPErrorProtocol.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">IAPErrorProtocol</span> <span class="p">:</span> <span class="kt">LocalizedError</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>Copyright © 2020 <a class="link" href="https://iridescent.dev" target="_blank" rel="external">Iridescent</a>.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

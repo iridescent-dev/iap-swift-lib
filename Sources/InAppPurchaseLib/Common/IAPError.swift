@@ -12,23 +12,49 @@ public protocol IAPErrorProtocol: LocalizedError {
     var code: IAPErrorCode { get }
 }
 
+/// The list of error codes that can be returned by the library.
 public enum IAPErrorCode {
+    /* MARK: - Errors returned by `refresh()`, `purchase()` or `restorePurchases()` */
+    /// You must call the `initialize` fuction before using the library.
     case libraryNotInitialized
-    case productNotFound
-    case cannotMakePurchase
-    case alreadyPurchasing
     
+    /// The Bundle Identifier is invalid.
     case bundleIdentifierInvalid
+    
+    /// The Validator URL String is invalid.
     case validatorUrlInvalid
+    
+    /// Failed to refresh the App Store receipt.
     case refreshReceiptFailed
+    
+    /// Failed to validate the App Store receipt with Fovea.
     case validateReceiptFailed
+    
+    /// Failed to read the receipt validation.
     case readReceiptFailed
     
+    /* MARK: - Errors returned by `refresh()` */
+    /// Failed to refresh products from the App Store.
     case refreshProductsFailed
+    
+    /* MARK: - Errors returned by `purchase()` */
+    /// The product was not found on the App Store and cannot be purchased.
+    case productNotFound
+    
+    /// The user is not allowed to authorize payments.
+    case cannotMakePurchase
+    
+    /// A purchase is already in progress.
+    case alreadyPurchasing
 }
 
+/// When calling `refresh()`, `purchase()` or `restorePurchases()`, the callback can return an `IAPError` if the state is `failed`.
 public struct IAPError: IAPErrorProtocol {
+    /// The error code.
+    /// - See also: `IAPErrorCode`.
     public var code: IAPErrorCode
+    
+    /// The error description.
     public var localizedDescription: String {
         switch code {
         case .libraryNotInitialized:

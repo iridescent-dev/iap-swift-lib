@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>IAPErrorCode Enumeration Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Enum/IAPErrorCode" class="dashAnchor"></a>
+
+    <a title="IAPErrorCode Enumeration Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          InAppPurchaseLib documentation
+        </a>
+         (77% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/iridescent-dev/iap-swift-lib">
+            <img class="header-icon" src="../img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">InAppPurchaseLib Reference</a>
+      <img class="carat" src="../img/carat.png" />
+      IAPErrorCode Enumeration Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Getting%20Started.html">Getting Started</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../installation.html">Installation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../micro-example.html">Micro Example</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Usage.html">Usage</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../initialization.html">Initialization</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../displaying-products.html">Displaying products</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../displaying-subscriptions.html">Displaying subscriptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../refreshing.html">Refreshing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../purchasing.html">Purchasing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../handling-purchases.html">Handling purchases</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../restoring-purchases.html">Restoring purchases</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../displaying-products-with-purchases.html">Displaying products with purchases</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../errors.html">Errors</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../analytics.html">Analytics</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../server-integration.html">Server integration</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../API%20documentation.html">API documentation</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/InAppPurchase.html">InAppPurchase</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/InAppPurchaseLib.html">InAppPurchaseLib</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/DefaultPurchaseDelegate.html">DefaultPurchaseDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/IAPPurchaseDelegate.html">IAPPurchaseDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/IAPProduct.html">IAPProduct</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/IAPProductType.html">IAPProductType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/SKProduct.html">SKProduct</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/IAPPeriodFormat.html">IAPPeriodFormat</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../API%20documentation.html#/s:16InAppPurchaseLib19IAPPurchaseCallbacka">IAPPurchaseCallback</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../API%20documentation.html#/s:16InAppPurchaseLib18IAPRefreshCallbacka">IAPRefreshCallback</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/IAPPurchaseResult.html">IAPPurchaseResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/IAPRefreshResult.html">IAPRefreshResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/IAPPurchaseResultState.html">IAPPurchaseResultState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/IAPRefreshResultState.html">IAPRefreshResultState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/IAPError.html">IAPError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/IAPErrorCode.html">IAPErrorCode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/IAPErrorProtocol.html">IAPErrorProtocol</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>IAPErrorCode</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">IAPErrorCode</span></code></pre>
+
+                </div>
+              </div>
+            <p>The list of error codes that can be returned by the library.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Errors%20returned%20by%20%60refresh()%60,%20%60purchase()%60%20or%20%60restorePurchases()%60"></a>
+                <a name="//apple_ref/swift/Section/Errors returned by `refresh()`, `purchase()` or `restorePurchases()`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Errors%20returned%20by%20%60refresh()%60,%20%60purchase()%60%20or%20%60restorePurchases()%60"></a>
+                  <h3 class="section-name"><p>Errors returned by <code>refresh()</code>, <code>purchase()</code> or <code>restorePurchases()</code></p>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO21libraryNotInitializedyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/libraryNotInitialized" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO21libraryNotInitializedyA2CmF">libraryNotInitialized</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>You must call the <code>initialize</code> fuction before using the library.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">libraryNotInitialized</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO23bundleIdentifierInvalidyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/bundleIdentifierInvalid" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO23bundleIdentifierInvalidyA2CmF">bundleIdentifierInvalid</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The Bundle Identifier is invalid.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">bundleIdentifierInvalid</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO19validatorUrlInvalidyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/validatorUrlInvalid" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO19validatorUrlInvalidyA2CmF">validatorUrlInvalid</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The Validator URL String is invalid.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">validatorUrlInvalid</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO20refreshReceiptFailedyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/refreshReceiptFailed" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO20refreshReceiptFailedyA2CmF">refreshReceiptFailed</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Failed to refresh the App Store receipt.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">refreshReceiptFailed</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO21validateReceiptFailedyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/validateReceiptFailed" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO21validateReceiptFailedyA2CmF">validateReceiptFailed</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Failed to validate the App Store receipt with Fovea.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">validateReceiptFailed</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO17readReceiptFailedyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/readReceiptFailed" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO17readReceiptFailedyA2CmF">readReceiptFailed</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Failed to read the receipt validation.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">readReceiptFailed</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Errors%20returned%20by%20%60refresh()%60"></a>
+                <a name="//apple_ref/swift/Section/Errors returned by `refresh()`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Errors%20returned%20by%20%60refresh()%60"></a>
+                  <h3 class="section-name"><p>Errors returned by <code>refresh()</code></p>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO21refreshProductsFailedyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/refreshProductsFailed" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO21refreshProductsFailedyA2CmF">refreshProductsFailed</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Failed to refresh products from the App Store.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">refreshProductsFailed</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Errors%20returned%20by%20%60purchase()%60"></a>
+                <a name="//apple_ref/swift/Section/Errors returned by `purchase()`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Errors%20returned%20by%20%60purchase()%60"></a>
+                  <h3 class="section-name"><p>Errors returned by <code>purchase()</code></p>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO15productNotFoundyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/productNotFound" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO15productNotFoundyA2CmF">productNotFound</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The product was not found on the App Store and cannot be purchased.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">productNotFound</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO010cannotMakeC0yA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/cannotMakePurchase" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO010cannotMakeC0yA2CmF">cannotMakePurchase</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The user is not allowed to authorize payments.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">cannotMakePurchase</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:16InAppPurchaseLib12IAPErrorCodeO17alreadyPurchasingyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/alreadyPurchasing" class="dashAnchor"></a>
+                    <a class="token" href="#/s:16InAppPurchaseLib12IAPErrorCodeO17alreadyPurchasingyA2CmF">alreadyPurchasing</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A purchase is already in progress.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">alreadyPurchasing</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>Copyright © 2020 <a class="link" href="https://iridescent.dev" target="_blank" rel="external">Iridescent</a>.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

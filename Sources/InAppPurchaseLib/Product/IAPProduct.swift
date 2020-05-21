@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 public struct IAPProduct {
     
     /// The identifier of the product.

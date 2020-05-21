@@ -1,36 +1,5 @@
-<p align="center">
-  <img src="https://github.com/iridescent-dev/iap-swift-lib/blob/master/Documentation/Images/InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
-</p>
+# Micro Example
 
-> An easy-to-use Swift library for In-App Purchases, using Fovea.Billing for receipts validation.
-
-
-# Features
-
-* ✅ Purchase a product 
-* ✅ Restore purchased products
-* ✅ Verify transactions with the App Store on Fovea.Billing server
-* ✅ Handle and notify payment transaction states
-* ✅ Retreive products information from the App Store
-* ✅ Support all product types (consumable, non-consumable, auto-renewable subscription, non-renewing subscription)
-* ✅ Status of purchases available when offline
-* ✅ Server integration with a Webhook
-
-# Getting Started
-If you haven't already, I highly recommend your read the *Overview* and *Preparing* section of Apple's [In-App Purchase official documentation](https://developer.apple.com/in-app-purchase).
-
-## Installation
-* Select your project in Xcode
-* Go to the section *Swift Package*
-* Click on *(+) Add Package Dependency*
-* Copy the Git URL: *https://github.com/iridescent-dev/iap-swift-lib.git*
-* Click on *Next* > *Next*
-* Make sure your project is selected in *Add to target*
-* Click on *Finish*
-
-*Note:* You have to `import InAppPurchaseLib` wherever you use the library.
-
-## Micro Example
 
 ```swift
 /** AppDelegate.swift */
@@ -51,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillTerminate(_ application: UIApplication) {
-    // clean
+    // Clean
     InAppPurchase.stop()
   }
 }
@@ -119,28 +88,3 @@ class ViewController: UIViewController {
   }
 }
 ```
-
-# Documentation
-- [Getting Started](https://iridescent-dev.github.io/iap-swift-lib/Getting%20Started.html)
-- [Usage](https://iridescent-dev.github.io/iap-swift-lib/Usage.html)
-- [API documentation](https://iridescent-dev.github.io/iap-swift-lib/API%20documentation.html)
-
-See also:
-- [In-App Purchase official documentation](https://developer.apple.com/in-app-purchase)
-- [StoreKit Documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
-
-# Xcode Demo Project
-Do not hesitate to check the demo project available on here: [iap-swift-lib-demo](https://github.com/iridescent-dev/iap-swift-lib-demo).
-
-# Coding
-Generate the documentation, using [Jazzy](https://github.com/realm/jazzy) by running the following command:
-```
-jazzy
-```
-
-# Troubleshooting
-Common issues are covered here: https://github.com/iridescent-dev/iap-swift-lib/wiki/Troubleshooting
-
-
-# License
-InAppPurchaseLib is open-sourced library licensed under the MIT License. See [LICENSE](LICENSE) for details.
