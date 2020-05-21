@@ -19,37 +19,37 @@ public enum IAPPeriodFormat {
 extension SKProduct {
     public static var localizedPeriodFormat: IAPPeriodFormat = .short
     
-    // Checks if the product has an introductory price the user is eligible to.
+    /// Checks if the product has an introductory price the user is eligible to.
     public func hasIntroductoryPriceEligible() -> Bool {
         let ineligibleForIntroPriceProductIDs = IAPStorageService.getStringArray(forKey: INELIGIBLE_FOR_INTRO_PRICE_PRODUCT_IDS_KEY)
         return !ineligibleForIntroPriceProductIDs.contains(productIdentifier) && introductoryPrice != nil
     }
     
-    // Returns a localized string with the cost of the product in the local currency.
+    /// Returns a localized string with the cost of the product in the local currency.
     public var localizedPrice: String {
         return getLocalizedPrice(locale: priceLocale, price: price)
     }
     
-    // Returns a localized string with the period of the subscription product.
+    /// Returns a localized string with the period of the subscription product.
     public var localizedSubscriptionPeriod: String? {
         if subscriptionPeriod == nil { return nil }
         return getLocalizedPeriod(unit: subscriptionPeriod!.unit, numberOfUnits: subscriptionPeriod!.numberOfUnits)
     }
     
-    // Returns a localized string with the introductory price if available, in the local currency.
+    /// Returns a localized string with the introductory price if available, in the local currency.
     public var localizedIntroductoryPrice: String? {
         if introductoryPrice == nil { return nil }
         return getLocalizedPrice(locale: introductoryPrice!.priceLocale, price: introductoryPrice!.price)
     }
     
-    // Returns a localized string with the introductory price period of the subscription product.
+    /// Returns a localized string with the introductory price period of the subscription product.
     public var localizedIntroductoryPeriod: String? {
         if introductoryPrice == nil { return nil }
         return getLocalizedPeriod(unit: introductoryPrice!.subscriptionPeriod.unit, numberOfUnits: introductoryPrice!.subscriptionPeriod.numberOfUnits)
         
     }
     
-    // Returns a localized string with the duration of the introductory price.
+    /// Returns a localized string with the duration of the introductory price.
     public var localizedIntroductoryDuration: String? {
         if introductoryPrice == nil { return nil }
         let numberOfUnits = introductoryPrice!.subscriptionPeriod.numberOfUnits * introductoryPrice!.numberOfPeriods
