@@ -16,7 +16,6 @@ custom_categories:
     children:
     - "Installation"
     - "Micro Example"
-    - "License"
   - name: "Usage"
     children:
     - "Initialization"

@@ -25,7 +25,7 @@ public protocol InAppPurchaseLib {
     ///     - iapProducts: An array of `IAPProduct`.
     ///     - validatorUrlString: The validator url retrieved from Fovea.
     ///     - iapPurchaseDelegate: An instance of class that adopts the `IAPPurchaseDelegate` protocol (default value = `DefaultPurchaseDelegate`).
-    ///     - applicationUsername: The user name, if your app implements user login.
+    ///     - applicationUsername: The user name, if your app implements user login (default value = `nil`).
     static func initialize(iapProducts: Array<IAPProduct>, validatorUrlString: String, iapPurchaseDelegate: IAPPurchaseDelegate, applicationUsername: String?) -> Void
     
     /// Stop observing the payment queue, when the application will terminate, for proper cleanup.
@@ -58,7 +58,7 @@ public protocol InAppPurchaseLib {
     /// Request a Payment from the App Store.
     /// - Parameters:
     ///     - productIdentifier: The identifier of the product to purchase.
-    ///     - quantity: The quantity to purchase (default value = 1).
+    ///     - quantity: The quantity to purchase (default value = `1`).
     ///     - callback: The function that will be called after processing.
     /// - See also:`IAPPurchaseResult`
     static func purchase(productIdentifier: String, quantity: Int, callback: @escaping IAPPurchaseCallback) -> Void
@@ -104,12 +104,12 @@ public protocol InAppPurchaseLib {
 }
 
 public extension InAppPurchaseLib {
-    // Sets default `iapPurchaseDelegate` and `applicationUsername`
+    /// Sets `DefaultPurchaseDelegate` as default value for `iapPurchaseDelegate` and `nil` for `applicationUsername`.
     static func initialize(iapProducts: Array<IAPProduct>, validatorUrlString: String, iapPurchaseDelegate: IAPPurchaseDelegate = DefaultPurchaseDelegate(), applicationUsername: String? = nil) {
         return initialize(iapProducts: iapProducts, validatorUrlString: validatorUrlString, iapPurchaseDelegate: iapPurchaseDelegate, applicationUsername: applicationUsername)
     }
     
-    // Sets 1 as default value for the quantity.
+    /// Sets `1` as default value for the `quantity`.
     static func purchase(productIdentifier: String, quantity: Int = 1, callback: @escaping IAPPurchaseCallback) {
         return purchase(productIdentifier: productIdentifier, quantity: quantity, callback: callback)
     }
@@ -132,7 +132,7 @@ public class DefaultPurchaseDelegate: IAPPurchaseDelegate {
     
     /// Finish the product transactions when a product is newly purchased, updated or restored.
     /// - Parameter productIdentifier: The identifier of the product.
-    public func productPurchased(productIdentifier: String) {
+    public func productPurchased(productIdentifier: String) -> Void {
         InAppPurchase.finishTransactions(for: productIdentifier)
     }
 }

@@ -1,13 +1,13 @@
 # Displaying products
 Let's start with the simplest case: you have a single product.
 
-You can retrieve all information about this product using the function `InAppPurchase.getProductBy(identifier: "my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with helpful methods.
+You can retrieve all information about this product using the function `InAppPurchase.getProductBy(identifier: "my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with [helpful methods](Extensions/SKProduct.html).
 
 Those are the most important:
  - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
  - `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
  - `localizedDescription: String` - A description of the product, in the language of the device, as retrieved from the AppStore.
- - `localizedPrice: String` - The cost of the product in the local currency (_read-only property added by this library_).
+ - `localizedPrice: String` - The cost of the product in the local currency (_read-only property added by this library, available for OSX >= 10.13.2 and iOS >= 11.2_).
 
 *Example*:
 

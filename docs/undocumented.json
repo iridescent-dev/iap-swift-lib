@@ -9,65 +9,9 @@
     },
     {
       "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 16,
-      "symbol": "IAPPurchaseResult.state",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 17,
-      "symbol": "IAPPurchaseResult.iapError",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 18,
-      "symbol": "IAPPurchaseResult.skError",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 20,
-      "symbol": "IAPPurchaseResult.localizedDescription",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 40,
+      "line": 52,
       "symbol": "IAPRefreshCallback",
       "symbol_kind": "source.lang.swift.decl.typealias",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 44,
-      "symbol": "IAPRefreshResult.state",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 45,
-      "symbol": "IAPRefreshResult.iapError",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 46,
-      "symbol": "IAPRefreshResult.addedPurchases",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Common/IAPCallback.swift",
-      "line": 47,
-      "symbol": "IAPRefreshResult.updatedPurchases",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
@@ -89,76 +33,6 @@
       "line": 131,
       "symbol": "DefaultPurchaseDelegate.init()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/IAPProduct.swift",
-      "line": 10,
-      "symbol": "IAPProduct",
-      "symbol_kind": "source.lang.swift.decl.struct",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/IAPProduct.swift",
-      "line": 30,
-      "symbol": "IAPProductType",
-      "symbol_kind": "source.lang.swift.decl.enum",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/IAPProduct.swift",
-      "line": 31,
-      "symbol": "IAPProductType.consumable",
-      "symbol_kind": "source.lang.swift.decl.enumelement",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/IAPProduct.swift",
-      "line": 32,
-      "symbol": "IAPProductType.nonConsumable",
-      "symbol_kind": "source.lang.swift.decl.enumelement",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/IAPProduct.swift",
-      "line": 33,
-      "symbol": "IAPProductType.nonRenewingSubscription",
-      "symbol_kind": "source.lang.swift.decl.enumelement",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/IAPProduct.swift",
-      "line": 34,
-      "symbol": "IAPProductType.autoRenewableSubscription",
-      "symbol_kind": "source.lang.swift.decl.enumelement",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/SKProductExtension.swift",
-      "line": 12,
-      "symbol": "IAPPeriodFormat",
-      "symbol_kind": "source.lang.swift.decl.enum",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/SKProductExtension.swift",
-      "line": 13,
-      "symbol": "IAPPeriodFormat.short",
-      "symbol_kind": "source.lang.swift.decl.enumelement",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/SKProductExtension.swift",
-      "line": 14,
-      "symbol": "IAPPeriodFormat.long",
-      "symbol_kind": "source.lang.swift.decl.enumelement",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/veronique/Documents/iap-swift-lib/Sources/InAppPurchaseLib/Product/SKProductExtension.swift",
-      "line": 20,
-      "symbol": "SKProduct.localizedPeriodFormat",
-      "symbol_kind": "source.lang.swift.decl.var.static",
       "warning": "undocumented"
     }
   ],

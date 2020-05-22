@@ -8,15 +8,21 @@
 import Foundation
 import StoreKit
 
-
+/// The format used for the localized subscription periods.
 public enum IAPPeriodFormat {
+    /// Remove the number of units if it is equal to 1.
+    /// Ex: if the period is "1 month", the returned period will be "month".
     case short
+    
+    /// The period will be returned with the number and the unit.
+    /// Ex: "1 month".
     case long
 }
 
 @available(OSX 10.13.2, *)
 @available(iOS 11.2, *)
 extension SKProduct {
+    /// The format used for the localized subscription periods.
     public static var localizedPeriodFormat: IAPPeriodFormat = .short
     
     /// Checks if the product has an introductory price the user is eligible to.

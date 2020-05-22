@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillTerminate(_ application: UIApplication) {
-    // Clean
+    // Stop library when the application will terminate
     InAppPurchase.stop()
   }
 }
@@ -71,6 +71,7 @@ class ViewController: UIViewController {
     }
   }
 
+  // Initiating a purchase
   @IBAction func purchase(_ sender: Any) {
     self.loaderView.show()
     InAppPurchase.purchase(
@@ -80,6 +81,7 @@ class ViewController: UIViewController {
       })
   }
 
+  // Restoring purchases
   @IBAction func restorePurchases(_ sender: Any) {
     self.loaderView.show()
     InAppPurchase.restorePurchases(callback: { result in

@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
           InAppPurchaseLib documentation
         </a>
-         (77% documented)
+         (95% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -180,7 +180,7 @@
   <span class="p">}</span>
 
   <span class="kd">func</span> <span class="nf">applicationWillTerminate</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// Clean</span>
+    <span class="c1">// Stop library when the application will terminate</span>
     <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">stop</span><span class="p">()</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -229,6 +229,7 @@
     <span class="p">}</span>
   <span class="p">}</span>
 
+  <span class="c1">// Initiating a purchase</span>
   <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">purchase</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
     <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
@@ -238,6 +239,7 @@
       <span class="p">})</span>
   <span class="p">}</span>
 
+  <span class="c1">// Restoring purchases</span>
   <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
     <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>

@@ -8,17 +8,17 @@
 import Foundation
 import StoreKit
 
-/// 
+/// The main class of the library.
 public class InAppPurchase: NSObject, InAppPurchaseLib {
-    // InAppPurchaseLib version number.
+    /// InAppPurchaseLib version number.
     internal static let versionNumber = "1.0.2"
-    // The initialize function has been called.
+    /// The initialize function has been called.
     internal static var initialized: Bool {
         return !iapProducts.isEmpty && iapPurchaseDelegate != nil && validatorUrlString != nil
     }
-    // Callbacks that are waiting for the refresh.
+    /// Callbacks that are waiting for the refresh.
     private static var refreshCallbacks: Array<IAPRefreshCallback> = []
-    // The date of the last refresh.
+    /// The date of the last refresh.
     private static var lastRefreshDate: Date? = nil
     
     

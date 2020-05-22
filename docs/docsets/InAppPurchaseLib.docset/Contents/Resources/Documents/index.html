@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
           InAppPurchaseLib documentation
         </a>
-         (77% documented)
+         (95% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -183,6 +183,22 @@
 <h1 id='getting-started' class='heading'>Getting Started</h1>
 
 <p>If you haven&rsquo;t already, I highly recommend your read the <em>Overview</em> and <em>Preparing</em> section of Apple&rsquo;s <a href="https://developer.apple.com/in-app-purchase">In-App Purchase official documentation</a>.</p>
+<h2 id='requirements' class='heading'>Requirements</h2>
+
+<ul>
+<li>Configure your App and Xcode to support In-App Purchases.
+
+<ul>
+<li><a href="https://help.apple.com/app-store-connect/#/devb57be10e7">AppStore Connect Setup</a></li>
+</ul></li>
+<li>Create and configure your <a href="https://billing.fovea.cc/?ref=iap-swift-lib">Fovea.Billing</a> project account:
+
+<ul>
+<li>Set your bundle ID</li>
+<li>The iOS Shared Secret (or shared key) is to be retrieved from <a href="https://appstoreconnect.apple.com/">AppStoreConnect</a></li>
+<li>The iOS Subscription Status URL (only if you want subscriptions)</li>
+</ul></li>
+</ul>
 <h2 id='installation' class='heading'>Installation</h2>
 
 <ul>
@@ -190,97 +206,58 @@
 <li>Go to the section <em>Swift Package</em></li>
 <li>Click on <em>(+) Add Package Dependency</em></li>
 <li>Copy the Git URL: <em><a href="https://github.com/iridescent-dev/iap-swift-lib.git">https://github.com/iridescent-dev/iap-swift-lib.git</a></em></li>
-<li>Click on <em>Next</em> &gt; <em>Next</em></li>
+<li>Click on <em>Next</em></li>
+<li>In <em>Rules</em> select <em>Version: Up to Next Major &hellip;</em></li>
+<li>Click on <em>Next</em></li>
 <li>Make sure your project is selected in <em>Add to target</em></li>
 <li>Click on <em>Finish</em></li>
 </ul>
 
 <p><em>Note:</em> You have to <code>import InAppPurchaseLib</code> wherever you use the library.</p>
-<h2 id='micro-example' class='heading'>Micro Example</h2>
-<pre class="highlight swift"><code><span class="cm">/** AppDelegate.swift */</span>
-<span class="kd">import</span> <span class="kt">UIKit</span>
-<span class="kd">import</span> <span class="kt">InAppPurchaseLib</span>
+<h2 id='basic-usage' class='heading'>Basic Usage</h2>
 
-<span class="kd">@UIApplicationMain</span>
-<span class="kd">class</span> <span class="kt">AppDelegate</span><span class="p">:</span> <span class="kt">UIResponder</span><span class="p">,</span> <span class="kt">UIApplicationDelegate</span> <span class="p">{</span>
-  <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nv">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">LaunchOptionsKey</span><span class="p">:</span> <span class="kt">Any</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
-    <span class="c1">// Initialize the library</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">initialize</span><span class="p">(</span>
-      <span class="nv">iapProducts</span><span class="p">:</span> <span class="p">[</span>
-        <span class="kt">IAPProduct</span><span class="p">(</span><span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">,</span> <span class="nv">productType</span><span class="p">:</span> <span class="o">.</span><span class="n">nonConsumable</span><span class="p">)</span>
-      <span class="p">],</span>
-      <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"https://validator.fovea.cc/v1/validate?appName=demo&amp;apiKey=12345678"</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="kc">true</span>
-  <span class="p">}</span>
-
-  <span class="kd">func</span> <span class="nf">applicationWillTerminate</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// clean</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">stop</span><span class="p">()</span>
-  <span class="p">}</span>
+<ul>
+<li><p>Initialize the library</p>
+<pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">initialize</span><span class="p">(</span>
+<span class="nv">iapProducts</span><span class="p">:</span> <span class="p">[</span> <span class="kt">IAPProduct</span><span class="p">(</span><span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">,</span> <span class="nv">productType</span><span class="p">:</span> <span class="o">.</span><span class="n">nonConsumable</span><span class="p">)</span> <span class="p">],</span>
+<span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"https://validator.fovea.cc/v1/validate?appName=demo&amp;apiKey=12345678"</span>
+<span class="p">)</span>
+</code></pre></li>
+<li><p>Stop library when the application will terminate</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">applicationWillTerminate</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">)</span> <span class="p">{</span>
+<span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">stop</span><span class="p">()</span>
 <span class="p">}</span>
-</code></pre>
-<pre class="highlight swift"><code><span class="cm">/** ViewController.swift */</span>
-<span class="kd">import</span> <span class="kt">UIKit</span>
-<span class="kd">import</span> <span class="kt">StoreKit</span>
-<span class="kd">import</span> <span class="kt">InAppPurchaseLib</span>
-
-<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
-  <span class="kd">private</span> <span class="k">var</span> <span class="nv">loaderView</span> <span class="o">=</span> <span class="kt">LoaderView</span><span class="p">()</span>
-  <span class="kd">@IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">statusLabel</span><span class="p">:</span> <span class="kt">UILabel</span><span class="o">!</span>
-  <span class="kd">@IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">productTitleLabel</span><span class="p">:</span> <span class="kt">UILabel</span><span class="o">!</span>
-  <span class="kd">@IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">productDescriptionLabel</span><span class="p">:</span> <span class="kt">UILabel</span><span class="o">!</span>
-  <span class="kd">@IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">purchaseButton</span><span class="p">:</span> <span class="kt">UIButton</span><span class="o">!</span>
-  <span class="kd">@IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">restorePurchasesButton</span><span class="p">:</span> <span class="kt">UIButton</span><span class="o">!</span>
-
-  <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">super</span><span class="o">.</span><span class="nf">viewDidLoad</span><span class="p">()</span>
-    <span class="c1">// Add action for purchases and restore butons.</span>
-    <span class="n">purchaseButton</span><span class="o">.</span><span class="nf">addTarget</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="nv">action</span><span class="p">:</span> <span class="kd">#selector(</span><span class="nf">self.purchase</span><span class="kd">)</span><span class="p">,</span> <span class="nv">for</span><span class="p">:</span> <span class="o">.</span><span class="n">touchUpInside</span><span class="p">)</span>
-    <span class="n">restorePurchasesButton</span><span class="o">.</span><span class="nf">addTarget</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="nv">action</span><span class="p">:</span> <span class="kd">#selector(</span><span class="nf">self.restorePurchases</span><span class="kd">)</span><span class="p">,</span> <span class="nv">for</span><span class="p">:</span> <span class="o">.</span><span class="n">touchUpInside</span><span class="p">)</span>
-  <span class="p">}</span>
-
-  <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewWillAppear</span><span class="p">(</span><span class="n">_</span> <span class="nv">animated</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">refresh</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
-      <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
-    <span class="p">})</span>
-  <span class="p">}</span>
-
-  <span class="kd">func</span> <span class="nf">refreshView</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">guard</span> <span class="k">let</span> <span class="nv">product</span><span class="p">:</span> <span class="kt">SKProduct</span> <span class="o">=</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="k">self</span><span class="o">.</span><span class="n">productTitleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"Product unavailable"</span>
-      <span class="k">return</span>
-    <span class="p">}</span>
-    <span class="c1">// Display product information.</span>
-    <span class="n">productTitleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedTitle</span>
-    <span class="n">productDescriptionLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedDescription</span>
-    <span class="n">purchaseButton</span><span class="o">.</span><span class="nf">setTitle</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">localizedPrice</span><span class="p">,</span> <span class="nv">for</span><span class="p">:</span> <span class="o">.</span><span class="n">normal</span><span class="p">)</span>
-
-    <span class="c1">// Disable the button if the product has already been purchased.</span>
-    <span class="k">if</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">hasActivePurchase</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">statusLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"OWNED"</span>
-      <span class="n">purchaseButton</span><span class="o">.</span><span class="n">isPointerInteractionEnabled</span> <span class="o">=</span> <span class="kc">false</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">purchase</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
-      <span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">,</span>
-      <span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-        <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
-      <span class="p">})</span>
-  <span class="p">}</span>
-
-  <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-      <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
-    <span class="p">})</span>
-  <span class="p">}</span>
+</code></pre></li>
+<li><p>Display product information</p>
+<pre class="highlight swift"><code><span class="k">guard</span> <span class="k">let</span> <span class="nv">product</span><span class="p">:</span> <span class="kt">SKProduct</span> <span class="o">=</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+<span class="n">productTitleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedTitle</span>
+<span class="n">productDescriptionLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedDescription</span>
+<span class="n">productPriceLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedPrice</span>
+</code></pre></li>
+<li><p>Initialize a purchase</p>
+<pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">purchase</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+<span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
+<span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">,</span>
+<span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
+<span class="p">})</span>
 <span class="p">}</span>
-</code></pre>
+</code></pre></li>
+<li><p>Unlock purchased content</p>
+<pre class="highlight swift"><code><span class="k">if</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">hasActivePurchase</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="p">{</span>
+<span class="c1">// display content related to the product</span>
+<span class="p">}</span>
+</code></pre></li>
+<li><p>Restore purchases</p>
+<pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+<span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+<span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
+<span class="p">})</span>
+<span class="p">}</span>
+</code></pre></li>
+</ul>
 <h1 id='documentation' class='heading'>Documentation</h1>
 
 <ul>

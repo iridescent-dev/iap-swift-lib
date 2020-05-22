@@ -11,7 +11,7 @@ That is why the process looks like so:
 - finalizing transactions when product delivery is complete
 - sending purchase request, for which successful doesn't always mean complete
 
-### Initiating a purchase
+## Initiating a purchase
 To initiate a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
 
 **Important**: Do not process the purchase here, we'll handle that later!

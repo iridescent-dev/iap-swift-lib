@@ -1,5 +1,13 @@
 # Displaying subscriptions
-For subscription products, you also have some data about subscription periods and introductory offers.
+You can retrieve all information about a product using the function `InAppPurchase.getProductBy(identifier: "my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with [helpful methods](Extensions/SKProduct.html).
+
+Those are the most important:
+- `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
+- `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
+- `localizedDescription: String` - A description of the product, in the language of the device, as retrieved from the AppStore.
+- `localizedPrice: String` - The cost of the product in the local currency (_read-only property added by this library, available for OSX >= 10.13.2 and iOS >= 11.2_).
+
+For subscription products, you also have some data about subscription periods and introductory offers. (_read-only property added by this library, available for OSX >= 10.13.2 and iOS >= 11.2_)
 
  - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
  - `localizedSubscriptionPeriod: String?` - The period of the subscription.

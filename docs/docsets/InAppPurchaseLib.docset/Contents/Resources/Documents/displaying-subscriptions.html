@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
           InAppPurchaseLib documentation
         </a>
-         (77% documented)
+         (95% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -163,7 +163,18 @@
             
             <h1 id='displaying-subscriptions' class='heading'>Displaying subscriptions</h1>
 
-<p>For subscription products, you also have some data about subscription periods and introductory offers.</p>
+<p>You can retrieve all information about a product using the function <code>InAppPurchase.getProductBy(identifier: &quot;my_product_id&quot;)</code>. This returns an <a href="https://developer.apple.com/documentation/storekit/skproduct">SKProduct</a> extended with <a href="Extensions/SKProduct.html">helpful methods</a>.</p>
+
+<p>Those are the most important:</p>
+
+<ul>
+<li><code>productIdentifier: String</code> - The string that identifies the product to the Apple AppStore.</li>
+<li><code>localizedTitle: String</code> - The name of the product, in the language of the device, as retrieved from the AppStore.</li>
+<li><code>localizedDescription: String</code> - A description of the product, in the language of the device, as retrieved from the AppStore.</li>
+<li><code>localizedPrice: String</code> - The cost of the product in the local currency (<em>read-only property added by this library, available for OSX &gt;= 10.13.2 and iOS &gt;= 11.2</em>).</li>
+</ul>
+
+<p>For subscription products, you also have some data about subscription periods and introductory offers. (<em>read-only property added by this library, available for OSX &gt;= 10.13.2 and iOS &gt;= 11.2</em>)</p>
 
 <ul>
 <li><code>func hasIntroductoryPriceEligible() -&gt; Bool</code> - The product has an introductory price the user is eligible to.</li>
