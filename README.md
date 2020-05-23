@@ -2,7 +2,7 @@
   <img src="img/InAppPurchaseLib.png" width="640" title="InAppPurchaseLib">
 </p>
 
-> An easy-to-use Swift library for In-App Purchases, using Fovea.Billing for receipts validation.
+_An easy-to-use Swift library for In-App Purchases, using Fovea.Billing for receipts validation._
 
 
 # Features
@@ -107,14 +107,10 @@ See also:
 Do not hesitate to check the demo project available on here: [iap-swift-lib-demo](https://github.com/iridescent-dev/iap-swift-lib-demo).
 
 # Coding
-Generate the documentation, using [Jazzy](https://github.com/realm/jazzy) by running the following command:
-```
-jazzy
-```
+Generate the documentation, using [Jazzy](https://github.com/realm/jazzy), just by running  `jazzy` from the root of the project.
 
 # Troubleshooting
 Common issues are covered here: https://github.com/iridescent-dev/iap-swift-lib/wiki/Troubleshooting
-
 
 # License
 InAppPurchaseLib is open-sourced library licensed under the MIT License. See [LICENSE](LICENSE) for details.

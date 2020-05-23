@@ -9,7 +9,7 @@ Each `IAPProduct` contains the following fields:
 * `productIdentifier` - The product unique identifier 
 * `productType` - The `IAPProductType` (*consumable*, *nonConsumable*, *nonRenewingSubscription* or *autoRenewableSubscription*)
 
-*Example:*
+### **Example**
 
 A good place is generally in your application delegate's `didFinishLaunchingWithOptions` function, like below:
 

@@ -5,7 +5,8 @@ The information sent from Fovea has been verified from Apple's server, which mak
 
 To take advantage of this, you have to inform the library of your application username. This `applicationUsername` can be provided as a parameter of the `InAppPurchase.initialize` method and updated later by changing the associated property.
 
-*Example:*
+### **Example**
+
 ``` swift
 InAppPurchase.initialize(
   iapProducts: [...],

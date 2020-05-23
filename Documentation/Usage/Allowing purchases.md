@@ -1,4 +1,4 @@
-# Displaying products with purchases
+# Allowing purchases
 In your store screen, where you present your products titles and prices with a purchase button, there are some cases to handle that we skipped. Owned products and deferred purchases.
 
 ## Owned products
@@ -34,24 +34,24 @@ Here's an example that covers what has been discussed above. We will update our 
 ``` swift
 @objc func refreshView() {
   guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
-    self.titleLabel.text = "Product unavailable"
+    titleLabel.text = "Product unavailable"
     return
   }
-  self.titleLabel.text = product.localizedTitle
+  titleLabel.text = product.localizedTitle
   // ...
 
   // "Ask to Buy" deferred purchase waiting for parent's approval
   if InAppPurchase.hasDeferredTransaction(for: "my_product_id") {
-    self.statusLabel.text = "Waiting for Approval..."
-    self.purchaseButton.isPointerInteractionEnabled = false
+    statusLabel.text = "Waiting for Approval..."
+    purchaseButton.isPointerInteractionEnabled = false
   }
   // "Owned" product
   else if InAppPurchase.hasActivePurchase(for: "my_product_id") {
-    self.statusLabel.text = "OWNED"
-    self.purchaseButton.isPointerInteractionEnabled = false
+    statusLabel.text = "OWNED"
+    purchaseButton.isPointerInteractionEnabled = false
   }
   else {
-    self.purchaseButton.isPointerInteractionEnabled = true
+    purchaseButton.isPointerInteractionEnabled = true
   }
 }
 ```

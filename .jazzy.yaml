@@ -20,13 +20,11 @@ custom_categories:
     children:
     - "Initialization"
     - "Displaying products"
-    - "Displaying subscriptions"
     - "Refreshing"
     - "Purchasing"
     - "Handling purchases"
+    - "Allowing purchases"
     - "Restoring purchases"
-    - "Displaying products with purchases"
-    - "Errors"
     - "Analytics"
     - "Server integration"
   - name: "API documentation"
@@ -48,4 +46,4 @@ custom_categories:
     - IAPError
     - IAPErrorCode
     - IAPErrorProtocol
-theme: fullwidth
+theme: apple

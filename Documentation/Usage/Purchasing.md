@@ -18,7 +18,7 @@ To initiate a purchase, use the `InAppPurchase.purchase()` function. It takes th
 
 From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.
 
-*Example:*
+### **Example**
 
 ``` swift
 self.loaderView.show()
