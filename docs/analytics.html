@@ -156,6 +156,7 @@
       <span class="k">case</span> <span class="o">.</span><span class="nv">purchased</span><span class="p">:</span>
         <span class="c1">// Reminder: We are not processing the purchase here, only updating your UI.</span>
         <span class="c1">//           That's why we do not send an event to analytics.</span>
+        <span class="k">break</span>
       <span class="k">case</span> <span class="o">.</span><span class="nv">failed</span><span class="p">:</span>
         <span class="kt">Analytics</span><span class="o">.</span><span class="nf">trackEvent</span><span class="p">(</span><span class="s">"purchase failed"</span><span class="p">)</span>
       <span class="k">case</span> <span class="o">.</span><span class="nv">deferred</span><span class="p">:</span>

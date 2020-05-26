@@ -63,11 +63,12 @@ class ViewController: UIViewController {
     productTitleLabel.text = product.localizedTitle
     productDescriptionLabel.text = product.localizedDescription
     purchaseButton.setTitle(product.localizedPrice, for: .normal)
-        
+
     // Disable the button if the product has already been purchased.
     if InAppPurchase.hasActivePurchase(for: "my_product") {
-      statusLabel.text = "OWNED"
       purchaseButton.isPointerInteractionEnabled = false
+    } else {
+      purchaseButton.isPointerInteractionEnabled = true
     }
   }
 
@@ -76,7 +77,7 @@ class ViewController: UIViewController {
     self.loaderView.show()
     InAppPurchase.purchase(
       productIdentifier: "my_product",
-      callback: { result in
+      callback: { _ in
         self.loaderView.hide()
       })
   }
@@ -84,7 +85,7 @@ class ViewController: UIViewController {
   // Restoring purchases
   @IBAction func restorePurchases(_ sender: Any) {
     self.loaderView.show()
-    InAppPurchase.restorePurchases(callback: { result in
+    InAppPurchase.restorePurchases(callback: { _ in
       self.loaderView.hide()
     })
   }

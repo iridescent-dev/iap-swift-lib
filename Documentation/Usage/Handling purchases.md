@@ -9,32 +9,24 @@ Finally, the magic happened: a user purchased one of your products! Let's see ho
 
 <a id="non-consumables"></a> 
 ## Non-Consumables
-Wherever your app needs to know if a non-consumable product has been purchased, use `InAppPurchase.hasActivePurchase(for: 
-productIdentifier)`. This will return true if the user currently owns the product.
+Wherever your app needs to know if a non-consumable product has been purchased, use `hasActivePurchase` method. This will return true if the user currently owns the product.
 
-**Note:** The last known state for the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline.
+``` swift
+InAppPurchase.hasActivePurchase(for productIdentifier: String) -> Bool
+```
+
+**Note:** The last known state for the user's purchases is stored as [UserDefaults](https://developer.apple.com/documentation/foundation/userdefaults). As such, their status is always available to your app, even when offline. It is updated when the library is initialized, after a purchase or after a refresh.
 
 If you have a server that needs to know about the purchase. You should rely on Fovea's webhook instead of doing anything in here. We will see that later in the [Server integration](server-integration.html) section.
 
 
 <a id="auto-renewable-subscriptions"></a> 
 ## Auto-Renewable Subscriptions
-As with non-consumables, you will use `InAppPurchase.hasActivePurchase(for: productIdentifier)` to check if the user is an active subscriber to a given product.
+As with [non-consumables](#non-consumables), you will use `InAppPurchase.hasActivePurchase()` to check if the user is an active subscriber to a given product.
 
-You might also like to call refresh regularly, for example when entering your main view. When appropriate, the library will refresh the receipt to detect subscription renewals or expiry.
+To be sure the state for the user's purchases is up-to-date, you might also like to call `InAppPurchase.refresh()` regularly, for example when entering your main view. When appropriate, the library will refresh the receipt to detect subscription renewals or expiry.
 
-As we've seend in the [Refreshing](refreshing.html) section:
-
-``` swift
-override func viewWillAppear(_ animated: Bool) {
-  self.refreshView()
-  InAppPurchase.refresh(callback: { _ in
-      self.refreshView()
-  })
-}
-```
-
-**Note:** Don't be reluctant to call `refresh()` often. Internally, the library ensures heavy operation are only performed if necessary: for example when a subscription just expired. So in 99% of cases this call will result in no-operations.
+As we've seend in the [Refreshing](refreshing.html) section, don't be reluctant to call `InAppPurchase.refresh()` often. Internally, the library ensures heavy operation are only performed if necessary: for example when a subscription just expired.
 
 
 <a id="consumables"></a>
@@ -53,8 +45,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, IAPPurchaseDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     InAppPurchase.initialize(
       iapProducts: [...],
-      iapPurchaseDelegate: self, // ADDED: iapPurchaseDelegate
-      validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
+      validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678",
+      iapPurchaseDelegate: self // ADDED: iapPurchaseDelegate
+    )
   }
 
   // IAPPurchaseDelegate implementation

@@ -137,10 +137,21 @@
 <p>Data might change or not be yet available when your &ldquo;product&rdquo; view is presented. In order to properly handle those cases, you should refresh your view after refreshing in-app products metadata. You want to be sure you&rsquo;re displaying up-to-date information.</p>
 
 <p>To achieve this, call <code>InAppPurchase.refresh()</code> when your view is presented.</p>
+
+<p><strong>Important</strong>: Don&rsquo;t be reluctant to call <code>InAppPurchase.refresh()</code> often. Internally, the library ensures heavy operation are only performed if necessary. So in 99% of cases this call will result in no-operations.</p>
+
+<p><strong>Note</strong>: This function is asynchronous and takes a <code>callback</code> function, called when the operation has been processed.
+From this callback, you can for example refresh your view by caling <code>self.refreshView()</code>. This function must be able to be called several times, so refresh the content but do not add elements to your view.</p>
 <pre class="highlight swift"><code><span class="k">override</span> <span class="kd">func</span> <span class="nf">viewWillAppear</span><span class="p">(</span><span class="n">_</span> <span class="nv">animated</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
-  <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">refresh</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
+  <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">refresh</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="k">switch</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nv">succeeded</span><span class="p">:</span>
       <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
+
+    <span class="k">case</span> <span class="o">.</span><span class="n">failed</span><span class="p">,</span> <span class="o">.</span><span class="nv">skipped</span><span class="p">:</span>
+      <span class="c1">// Do nothing.</span>
+      <span class="k">break</span>
   <span class="p">})</span>
 <span class="p">}</span>
 </code></pre>

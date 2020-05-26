@@ -3,15 +3,16 @@ In more advanced use cases, you have a server component. Users are logged in and
 
 The information sent from Fovea has been verified from Apple's server, which makes it way more trustable than information sent from your app itself.
 
-To take advantage of this, you have to inform the library of your application username. This `applicationUsername` can be provided as a parameter of the `InAppPurchase.initialize` method and updated later by changing the associated property.
+To take advantage of this, you have to inform the library of your application username. This `applicationUsername` can be provided as a parameter of the `InAppPurchase.initialize()` method or updated later by changing the associated property.
 
 ### **Example**
 
 ``` swift
 InAppPurchase.initialize(
   iapProducts: [...],
-  validatorUrlString: "..."),
-  applicationUsername: UserSession.getUserId())
+  validatorUrlString: "...",
+  applicationUsername: UserSession.getUserId()
+)
 
 // later ...
 InAppPurchase.applicationUsername = UserSession.getUserId()

@@ -16,7 +16,7 @@ A good place is generally in your application delegate's `didFinishLaunchingWith
 ``` swift
 import InAppPurchaseLib
 
-class AppDelegate: UIResponder, UIApplicationDelegate, IAPPurchaseDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
   ...
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     InAppPurchase.initialize(
@@ -26,10 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, IAPPurchaseDelegate {
         IAPProduct(productIdentifier: "disable_ads",  productType: .nonConsumable)
       ],
       validatorUrlString: "https://validator.fovea.cc/v1/validate?appName=demo&apiKey=12345678")
-  }
-
-  func productPurchased(productIdentifier: String) {
-    // ... process purchase (we'll see that later)
   }
 }
 ```

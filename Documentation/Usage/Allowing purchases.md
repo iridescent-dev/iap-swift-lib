@@ -2,7 +2,7 @@
 In your store screen, where you present your products titles and prices with a purchase button, there are some cases to handle that we skipped. Owned products and deferred purchases.
 
 ## Owned products
-Non-consumables and active auto-renewing subscriptions cannot be purchased again. You should adjust your UI to reflect that state. Refer to `InAppPurchase.hasActivePurchase()` to the example later in this section.
+Non-consumables and active auto-renewing subscriptions cannot be purchased again. You should adjust your UI to reflect that state. Refer to `InAppPurchase.hasActivePurchase()` to the [example](#example) later in this section.
 
 ## Deferred purchases
 Apple's **Ask to Buy** feature lets parents approve any purchases initiated by children, including in-app purchases.
@@ -13,8 +13,7 @@ With **Ask to Buy** enabled, when a child requests to make a purchase, the app i
 InAppPurchase.purchase(
   productIdentifier: productIdentifier,
   callback: { result in
-    switch result.state {
-    case .deferred:
+    if result.state == .deferred {
       // Pending parent approval
   }
 })
@@ -28,6 +27,7 @@ We will use the `hasDeferredTransaction` method:
 InAppPurchase.hasDeferredTransaction(for productIdentifier: String) -> Bool
 ```
 
+<a id="example"></a> 
 ## Example
 Here's an example that covers what has been discussed above. We will update our example `refreshView` function from before:
 

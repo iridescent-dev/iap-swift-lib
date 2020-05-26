@@ -136,26 +136,48 @@
 
 <p>Except if you only sell consumable products, Apple requires that you provide a &ldquo;Restore Purchases&rdquo; button to your users. In general, it is found in your application settings.</p>
 
-<p>Call this method when this button is pressed.</p>
+<p>Call <code>InAppPurchase.restorePurchases()</code> when this button is pressed.</p>
+
+<p><strong>Note</strong>: This function is asynchronous and takes a <code>callback</code> function, called when the operation has been processed.
+From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.</p>
 <pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
-  <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-      <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
-      <span class="k">switch</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
-      <span class="k">case</span> <span class="o">.</span><span class="nv">succeeded</span><span class="p">:</span>
-          <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">addedPurchases</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-              <span class="nf">print</span><span class="p">(</span><span class="s">"Restore purchases successful."</span><span class="p">)</span>
-          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-              <span class="nf">print</span><span class="p">(</span><span class="s">"No purchase to restore."</span><span class="p">)</span>
-          <span class="p">}</span>
-      <span class="k">case</span> <span class="o">.</span><span class="nv">failed</span><span class="p">:</span>
-          <span class="nf">print</span><span class="p">(</span><span class="s">"Restore purchases failed."</span><span class="p">)</span>
-      <span class="p">}</span>
+  <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
+    <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
   <span class="p">})</span>
 <span class="p">}</span>
 </code></pre>
 
-<p>The <code>callback</code> method is called once the operation is complete. You can use it to unlock the UI, by hiding your loader for example, and display the adapted message to the user.</p>
+<p>The callback also gives more information about the outcome of the restoration of purchases, you might want to use it to update your UI as well. So here&rsquo;s a more complete example.</p>
+<pre class="highlight swift"><code><span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+<span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span>
+  <span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
+
+    <span class="k">switch</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nv">succeeded</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">addedPurchases</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="c1">// At least one purchase has been restored.</span>
+        <span class="nf">showResultScreen</span><span class="p">(</span><span class="nv">withRestoredPurchases</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// No purchase to restore.</span>
+        <span class="nf">showResultScreen</span><span class="p">(</span><span class="nv">withRestoredPurchases</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+      <span class="p">}</span>
+
+    <span class="k">case</span> <span class="o">.</span><span class="nv">failed</span><span class="p">:</span>
+      <span class="c1">// Restore purchases failed.</span>
+      <span class="c1">// - More details in result.iapError</span>
+      <span class="nf">showError</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">iapError</span><span class="o">!.</span><span class="n">localizedDescription</span><span class="p">)</span>
+
+    <span class="k">case</span> <span class="o">.</span><span class="nv">skipped</span><span class="p">:</span>
+      <span class="c1">// Refreshing when restoring purchases is never skipped.</span>
+      <span class="k">break</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+</code></pre>
+
+<p>If the purchase fails, <code>result</code> will contain either <code>.skError</code>, a <a href="https://developer.apple.com/documentation/storekit/skerror/code"><code>SKError</code></a> from StoreKit, or <code>.iapError</code>, an <code><a href="Structs/IAPError.html">IAPError</a></code>.</p>
 
           </section>
         </section>

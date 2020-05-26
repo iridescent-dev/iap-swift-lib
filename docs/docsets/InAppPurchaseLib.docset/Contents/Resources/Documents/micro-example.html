@@ -195,8 +195,9 @@
 
     <span class="c1">// Disable the button if the product has already been purchased.</span>
     <span class="k">if</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">hasActivePurchase</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">statusLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"OWNED"</span>
       <span class="n">purchaseButton</span><span class="o">.</span><span class="n">isPointerInteractionEnabled</span> <span class="o">=</span> <span class="kc">false</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">purchaseButton</span><span class="o">.</span><span class="n">isPointerInteractionEnabled</span> <span class="o">=</span> <span class="kc">true</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
@@ -205,7 +206,7 @@
     <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
     <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
       <span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">,</span>
-      <span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+      <span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
         <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
       <span class="p">})</span>
   <span class="p">}</span>
@@ -213,7 +214,7 @@
   <span class="c1">// Restoring purchases</span>
   <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
       <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
     <span class="p">})</span>
   <span class="p">}</span>

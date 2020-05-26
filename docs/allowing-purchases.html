@@ -137,7 +137,7 @@
 <p>In your store screen, where you present your products titles and prices with a purchase button, there are some cases to handle that we skipped. Owned products and deferred purchases.</p>
 <h2 id='owned-products' class='heading'>Owned products</h2>
 
-<p>Non-consumables and active auto-renewing subscriptions cannot be purchased again. You should adjust your UI to reflect that state. Refer to <code>InAppPurchase.hasActivePurchase()</code> to the example later in this section.</p>
+<p>Non-consumables and active auto-renewing subscriptions cannot be purchased again. You should adjust your UI to reflect that state. Refer to <code>InAppPurchase.hasActivePurchase()</code> to the <a href="#example">example</a> later in this section.</p>
 <h2 id='deferred-purchases' class='heading'>Deferred purchases</h2>
 
 <p>Apple&rsquo;s <strong>Ask to Buy</strong> feature lets parents approve any purchases initiated by children, including in-app purchases.</p>
@@ -146,8 +146,7 @@
 <pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
   <span class="nv">productIdentifier</span><span class="p">:</span> <span class="n">productIdentifier</span><span class="p">,</span>
   <span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-    <span class="k">switch</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nv">deferred</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="o">.</span><span class="n">deferred</span> <span class="p">{</span>
       <span class="c1">// Pending parent approval</span>
   <span class="p">}</span>
 <span class="p">})</span>
@@ -158,6 +157,8 @@
 <p>We will use the <code>hasDeferredTransaction</code> method:</p>
 <pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">hasDeferredTransaction</span><span class="p">(</span><span class="k">for</span> <span class="nv">productIdentifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
 </code></pre>
+
+<p><a id="example"></a> </p>
 <h2 id='example' class='heading'>Example</h2>
 
 <p>Here&rsquo;s an example that covers what has been discussed above. We will update our example <code>refreshView</code> function from before:</p>

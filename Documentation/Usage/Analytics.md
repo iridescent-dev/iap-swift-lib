@@ -20,6 +20,7 @@ func makePurchase() {
       case .purchased:
         // Reminder: We are not processing the purchase here, only updating your UI.
         //           That's why we do not send an event to analytics.
+        break
       case .failed:
         Analytics.trackEvent("purchase failed")
       case .deferred:

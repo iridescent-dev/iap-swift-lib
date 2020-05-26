@@ -153,11 +153,12 @@
 </ul>
 <h2 id='initiating-a-purchase' class='heading'>Initiating a purchase</h2>
 
-<p>To initiate a purchase, use the <code>InAppPurchase.purchase()</code> function. It takes the <code>productIdentifier</code> and a <code>callback</code> function, called when the purchase has been processed.</p>
+<p>To initiate a purchase, use the <code>InAppPurchase.purchase()</code> function with the <code>productIdentifier</code>.</p>
 
 <p><strong>Important</strong>: Do not process the purchase here, we&rsquo;ll handle that later!</p>
 
-<p>From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.</p>
+<p><strong>Note</strong>: This function is asynchronous and takes a <code>callback</code> function, called when the purchase has been processed.
+From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.</p>
 <h3 id='strong-example-strong' class='heading'><strong>Example</strong></h3>
 <pre class="highlight swift"><code><span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
 <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
@@ -167,7 +168,7 @@
 <span class="p">})</span>
 </code></pre>
 
-<p>This simple example locks the UI with a loader when the purchase is in progress. We&rsquo;ll see later how the purchase has to be processed by your applicaiton.</p>
+<p>This simple example locks the UI with a loader when the purchase is in progress. We&rsquo;ll see later how the purchase has to be processed by your application.</p>
 
 <p>The callback also gives more information about the outcome of the purchase, you might want to use it to update your UI as well. Note that some events are useful for analytics. So here&rsquo;s a more complete example.</p>
 <pre class="highlight swift"><code><span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
@@ -182,21 +183,25 @@
       <span class="c1">// Reminder: Do not process the purchase here, only update your UI.</span>
       <span class="c1">//           that's why we do not send data to analytics.</span>
       <span class="nf">openThankYouScreen</span><span class="p">()</span>
+
     <span class="k">case</span> <span class="o">.</span><span class="nv">failed</span><span class="p">:</span>
       <span class="c1">// Purchase failed</span>
       <span class="c1">// - Human formated reason can be found in result.localizedDescription</span>
       <span class="c1">// - More details in either result.skError or result.iapError</span>
-      <span class="nf">showError</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+      <span class="nf">showError</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">localizedDescription</span><span class="o">!</span><span class="p">)</span>
+
     <span class="k">case</span> <span class="o">.</span><span class="nv">deferred</span><span class="p">:</span>
       <span class="c1">// The purchase is deferred, waiting for the parent's approval</span>
       <span class="nf">openWaitingParentApprovalScreen</span><span class="p">()</span>
+
     <span class="k">case</span> <span class="o">.</span><span class="nv">cancelled</span><span class="p">:</span>
       <span class="c1">// The user canceled the request, generally only useful for analytics.</span>
+      <span class="k">break</span>
   <span class="p">}</span>
 <span class="p">})</span>
 </code></pre>
 
-<p>If the purchase fails, result will contain either <code>.skError</code>, a <a href="https://developer.apple.com/documentation/storekit/skerror/code"><code>SKError</code></a> from StoreKit, or <code>.iapError</code>, an <a href="errors.html"><code><a href="Structs/IAPError.html">IAPError</a></code></a>.</p>
+<p>If the purchase fails, <code>result</code> will contain either <code>.skError</code>, a <a href="https://developer.apple.com/documentation/storekit/skerror/code"><code>SKError</code></a> from StoreKit, or <code>.iapError</code>, an <code><a href="Structs/IAPError.html">IAPError</a></code>.</p>
 
 <p><em>Tip:</em> After a successful purchase, you should see a new transaction in <a href="https://billing-dashboard.fovea.cc/transactions">Fovea&rsquo;s dashboard</a>.</p>
 

@@ -8,7 +8,7 @@ If you have *consumable* and/or *non-renewing subscription* products in your app
 * Input: the library requires an array of `IAPProduct` when it is initialized.
 
 * Output: the library will returns [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with helpful methods. See the [`SKProduct` extension](Extensions/SKProduct.html).
-  
+
 # Callbacks
 `refresh()`, `purchase()` and `restorePurchases()` are asynchronous functions. You must provide a callback that will allow you to perform actions depending on the result.
 

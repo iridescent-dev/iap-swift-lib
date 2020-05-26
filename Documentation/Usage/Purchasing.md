@@ -12,10 +12,11 @@ That is why the process looks like so:
 - sending purchase request, for which successful doesn't always mean complete
 
 ## Initiating a purchase
-To initiate a purchase, use the `InAppPurchase.purchase()` function. It takes the `productIdentifier` and a `callback` function, called when the purchase has been processed.
+To initiate a purchase, use the `InAppPurchase.purchase()` function with the `productIdentifier`.
 
 **Important**: Do not process the purchase here, we'll handle that later!
 
+**Note**: This function is asynchronous and takes a `callback` function, called when the purchase has been processed.
 From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.
 
 ### **Example**
@@ -29,7 +30,7 @@ InAppPurchase.purchase(
 })
 ```
 
-This simple example locks the UI with a loader when the purchase is in progress. We'll see later how the purchase has to be processed by your applicaiton.
+This simple example locks the UI with a loader when the purchase is in progress. We'll see later how the purchase has to be processed by your application.
 
 The callback also gives more information about the outcome of the purchase, you might want to use it to update your UI as well. Note that some events are useful for analytics. So here's a more complete example.
 
@@ -46,20 +47,24 @@ InAppPurchase.purchase(
       // Reminder: Do not process the purchase here, only update your UI.
       //           that's why we do not send data to analytics.
       openThankYouScreen()
+      
     case .failed:
       // Purchase failed
       // - Human formated reason can be found in result.localizedDescription
       // - More details in either result.skError or result.iapError
-      showError(result.localizedDescription)
+      showError(result.localizedDescription!)
+      
     case .deferred:
       // The purchase is deferred, waiting for the parent's approval
       openWaitingParentApprovalScreen()
+      
     case .cancelled:
       // The user canceled the request, generally only useful for analytics.
+      break
   }
 })
 ```
 
-If the purchase fails, result will contain either `.skError`, a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) from StoreKit, or `.iapError`, an [`IAPError`](errors.html).
+If the purchase fails, `result` will contain either `.skError`, a [`SKError`](https://developer.apple.com/documentation/storekit/skerror/code) from StoreKit, or `.iapError`, an `IAPError`.
 
 *Tip:* After a successful purchase, you should see a new transaction in [Fovea's dashboard](https://billing-dashboard.fovea.cc/transactions).

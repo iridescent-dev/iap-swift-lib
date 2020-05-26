@@ -146,30 +146,22 @@
 <p><a id="non-consumables"></a> </p>
 <h2 id='non-consumables' class='heading'>Non-Consumables</h2>
 
-<p>Wherever your app needs to know if a non-consumable product has been purchased, use <code>InAppPurchase.hasActivePurchase(for: 
-productIdentifier)</code>. This will return true if the user currently owns the product.</p>
+<p>Wherever your app needs to know if a non-consumable product has been purchased, use <code>hasActivePurchase</code> method. This will return true if the user currently owns the product.</p>
+<pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">hasActivePurchase</span><span class="p">(</span><span class="k">for</span> <span class="nv">productIdentifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+</code></pre>
 
-<p><strong>Note:</strong> The last known state for the user&rsquo;s purchases is stored as <a href="https://developer.apple.com/documentation/foundation/userdefaults">UserDefaults</a>. As such, their status is always available to your app, even when offline.</p>
+<p><strong>Note:</strong> The last known state for the user&rsquo;s purchases is stored as <a href="https://developer.apple.com/documentation/foundation/userdefaults">UserDefaults</a>. As such, their status is always available to your app, even when offline. It is updated when the library is initialized, after a purchase or after a refresh.</p>
 
 <p>If you have a server that needs to know about the purchase. You should rely on Fovea&rsquo;s webhook instead of doing anything in here. We will see that later in the <a href="server-integration.html">Server integration</a> section.</p>
 
 <p><a id="auto-renewable-subscriptions"></a> </p>
 <h2 id='auto-renewable-subscriptions' class='heading'>Auto-Renewable Subscriptions</h2>
 
-<p>As with non-consumables, you will use <code>InAppPurchase.hasActivePurchase(for: productIdentifier)</code> to check if the user is an active subscriber to a given product.</p>
+<p>As with <a href="#non-consumables">non-consumables</a>, you will use <code>InAppPurchase.hasActivePurchase()</code> to check if the user is an active subscriber to a given product.</p>
 
-<p>You might also like to call refresh regularly, for example when entering your main view. When appropriate, the library will refresh the receipt to detect subscription renewals or expiry.</p>
+<p>To be sure the state for the user&rsquo;s purchases is up-to-date, you might also like to call <code>InAppPurchase.refresh()</code> regularly, for example when entering your main view. When appropriate, the library will refresh the receipt to detect subscription renewals or expiry.</p>
 
-<p>As we&rsquo;ve seend in the <a href="refreshing.html">Refreshing</a> section:</p>
-<pre class="highlight swift"><code><span class="k">override</span> <span class="kd">func</span> <span class="nf">viewWillAppear</span><span class="p">(</span><span class="n">_</span> <span class="nv">animated</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
-  <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">refresh</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
-      <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
-  <span class="p">})</span>
-<span class="p">}</span>
-</code></pre>
-
-<p><strong>Note:</strong> Don&rsquo;t be reluctant to call <code>refresh()</code> often. Internally, the library ensures heavy operation are only performed if necessary: for example when a subscription just expired. So in 99% of cases this call will result in no-operations.</p>
+<p>As we&rsquo;ve seend in the <a href="refreshing.html">Refreshing</a> section, don&rsquo;t be reluctant to call <code>InAppPurchase.refresh()</code> often. Internally, the library ensures heavy operation are only performed if necessary: for example when a subscription just expired.</p>
 
 <p><a id="consumables"></a></p>
 <h2 id='consumables' class='heading'>Consumables</h2>
@@ -186,8 +178,9 @@ productIdentifier)</code>. This will return true if the user currently owns the 
   <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nv">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">LaunchOptionsKey</span><span class="p">:</span> <span class="kt">Any</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
     <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">initialize</span><span class="p">(</span>
       <span class="nv">iapProducts</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
-      <span class="nv">iapPurchaseDelegate</span><span class="p">:</span> <span class="k">self</span><span class="p">,</span> <span class="c1">// ADDED: iapPurchaseDelegate</span>
-      <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"https://validator.fovea.cc/v1/validate?appName=demo&amp;apiKey=12345678"</span><span class="p">)</span>
+      <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"https://validator.fovea.cc/v1/validate?appName=demo&amp;apiKey=12345678"</span><span class="p">,</span>
+      <span class="nv">iapPurchaseDelegate</span><span class="p">:</span> <span class="k">self</span> <span class="c1">// ADDED: iapPurchaseDelegate</span>
+    <span class="p">)</span>
   <span class="p">}</span>
 
   <span class="c1">// IAPPurchaseDelegate implementation</span>

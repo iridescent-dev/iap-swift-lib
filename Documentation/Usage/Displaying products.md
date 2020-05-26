@@ -7,8 +7,13 @@
 ## Basic Information
 Let's start with the simplest case: you have a single product.
 
-You can retrieve all information about this product using the function `InAppPurchase.getProductBy(identifier: "my_product_id")`. This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with [helpful methods](Extensions/SKProduct.html).
+You can retrieve all information about this product using the function `InAppPurchase.getProductBy()`. 
 
+``` swift
+InAppPurchase.getProductBy(identifier: String) -> SKProduct?
+```
+
+This returns an [SKProduct](https://developer.apple.com/documentation/storekit/skproduct) extended with [helpful methods](Extensions/SKProduct.html).
 Those are the most important:
  - `productIdentifier: String` - The string that identifies the product to the Apple AppStore.
  - `localizedTitle: String` - The name of the product, in the language of the device, as retrieved from the AppStore.
@@ -22,12 +27,12 @@ You can add a function similar to this to your view.
 ``` swift
 @objc func refreshView() {
   guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
-    titleLabel.text = "Product unavailable"
+    self.titleLabel.text = "Product unavailable"
     return
   }
-  titleLabel.text = product.localizedTitle
-  descriptionLabel.text = product.localizedDescription
-  priceLabel.text = product.localizedPrice
+  self.titleLabel.text = product.localizedTitle
+  self.descriptionLabel.text = product.localizedDescription
+  self.priceLabel.text = product.localizedPrice
 }
 ```
 
@@ -37,7 +42,7 @@ Make sure to call this function when the view appears on screen, for instance by
 
 ``` swift
 override func viewWillAppear(_ animated: Bool) {
-  refreshView()
+  self.refreshView()
 }
 ```
 
@@ -47,7 +52,7 @@ For subscription products, you also have some data about subscription periods an
 
  - `func hasIntroductoryPriceEligible() -> Bool` - The product has an introductory price the user is eligible to.
  - `localizedSubscriptionPeriod: String?` - The period of the subscription.
- - `localizedIntroductoryPrice: String?` -  The cost of the introductory offer if available in the local currency.
+ - `localizedIntroductoryPrice: String?` - The cost of the introductory offer if available in the local currency.
  - `localizedIntroductoryPeriod: String?` - The subscription period of the introductory offer.
  - `localizedIntroductoryDuration: String?` - The duration of the introductory offer.
 
@@ -56,11 +61,11 @@ For subscription products, you also have some data about subscription periods an
 ``` swift
 @objc func refreshView() {
   guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
-    titleLabel.text = "Product unavailable"
+    self.titleLabel.text = "Product unavailable"
     return
   }
-  titleLabel.text = product.localizedTitle
-  descriptionLabel.text = product.localizedDescription
+  self.titleLabel.text = product.localizedTitle
+  self.descriptionLabel.text = product.localizedDescription
 
   // Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"
   var priceText = "\(product.localizedPrice) / \(product.localizedSubscriptionPeriod!)"
@@ -73,7 +78,7 @@ For subscription products, you also have some data about subscription periods an
           " for \(product.localizedIntroductoryDuration!) (then \(priceText))"
       }
   }
-  priceLabel.text = priceText
+  self.priceLabel.text = priceText
 }
 ```
 

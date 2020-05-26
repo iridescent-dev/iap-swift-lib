@@ -138,12 +138,13 @@
 
 <p>The information sent from Fovea has been verified from Apple&rsquo;s server, which makes it way more trustable than information sent from your app itself.</p>
 
-<p>To take advantage of this, you have to inform the library of your application username. This <code>applicationUsername</code> can be provided as a parameter of the <code>InAppPurchase.initialize</code> method and updated later by changing the associated property.</p>
+<p>To take advantage of this, you have to inform the library of your application username. This <code>applicationUsername</code> can be provided as a parameter of the <code>InAppPurchase.initialize()</code> method or updated later by changing the associated property.</p>
 <h3 id='strong-example-strong' class='heading'><strong>Example</strong></h3>
 <pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">initialize</span><span class="p">(</span>
   <span class="nv">iapProducts</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
-  <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"..."</span><span class="p">),</span>
-  <span class="nv">applicationUsername</span><span class="p">:</span> <span class="kt">UserSession</span><span class="o">.</span><span class="nf">getUserId</span><span class="p">())</span>
+  <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"..."</span><span class="p">,</span>
+  <span class="nv">applicationUsername</span><span class="p">:</span> <span class="kt">UserSession</span><span class="o">.</span><span class="nf">getUserId</span><span class="p">()</span>
+<span class="p">)</span>
 
 <span class="c1">// later ...</span>
 <span class="kt">InAppPurchase</span><span class="o">.</span><span class="n">applicationUsername</span> <span class="o">=</span> <span class="kt">UserSession</span><span class="o">.</span><span class="nf">getUserId</span><span class="p">()</span>

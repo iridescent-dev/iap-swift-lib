@@ -144,9 +144,12 @@
 
 <p>Let&rsquo;s start with the simplest case: you have a single product.</p>
 
-<p>You can retrieve all information about this product using the function <code>InAppPurchase.getProductBy(identifier: &quot;my_product_id&quot;)</code>. This returns an <a href="https://developer.apple.com/documentation/storekit/skproduct">SKProduct</a> extended with <a href="Extensions/SKProduct.html">helpful methods</a>.</p>
+<p>You can retrieve all information about this product using the function <code>InAppPurchase.getProductBy()</code>. </p>
+<pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">SKProduct</span><span class="p">?</span>
+</code></pre>
 
-<p>Those are the most important:</p>
+<p>This returns an <a href="https://developer.apple.com/documentation/storekit/skproduct">SKProduct</a> extended with <a href="Extensions/SKProduct.html">helpful methods</a>.
+Those are the most important:</p>
 
 <ul>
 <li><code>productIdentifier: String</code> - The string that identifies the product to the Apple AppStore.</li>
@@ -159,12 +162,12 @@
 <p>You can add a function similar to this to your view.</p>
 <pre class="highlight swift"><code><span class="kd">@objc</span> <span class="kd">func</span> <span class="nf">refreshView</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">guard</span> <span class="k">let</span> <span class="nv">product</span><span class="p">:</span> <span class="kt">SKProduct</span> <span class="o">=</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="s">"my_product_id"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"Product unavailable"</span>
+    <span class="k">self</span><span class="o">.</span><span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"Product unavailable"</span>
     <span class="k">return</span>
   <span class="p">}</span>
-  <span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedTitle</span>
-  <span class="n">descriptionLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedDescription</span>
-  <span class="n">priceLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedPrice</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedTitle</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">descriptionLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedDescription</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">priceLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedPrice</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -172,7 +175,7 @@
 
 <p>Make sure to call this function when the view appears on screen, for instance by calling it from <a href="https://developer.apple.com/documentation/uikit/uiviewcontroller/1621510-viewwillappear"><code>viewWillAppear</code></a>.</p>
 <pre class="highlight swift"><code><span class="k">override</span> <span class="kd">func</span> <span class="nf">viewWillAppear</span><span class="p">(</span><span class="n">_</span> <span class="nv">animated</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nf">refreshView</span><span class="p">()</span>
+  <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -184,18 +187,18 @@
 <ul>
 <li><code>func hasIntroductoryPriceEligible() -&gt; Bool</code> - The product has an introductory price the user is eligible to.</li>
 <li><code>localizedSubscriptionPeriod: String?</code> - The period of the subscription.</li>
-<li><code>localizedIntroductoryPrice: String?</code> -  The cost of the introductory offer if available in the local currency.</li>
+<li><code>localizedIntroductoryPrice: String?</code> - The cost of the introductory offer if available in the local currency.</li>
 <li><code>localizedIntroductoryPeriod: String?</code> - The subscription period of the introductory offer.</li>
 <li><code>localizedIntroductoryDuration: String?</code> - The duration of the introductory offer.</li>
 </ul>
 <h3 id='strong-example-strong' class='heading'><strong>Example</strong></h3>
 <pre class="highlight swift"><code><span class="kd">@objc</span> <span class="kd">func</span> <span class="nf">refreshView</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">guard</span> <span class="k">let</span> <span class="nv">product</span><span class="p">:</span> <span class="kt">SKProduct</span> <span class="o">=</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="s">"my_product_id"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"Product unavailable"</span>
+    <span class="k">self</span><span class="o">.</span><span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"Product unavailable"</span>
     <span class="k">return</span>
   <span class="p">}</span>
-  <span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedTitle</span>
-  <span class="n">descriptionLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedDescription</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedTitle</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">descriptionLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedDescription</span>
 
   <span class="c1">// Format price text. Example: "0,99€ / month for 3 months (then 3,99 € / month)"</span>
   <span class="k">var</span> <span class="nv">priceText</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">product</span><span class="o">.</span><span class="n">localizedPrice</span><span class="se">)</span><span class="s"> / </span><span class="se">\(</span><span class="n">product</span><span class="o">.</span><span class="n">localizedSubscriptionPeriod</span><span class="o">!</span><span class="se">)</span><span class="s">"</span>
@@ -208,7 +211,7 @@
           <span class="s">" for </span><span class="se">\(</span><span class="n">product</span><span class="o">.</span><span class="n">localizedIntroductoryDuration</span><span class="o">!</span><span class="se">)</span><span class="s"> (then </span><span class="se">\(</span><span class="n">priceText</span><span class="se">)</span><span class="s">)"</span>
       <span class="p">}</span>
   <span class="p">}</span>
-  <span class="n">priceLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">priceText</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">priceLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">priceText</span>
 <span class="p">}</span>
 </code></pre>
 

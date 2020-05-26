@@ -154,7 +154,7 @@
 <p>A good place is generally in your application delegate&rsquo;s <code>didFinishLaunchingWithOptions</code> function, like below:</p>
 <pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">InAppPurchaseLib</span>
 
-<span class="kd">class</span> <span class="kt">AppDelegate</span><span class="p">:</span> <span class="kt">UIResponder</span><span class="p">,</span> <span class="kt">UIApplicationDelegate</span><span class="p">,</span> <span class="kt">IAPPurchaseDelegate</span> <span class="p">{</span>
+<span class="kd">class</span> <span class="kt">AppDelegate</span><span class="p">:</span> <span class="kt">UIResponder</span><span class="p">,</span> <span class="kt">UIApplicationDelegate</span> <span class="p">{</span>
   <span class="o">...</span>
   <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nv">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">LaunchOptionsKey</span><span class="p">:</span> <span class="kt">Any</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
     <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">initialize</span><span class="p">(</span>
@@ -164,10 +164,6 @@
         <span class="kt">IAPProduct</span><span class="p">(</span><span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"disable_ads"</span><span class="p">,</span>  <span class="nv">productType</span><span class="p">:</span> <span class="o">.</span><span class="n">nonConsumable</span><span class="p">)</span>
       <span class="p">],</span>
       <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"https://validator.fovea.cc/v1/validate?appName=demo&amp;apiKey=12345678"</span><span class="p">)</span>
-  <span class="p">}</span>
-
-  <span class="kd">func</span> <span class="nf">productPurchased</span><span class="p">(</span><span class="nv">productIdentifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// ... process purchase (we'll see that later)</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
