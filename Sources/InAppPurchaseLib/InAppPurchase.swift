@@ -11,7 +11,7 @@ import StoreKit
 /// The main class of the library.
 public class InAppPurchase: NSObject, InAppPurchaseLib {
     /// InAppPurchaseLib version number.
-    internal static let versionNumber = "1.0.2"
+    internal static let versionNumber = "1.0.3"
     /// The initialize function has been called.
     internal static var initialized: Bool {
         return !iapProducts.isEmpty && iapPurchaseDelegate != nil && validatorUrlString != nil
@@ -29,8 +29,18 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
     public static var validatorUrlString: String? = nil
     /// The instance of class that adopts the `IAPPurchaseDelegate` protocol.
     public static var iapPurchaseDelegate: IAPPurchaseDelegate? = nil
+    
+    private static var _applicationUsername: String? = nil
     /// The user name, if your app implements user login.
-    public static var applicationUsername: String? = nil
+    public static var applicationUsername: String? {
+        set {
+            // Force the next refresh if the applicationUsername is changed.
+            lastRefreshDate = (_applicationUsername != newValue) ? nil : lastRefreshDate
+            // Sets the applicationUsername.
+            _applicationUsername = newValue
+        }
+        get { return _applicationUsername }
+    }
     
     
     /* MARK: - Main methods */
