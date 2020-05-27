@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Server integration  Reference</title>
+    <title>Requirements  Reference</title>
     <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,7 +10,7 @@
     
   </head>
   <body>
-    <a title="Server integration  Reference"></a>
+    <a title="Requirements  Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="index.html">InAppPurchaseLib documentation</a> (95% documented)</p>
@@ -21,7 +21,7 @@
       <p id="breadcrumbs">
         <a href="index.html">InAppPurchaseLib Reference</a>
         <img id="carat" src="img/carat.png" />
-        Server integration  Reference
+        Requirements  Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -135,27 +135,22 @@
         <section>
           <section class="section">
             
-            <h1 id='server-integration' class='heading'>Server integration</h1>
+            <h1 id='requirements' class='heading'>Requirements</h1>
 
-<p>In more advanced use cases, you have a server component. Users are logged in and you&rsquo;ll like to unlock the content for this user on your server. The safest approach is to setup a <a href="https://billing.fovea.cc/documentation/webhook/?ref=iap-swift-lib">Webhook on Fovea</a>. You&rsquo;ll receive notifications from Fovea that transaction have been processed and/or subscriptions updated.</p>
+<ul>
+<li>Configure your App and Xcode to support In-App Purchases.
 
-<p>The information sent from Fovea has been verified from Apple&rsquo;s server, which makes it way more trustable than information sent from your app itself.</p>
+<ul>
+<li><a href="https://help.apple.com/app-store-connect/#/devb57be10e7">AppStore Connect Setup</a></li>
+</ul></li>
+<li>Create and configure your <a href="https://billing.fovea.cc/?ref=iap-swift-lib">Fovea.Billing</a> project account:
 
-<p>To take advantage of this, you have to inform the library of your application username. This <code>applicationUsername</code> can be provided as a parameter of the <code>InAppPurchase.initialize()</code> method or updated later by changing the associated property.</p>
-<h3 id='strong-example-strong' class='heading'><strong>Example</strong></h3>
-<pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">initialize</span><span class="p">(</span>
-  <span class="nv">iapProducts</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
-  <span class="nv">validatorUrlString</span><span class="p">:</span> <span class="s">"..."</span><span class="p">,</span>
-  <span class="nv">applicationUsername</span><span class="p">:</span> <span class="kt">UserSession</span><span class="o">.</span><span class="nf">getUserId</span><span class="p">()</span>
-<span class="p">)</span>
-
-<span class="c1">// later ...</span>
-<span class="kt">InAppPurchase</span><span class="o">.</span><span class="n">applicationUsername</span> <span class="o">=</span> <span class="kt">UserSession</span><span class="o">.</span><span class="nf">getUserId</span><span class="p">()</span>
-</code></pre>
-
-<p>If a user account is mandatory in your app, you will want to delay calls to <code>InAppPurchase.initialize()</code> to when your user&rsquo;s session is ready.</p>
-
-<p>Do not hesitate to <a href="mailto:support@fovea.cc">contact Fovea</a> for help.</p>
+<ul>
+<li>Set your bundle ID</li>
+<li>The iOS Shared Secret (or shared key) is to be retrieved from <a href="https://appstoreconnect.apple.com/">AppStoreConnect</a></li>
+<li>The iOS Subscription Status URL (only if you want subscriptions)</li>
+</ul></li>
+</ul>
 
           </section>
         </section>

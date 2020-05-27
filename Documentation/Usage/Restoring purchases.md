@@ -7,12 +7,11 @@ Call `InAppPurchase.restorePurchases()` when this button is pressed.
 From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.
 
 ``` swift
-@IBAction func restorePurchases(_ sender: Any) {
-  self.loaderView.show()
-  InAppPurchase.restorePurchases(callback: { _ in
-    self.loaderView.hide()
-  })
-}
+self.loaderView.show()
+InAppPurchase.restorePurchases(callback: { _ in
+  self.loaderView.hide()
+})
+
 ```
 
 The callback also gives more information about the outcome of the restoration of purchases, you might want to use it to update your UI as well. So here's a more complete example.

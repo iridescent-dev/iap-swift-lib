@@ -52,9 +52,7 @@ InAppPurchase.initialize(
 
 * Stop library when the application will terminate
 ``` swift
-func applicationWillTerminate(_ application: UIApplication) {
-  InAppPurchase.stop()
-}
+InAppPurchase.stop()
 ```
 
 * Display product information
@@ -67,14 +65,12 @@ productPriceLabel.text = product.localizedPrice
 
 * Initialize a purchase
 ``` swift
-@IBAction func purchase(_ sender: Any) {
-  self.loaderView.show()
-  InAppPurchase.purchase(
-    productIdentifier: "my_product",
-    callback: { result in
-      self.loaderView.hide()
-    })
-}
+self.loaderView.show()
+InAppPurchase.purchase(
+  productIdentifier: "my_product",
+  callback: { result in
+    self.loaderView.hide()
+})
 ```
 
 * Unlock purchased content
@@ -86,12 +82,10 @@ if InAppPurchase.hasActivePurchase(for: "my_product") {
 
 * Restore purchases
 ``` swift
-@IBAction func restorePurchases(_ sender: Any) {
-  self.loaderView.show()
-  InAppPurchase.restorePurchases(callback: { result in
-    self.loaderView.hide()
-  })
-}
+self.loaderView.show()
+InAppPurchase.restorePurchases(callback: { result in
+  self.loaderView.hide()
+})
 ```
 
 # Documentation

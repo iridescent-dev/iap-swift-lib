@@ -32,7 +32,7 @@ InAppPurchase.hasDeferredTransaction(for productIdentifier: String) -> Bool
 Here's an example that covers what has been discussed above. We will update our example `refreshView` function from before:
 
 ``` swift
-@objc func refreshView() {
+func refreshView() {
   guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
     titleLabel.text = "Product unavailable"
     return

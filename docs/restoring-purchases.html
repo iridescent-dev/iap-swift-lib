@@ -31,6 +31,9 @@
             <a href="Getting%20Started.html">Getting Started</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="requirements.html">Requirements</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="installation.html">Installation</a>
               </li>
               <li class="nav-group-task">
@@ -140,12 +143,11 @@
 
 <p><strong>Note</strong>: This function is asynchronous and takes a <code>callback</code> function, called when the operation has been processed.
 From this callback, you can for example unlock the UI by hiding your loading indicator and display a message to the user.</p>
-<pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
-  <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
-    <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
-  <span class="p">})</span>
-<span class="p">}</span>
+<pre class="highlight swift"><code><span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+<span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
+<span class="p">})</span>
+
 </code></pre>
 
 <p>The callback also gives more information about the outcome of the restoration of purchases, you might want to use it to update your UI as well. So here&rsquo;s a more complete example.</p>

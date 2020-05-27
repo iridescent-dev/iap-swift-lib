@@ -25,7 +25,7 @@ Those are the most important:
 You can add a function similar to this to your view.
 
 ``` swift
-@objc func refreshView() {
+func refreshView() {
   guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return
@@ -59,7 +59,7 @@ For subscription products, you also have some data about subscription periods an
 ### **Example**
 
 ``` swift
-@objc func refreshView() {
+func refreshView() {
   guard let product: SKProduct = InAppPurchase.getProductBy(identifier: "my_product_id") else {
     self.titleLabel.text = "Product unavailable"
     return

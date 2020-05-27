@@ -49,8 +49,10 @@ class ViewController: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     self.refreshView()
-    InAppPurchase.refresh(callback: { _ in
-      self.refreshView()
+    InAppPurchase.refresh(callback: { result in
+      if result.state == .succeeded {
+        self.refreshView()
+      }
     })
   }
 

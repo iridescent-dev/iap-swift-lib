@@ -31,6 +31,9 @@
             <a href="Getting%20Started.html">Getting Started</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="requirements.html">Requirements</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="installation.html">Installation</a>
               </li>
               <li class="nav-group-task">
@@ -193,9 +196,7 @@
 <span class="p">)</span>
 </code></pre></li>
 <li><p>Stop library when the application will terminate</p>
-<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">applicationWillTerminate</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">)</span> <span class="p">{</span>
-<span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">stop</span><span class="p">()</span>
-<span class="p">}</span>
+<pre class="highlight swift"><code><span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">stop</span><span class="p">()</span>
 </code></pre></li>
 <li><p>Display product information</p>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="k">let</span> <span class="nv">product</span><span class="p">:</span> <span class="kt">SKProduct</span> <span class="o">=</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
@@ -204,14 +205,12 @@
 <span class="n">productPriceLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">localizedPrice</span>
 </code></pre></li>
 <li><p>Initialize a purchase</p>
-<pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">purchase</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
-<span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+<pre class="highlight swift"><code><span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
 <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">purchase</span><span class="p">(</span>
 <span class="nv">productIdentifier</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">,</span>
 <span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-  <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
+<span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
 <span class="p">})</span>
-<span class="p">}</span>
 </code></pre></li>
 <li><p>Unlock purchased content</p>
 <pre class="highlight swift"><code><span class="k">if</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">hasActivePurchase</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="s">"my_product"</span><span class="p">)</span> <span class="p">{</span>
@@ -219,12 +218,10 @@
 <span class="p">}</span>
 </code></pre></li>
 <li><p>Restore purchases</p>
-<pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">restorePurchases</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
-<span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+<pre class="highlight swift"><code><span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
 <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">restorePurchases</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
 <span class="k">self</span><span class="o">.</span><span class="n">loaderView</span><span class="o">.</span><span class="nf">hide</span><span class="p">()</span>
 <span class="p">})</span>
-<span class="p">}</span>
 </code></pre></li>
 </ul>
 <h1 id='documentation' class='heading'>Documentation</h1>

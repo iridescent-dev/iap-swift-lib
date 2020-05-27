@@ -31,6 +31,9 @@
             <a href="Getting%20Started.html">Getting Started</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="requirements.html">Requirements</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="installation.html">Installation</a>
               </li>
               <li class="nav-group-task">
@@ -162,7 +165,7 @@
 <h2 id='example' class='heading'>Example</h2>
 
 <p>Here&rsquo;s an example that covers what has been discussed above. We will update our example <code>refreshView</code> function from before:</p>
-<pre class="highlight swift"><code><span class="kd">@objc</span> <span class="kd">func</span> <span class="nf">refreshView</span><span class="p">()</span> <span class="p">{</span>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">refreshView</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">guard</span> <span class="k">let</span> <span class="nv">product</span><span class="p">:</span> <span class="kt">SKProduct</span> <span class="o">=</span> <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">getProductBy</span><span class="p">(</span><span class="nv">identifier</span><span class="p">:</span> <span class="s">"my_product_id"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
     <span class="n">titleLabel</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">"Product unavailable"</span>
     <span class="k">return</span>

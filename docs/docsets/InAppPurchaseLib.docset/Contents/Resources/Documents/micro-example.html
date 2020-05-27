@@ -31,6 +31,9 @@
             <a href="Getting%20Started.html">Getting Started</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="requirements.html">Requirements</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="installation.html">Installation</a>
               </li>
               <li class="nav-group-task">
@@ -178,8 +181,10 @@
 
   <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewWillAppear</span><span class="p">(</span><span class="n">_</span> <span class="nv">animated</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
-    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">refresh</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
-      <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
+    <span class="kt">InAppPurchase</span><span class="o">.</span><span class="nf">refresh</span><span class="p">(</span><span class="nv">callback</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+      <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="o">.</span><span class="n">succeeded</span> <span class="p">{</span>
+        <span class="k">self</span><span class="o">.</span><span class="nf">refreshView</span><span class="p">()</span>
+      <span class="p">}</span>
     <span class="p">})</span>
   <span class="p">}</span>
 
