@@ -1,5 +1,4 @@
 # Classes and Protocols
-
 The most important class is `InAppPurchase`. All the functions you need are defined in this class.
 
 If you have *consumable* and/or *non-renewing subscription* products in your application, you must have a class that adopts the `IAPPurchaseDelegate` protocol.
