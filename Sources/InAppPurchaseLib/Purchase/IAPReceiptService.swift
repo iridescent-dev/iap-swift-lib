@@ -25,16 +25,21 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
     
     
     /* MARK: - Main methods */
-    // Refresh the App Store Receipt
+    // Validate the App Store Receipt
     func refresh(callback: @escaping IAPRefreshCallback){
+        self.refreshCallbackBlock = callback
+        validateReceipt()
+    }
+    // Refresh the App Store Receipt
+    func forceRefresh(callback: @escaping IAPRefreshCallback){
         self.refreshCallbackBlock = callback
         refreshReceipt()
     }
-    // Refresh the App Store Receipt to validate a purchase.
+    // Validate the App Store Receipt after a purchase.
     func refreshAfterPurchased(callback: @escaping IAPPurchaseCallback, purchasingProductIdentifier: String){
         self.purchaseCallbackBlock = callback
         self.purchaseProductIdentifier = purchasingProductIdentifier
-        refreshReceipt()
+        validateReceipt()
     }
     
     // Checks if the user has already purchased at least one product.
@@ -125,7 +130,7 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
     }
     
     // Validate App Store receipt using Fovea.Billing validator.
-    private func validateReceipt(){
+    private func validateReceipt() {
         guard let appStoreReceiptURL = Bundle.main.appStoreReceiptURL, FileManager.default.fileExists(atPath: appStoreReceiptURL.path) else {
             refreshReceipt() // validateReceipt will be called again after receipt refreshing finishes.
             return

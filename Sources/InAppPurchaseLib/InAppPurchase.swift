@@ -182,8 +182,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
             callback(IAPRefreshResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
             return
         }
-        
-        IAPReceiptService.shared.refresh(callback: callback)
+        IAPReceiptService.shared.forceRefresh(callback: callback)
     }
     
     /// Finish all transactions for the product.
