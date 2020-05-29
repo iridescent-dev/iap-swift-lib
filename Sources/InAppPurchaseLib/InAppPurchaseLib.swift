@@ -31,7 +31,7 @@ public protocol InAppPurchaseLib {
     /// Stop observing the payment queue, when the application will terminate, for proper cleanup.
     static func stop() -> Void
     
-    /// Refresh Product list and user Receipt.
+    /// Load products and refresh the status of purchases and subscriptions.
     /// - Parameter callback: The function that will be called after processing.
     /// - See also:`IAPRefreshResult`
     static func refresh(callback: @escaping IAPRefreshCallback) -> Void

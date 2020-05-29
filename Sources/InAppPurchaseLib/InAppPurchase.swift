@@ -11,7 +11,7 @@ import StoreKit
 /// The main class of the library.
 public class InAppPurchase: NSObject, InAppPurchaseLib {
     /// InAppPurchaseLib version number.
-    internal static let versionNumber = "1.0.3"
+    internal static let versionNumber = "1.0.4"
     /// The initialize function has been called.
     internal static var initialized: Bool {
         return !iapProducts.isEmpty && iapPurchaseDelegate != nil && validatorUrlString != nil
@@ -182,7 +182,7 @@ public class InAppPurchase: NSObject, InAppPurchaseLib {
             callback(IAPRefreshResult(state: .failed, iapError: IAPError(code: .libraryNotInitialized)))
             return
         }
-        IAPReceiptService.shared.forceRefresh(callback: callback)
+        IAPReceiptService.shared.refreshReceipt(callback: callback)
     }
     
     /// Finish all transactions for the product.

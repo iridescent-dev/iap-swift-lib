@@ -25,23 +25,34 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
     
     
     /* MARK: - Main methods */
-    // Validate the App Store Receipt
+    // Refresh the App Store Receipt.
+    func refreshReceipt(callback: @escaping IAPRefreshCallback){
+        self.refreshCallbackBlock = callback
+        refreshAppStoreReceipt()
+    }
+    // Refresh the status of purchases and subscriptions.
     func refresh(callback: @escaping IAPRefreshCallback){
         self.refreshCallbackBlock = callback
-        validateReceipt()
+        validateAppStoreReceipt()
     }
-    // Refresh the App Store Receipt
-    func forceRefresh(callback: @escaping IAPRefreshCallback){
-        self.refreshCallbackBlock = callback
-        refreshReceipt()
-    }
-    // Validate the App Store Receipt after a purchase.
+    // Refresh the status of purchases and subscriptions after a purchase.
     func refreshAfterPurchased(callback: @escaping IAPPurchaseCallback, purchasingProductIdentifier: String){
         self.purchaseCallbackBlock = callback
         self.purchaseProductIdentifier = purchasingProductIdentifier
-        validateReceipt()
+        validateAppStoreReceipt()
     }
     
+    // Refresh is required if a subscription has just expired.
+    func refreshRequired() -> Bool {
+        for productIdentifier in InAppPurchase.iapProducts.filter({ $0.productType == .autoRenewableSubscription }).map({ $0.productIdentifier }) {
+            if hasJustExpiredSubscription(for: productIdentifier) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    // MARK: - Status of purchases and subscriptions
     // Checks if the user has already purchased at least one product.
     func hasAlreadyPurchased() -> Bool{
         return IAPStorageService.getBool(forKey: HAS_ALREADY_PURCHASED_KEY)
@@ -72,17 +83,6 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
         return nextExpiryDate == nil && expiryDate.addingTimeInterval(120) > Date()
     }
     
-    // Refresh is required if a subscription has just expired.
-    func refreshRequired() -> Bool {
-        for productIdentifier in InAppPurchase.iapProducts.filter({ $0.productType == .autoRenewableSubscription }).map({ $0.productIdentifier }) {
-            if hasJustExpiredSubscription(for: productIdentifier) {
-                return true
-            }
-        }
-        return false
-    }
-    
-    
     // Returns the latest purchased date for a given product.
     func getPurchaseDate(for productIdentifier: String) -> Date? {
         return IAPStorageService.getDate(forKey: PURCHASE_DATE_KEY, productIdentifier: productIdentifier)
@@ -103,11 +103,12 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
         return IAPStorageService.getDate(forKey: NEXT_EXPIRY_DATE_KEY, productIdentifier: productIdentifier)
     }
     
+    
     // MARK: - SKReceipt Refresh Request Delegate
     func requestDidFinish(_ request: SKRequest) {
         DispatchQueue.main.async {
             if request is SKReceiptRefreshRequest {
-                self.validateReceipt()
+                self.validateAppStoreReceipt()
             }
         }
     }
@@ -123,16 +124,16 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
     
     
     /* MARK: - Private methods. */
-    private func refreshReceipt() {
+    private func refreshAppStoreReceipt() {
         let request = SKReceiptRefreshRequest(receiptProperties: nil)
         request.delegate = self
         request.start()
     }
     
     // Validate App Store receipt using Fovea.Billing validator.
-    private func validateReceipt() {
+    private func validateAppStoreReceipt() {
         guard let appStoreReceiptURL = Bundle.main.appStoreReceiptURL, FileManager.default.fileExists(atPath: appStoreReceiptURL.path) else {
-            refreshReceipt() // validateReceipt will be called again after receipt refreshing finishes.
+            refreshAppStoreReceipt() // validateReceipt will be called again after receipt refreshing finishes.
             return
         }
         
@@ -193,14 +194,14 @@ class IAPReceiptService: NSObject, SKRequestDelegate {
                         print("[receipt error] Failed to validate the receipt: \(error?.localizedDescription ?? "")")
                         return
                 }
-                self.parseReceipt(json)
+                self.parseBillingResponse(json)
             }
         }.resume()
     }
     
     // Get user purchases informations from Fovea.Billing validator
     // (subscription expiration date, eligibility for introductory price, ...)
-    private func parseReceipt(_ json : Dictionary<String, Any>) {
+    private func parseBillingResponse(_ json : Dictionary<String, Any>) {
         guard let data = json["data"] as? [String: Any], let collection = data["collection"] as? [[String: Any]] else {
             self.notifyFailed(iapErrorCode: .readReceiptFailed)
             return
